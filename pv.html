@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>光伏承包工作台</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+:root {
+  --primary:#1F4E78; --primary-l:#2E75B6; --bg:#f0f2f5; --card:#fff;
+  --text:#333; --gray:#666; --light:#999; --green:#52c41a; --red:#ff4d4f;
+  --orange:#fa8c16; --yellow:#faad14; --border:#e8e8e8;
+  --mat:#fff7e6; --warn:#fff1f0;
+}
+body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; background:var(--bg); color:var(--text); font-size:14px; line-height:1.6; padding-bottom:64px; }
+.header { background:linear-gradient(135deg,#1F4E78,#2E75B6); color:#fff; padding:14px 16px 10px; position:sticky; top:0; z-index:100; box-shadow:0 2px 8px rgba(0,0,0,0.15); }
+.header h1 { font-size:17px; font-weight:600; }
+.header .sub { font-size:11px; opacity:0.9; margin-top:2px; }
+.card { background:var(--card); border-radius:10px; padding:14px; margin:10px 12px; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
+.card-title { font-size:14px; font-weight:600; color:var(--primary); margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; }
+.card-title .badge { font-size:10px; padding:2px 8px; border-radius:10px; background:var(--primary-l); color:#fff; font-weight:400; }
+.btn { display:inline-block; padding:10px 16px; background:var(--primary); color:#fff; border:none; border-radius:8px; font-size:14px; cursor:pointer; }
+.btn:active { opacity:0.8; }
+.btn-block { display:block; width:100%; }
+.btn-green { background:var(--green); }
+.btn-red { background:var(--red); }
+.btn-outline { background:transparent; color:var(--primary); border:1px solid var(--primary); }
+.btn-sm { padding:6px 10px; font-size:12px; }
+.input,.select { width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:14px; background:#fff; }
+.input:focus,.select:focus { outline:none; border-color:var(--primary-l); }
+.label { font-size:12px; color:var(--gray); margin-bottom:4px; display:block; }
+.form-row { margin-bottom:10px; }
+.stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.stat { background:#fff; border-radius:10px; padding:12px; text-align:center; }
+.stat .num { font-size:16px; font-weight:700; }
+.stat .lbl { font-size:11px; color:var(--gray); margin-top:2px; }
+.stat.income .num { color:var(--green); }
+.stat.expense .num { color:var(--red); }
+.stat.balance .num { color:var(--primary); }
+.stat.warn .num { color:var(--orange); }
+.list-item { display:flex; align-items:center; padding:10px 0; border-bottom:1px solid var(--border); }
+.list-item:last-child { border-bottom:none; }
+.list-item .li-main { flex:1; min-width:0; }
+.list-item .li-title { font-size:13px; font-weight:500; }
+.list-item .li-sub { font-size:11px; color:var(--gray); }
+.list-item .li-amount { font-size:14px; font-weight:600; }
+.list-item .li-amount.in { color:var(--green); }
+.list-item .li-amount.out { color:var(--red); }
+.tag { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; margin-right:4px; background:#f0f0f0; }
+.tag.mat { background:#fff7e6; color:#d46b08; }
+.tag.warn { background:#fff1f0; color:#cf1322; }
+.tag.ok { background:#f6ffed; color:#389e0d; }
+.bottom-nav { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid var(--border); display:flex; z-index:100; padding-bottom:env(safe-area-inset-bottom); }
+.nav-item { flex:1; padding:8px 2px; text-align:center; color:var(--gray); cursor:pointer; }
+.nav-item.active { color:var(--primary); }
+.nav-item .nav-icon { font-size:18px; }
+.nav-item .nav-label { font-size:10px; margin-top:2px; }
+.modal-mask { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:200; display:none; align-items:flex-end; justify-content:center; }
+.modal-mask.show { display:flex; }
+.modal { background:#fff; border-radius:12px 12px 0 0; width:100%; max-height:85vh; overflow-y:auto; }
+.modal-header { padding:14px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; background:#fff; }
+.modal-header h3 { font-size:16px; }
+.modal-header .close { font-size:22px; color:var(--gray); cursor:pointer; }
+.modal-body { padding:14px; }
+.toast { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,0.8); color:#fff; padding:10px 20px; border-radius:8px; font-size:14px; z-index:300; display:none; }
+.toast.show { display:block; }
+.empty { text-align:center; padding:30px 20px; color:var(--light); font-size:13px; }
+.empty .emoji { font-size:36px; margin-bottom:6px; }
+.bar-wrap { height:6px; background:#f0f0f0; border-radius:3px; margin:6px 0; overflow:hidden; }
+.bar-fill { height:100%; border-radius:3px; }
+.del-btn { color:var(--red); font-size:18px; margin-left:8px; cursor:pointer; }
+.chart-box { background:#fff; border-radius:10px; padding:12px; margin:10px 12px; }
+.chart-title { font-size:13px; font-weight:600; color:var(--primary); margin-bottom:8px; }
+canvas { width:100%; height:160px; }
+.tab-bar { display:flex; background:#fff; border-bottom:1px solid var(--border); position:sticky; top:48px; z-index:99; overflow-x:auto; }
+.tab-bar .tb { padding:10px 14px; font-size:12px; color:var(--gray); white-space:nowrap; border-bottom:2px solid transparent; cursor:pointer; }
+.tab-bar .tb.active { color:var(--primary); border-bottom-color:var(--primary); font-weight:600; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>光伏承包·垫资管控工作台</h1>
+  <div class="sub" id="todayDate"></div>
+</div>
+
+<div class="bottom-nav" id="bottomNav">
+  <div class="nav-item active" data-page="home"><div class="nav-icon">🏠</div><div class="nav-label">首页</div></div>
+  <div class="nav-item" data-page="progress"><div class="nav-icon">📊</div><div class="nav-label">进度</div></div>
+  <div class="nav-item" data-page="expense"><div class="nav-icon">💸</div><div class="nav-label">支出</div></div>
+  <div class="nav-item" data-page="material"><div class="nav-icon">📦</div><div class="nav-label">耗材</div></div>
+  <div class="nav-item" data-page="more"><div class="nav-icon">⚙️</div><div class="nav-label">更多</div></div>
+</div>
+
+
+
+<!-- ===== 首页 ===== -->
+<div class="page active" id="page-home">
+  <div class="stat-grid">
+    <div class="stat income"><div class="num" id="sContract">0</div><div class="lbl">合同总额</div></div>
+    <div class="stat expense"><div class="num" id="sExpense">0</div><div class="lbl">累计支出</div></div>
+    <div class="stat balance"><div class="num" id="sIncome">0</div><div class="lbl">累计回款</div></div>
+    <div class="stat warn"><div class="num" id="sGap">0</div><div class="lbl">资金缺口</div></div>
+  </div>
+  <div class="stat-grid">
+    <div class="stat"><div class="num" id="sProgress">0%</div><div class="lbl">工程进度</div></div>
+    <div class="stat"><div class="num" id="sAdvance">0</div><div class="lbl">垫资余额</div></div>
+    <div class="stat"><div class="num" id="sLoss">0%</div><div class="lbl">材料损耗率</div></div>
+    <div class="stat"><div class="num" id="sToday">0</div><div class="lbl">今日支出</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">⚠️ 预警提示</div>
+    <div id="warnList"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📈 进度vs支出vs回款</div>
+    <canvas id="chartTrend"></canvas>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🥧 支出类别占比</div>
+    <canvas id="chartPie"></canvas>
+  </div>
+</div>
+
+<!-- ===== 进度页 ===== -->
+<div class="page" id="page-progress">
+  <div class="card">
+    <div class="card-title">每日工程进度 <button class="btn btn-sm" onclick="openProgressModal()">+ 添加</button></div>
+    <div id="progressList"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">累计进度</div>
+    <div class="bar-wrap"><div class="bar-fill" id="progressBar" style="width:0%;background:var(--green);"></div></div>
+    <div style="font-size:12px;color:var(--gray);text-align:center;" id="progressText">0%</div>
+  </div>
+</div>
+
+<!-- ===== 支出页 ===== -->
+<div class="page" id="page-expense">
+  <div class="card">
+    <div class="card-title">每日支出明细 <button class="btn btn-sm" onclick="openExpenseModal()">+ 添加</button></div>
+    <div style="font-size:11px;color:var(--gray);margin-bottom:8px;">按垫资类别细化，每笔追到合同</div>
+    <div id="expenseList"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">按类别汇总</div>
+    <canvas id="chartExpCat"></canvas>
+  </div>
+</div>
+
+<!-- ===== 耗材页 ===== -->
+<div class="page" id="page-material">
+  <div class="card">
+    <div class="card-title">每日耗材损耗 <button class="btn btn-sm" onclick="openMaterialModal()">+ 添加</button></div>
+    <div style="font-size:11px;color:var(--gray);margin-bottom:8px;">计划vs实际，自动算损耗率，>2%红色</div>
+    <div id="materialList"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">各材料损耗率对比</div>
+    <canvas id="chartLoss"></canvas>
+  </div>
+</div>
+
+<!-- ===== 更多页 ===== -->
+<div class="page" id="page-more">
+  <div class="tab-bar">
+    <div class="tb active" data-sub="advance" onclick="switchSub('advance')">垫资管理</div>
+    <div class="tb" data-sub="fund" onclick="switchSub('fund')">资金收支</div>
+    <div class="tb" data-sub="subcontract" onclick="switchSub('subcontract')">分包合同</div>
+    <div class="tb" data-sub="salary" onclick="switchSub('salary')">农民工工资</div>
+    <div class="tb" data-sub="backup" onclick="switchSub('backup')">备份</div>
+  </div>
+  <div id="subContent"></div>
+</div>
+
+<!-- 通用弹窗 -->
+<div class="modal-mask" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">添加</h3>
+      <span class="close" onclick="closeModal()">×</span>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ========== 数据层 ==========
+const KEY = 'pv_workbench_v2';
+let state = {
+  contract: 5000000,
+  costRate: 0.85,
+  records: [],      // 资金收支 {id,type,cat,date,desc,party,amount,tax}
+  progress: [],     // 工程进度 {id,date,area,process,plan,actual,unit,total}
+  expenses: [],     // 支出明细 {id,date,no,desc,party,cat,mat,amount,tax}
+  materials: [],    // 耗材 {id,date,cat,spec,unit,plan,actual,price,supplier,team,note}
+  advances: [],     // 垫资 {id,date,cat,amount,purpose,source,repayDate,rate,repaid}
+  subcontracts: [], // 分包合同 {id,no,party,cat,amount,settled,paid,deposit,status,startEnd,note}
+  salaryFund: [],   // 工资专户流水 {id,date,desc,in,out,handler,approver,note}
+  salaryPay: []     // 工资发放 {id,month,team,count,should,actual,payDate,method,sign,note}
+};
+const LOSS_STD = {'组件':0.003,'支架':0.005,'电缆':0.015,'混凝土':0.02,'螺栓':0.01,'逆变器':0.001,'汇流箱':0.001};
+
+function load() {
+  try { const s = localStorage.getItem(KEY); if(s) Object.assign(state, JSON.parse(s)); } catch(e){}
+}
+function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
+function today() { return new Date().toISOString().slice(0,10); }
+function fmtMoney(n) { return parseFloat(n||0).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmtPct(n) { return (parseFloat(n||0)*100).toFixed(1)+'%'; }
+function toast(m) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); }
+function uid() { return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+
+// ========== 导航 ==========
+document.querySelectorAll('.bottom-nav .nav-item').forEach(it=>{
+  it.addEventListener('click',()=>{
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    it.classList.add('active');
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById('page-'+it.dataset.page).classList.add('active');
+    const p = it.dataset.page;
+    if(p==='home') renderHome();
+    if(p==='progress') renderProgress();
+    if(p==='expense') renderExpense();
+    if(p==='material') renderMaterial();
+    if(p==='more') renderSub('advance');
+  });
+});
+
+// ========== 首页 ==========
+function renderHome() {
+  const expense = state.expenses.reduce((s,e)=>s+e.amount,0);
+  const income = state.records.filter(r=>r.type==='in').reduce((s,r)=>s+r.amount,0);
+  const advance = state.advances.reduce((s,a)=>s+a.amount,0) - state.advances.reduce((s,a)=>s+a.repaid,0);
+  const gap = advance - income;
+  // 进度
+  const totalProgress = state.progress.length ? state.progress.reduce((s,p)=>s+p.actual,0) : 0;
+  const totalQty = state.progress.length ? state.progress[0].total : 0;
+  const pct = totalQty>0 ? totalProgress/totalQty : 0;
+  // 损耗率
+  const matPlan = state.materials.reduce((s,m)=>s+m.plan,0);
+  const matLoss = state.materials.reduce((s,m)=>s+(m.actual-m.plan),0);
+  const lossRate = matPlan>0 ? matLoss/matPlan : 0;
+  const todayExp = state.expenses.filter(e=>e.date===today()).reduce((s,e)=>s+e.amount,0);
+
+  document.getElementById('sContract').textContent = fmtMoney(state.contract);
+  document.getElementById('sExpense').textContent = fmtMoney(expense);
+  document.getElementById('sIncome').textContent = fmtMoney(income);
+  document.getElementById('sGap').textContent = fmtMoney(gap);
+  document.getElementById('sProgress').textContent = fmtPct(pct);
+  document.getElementById('sAdvance').textContent = fmtMoney(advance);
+  document.getElementById('sLoss').textContent = fmtPct(lossRate);
+  document.getElementById('sToday').textContent = fmtMoney(todayExp);
+
+  // 预警
+  const warns = [];
+  if(gap > state.contract*0.3) warns.push({t:'⚠资金缺口超合同30%！立即催收',c:'red'});
+  if(expense > state.contract*state.costRate) warns.push({t:'⚠累计支出超目标成本！查耗材损耗',c:'red'});
+  if(pct<0.5 && expense>0) warns.push({t:'进度<50%垫资高峰期，严控支出',c:'orange'});
+  if(lossRate > 0.02) warns.push({t:'⚠综合材料损耗率>2%！立即排查',c:'red'});
+  state.materials.forEach(m=>{
+    const lr = m.plan>0 ? (m.actual-m.plan)/m.plan : 0;
+    if(lr > (LOSS_STD[m.cat]||0.01)*1.5) warns.push({t:`⚠${m.cat}损耗率${fmtPct(lr)}超标准`,c:'orange'});
+  });
+  state.advances.forEach(a=>{
+    if(a.repayDate && new Date(a.repayDate)<new Date() && a.amount>a.repaid) warns.push({t:`⚠垫资${a.source}逾期未还`,c:'red'});
+  });
+  document.getElementById('warnList').innerHTML = warns.length ? warns.map(w=>`<div style="padding:8px 0;border-bottom:1px solid var(--border);color:var(--${w.c==='red'?'red':'orange'});font-size:13px;font-weight:500;">${w.t}</div>`).join('') : '<div class="empty"><div class="emoji">✅</div>暂无预警</div>';
+
+  drawTrendChart();
+  drawPieChart();
+}
+
+function drawTrendChart() {
+  const cv = document.getElementById('chartTrend');
+  const ctx = cv.getContext('2d');
+  const W = cv.width = cv.offsetWidth*2, H = cv.height = 320;
+  ctx.scale(2,2); ctx.clearRect(0,0,W,H);
+  const w = cv.offsetWidth, h = 160;
+  // 数据：最近7天累计进度/支出率/回款率
+  const days = [];
+  for(let i=6;i>=0;i--){
+    const d = new Date(); d.setDate(d.getDate()-i);
+    const ds = d.toISOString().slice(0,10);
+    const exp = state.expenses.filter(e=>e.date<=ds).reduce((s,e)=>s+e.amount,0);
+    const inc = state.records.filter(r=>r.type==='in'&&r.date<=ds).reduce((s,r)=>s+r.amount,0);
+    const prog = state.progress.filter(p=>p.date<=ds).reduce((s,p)=>s+p.actual,0);
+    const total = state.progress[0]?.total||1;
+    days.push({d:ds.slice(5),prog:prog/total,exp:exp/state.contract,inc:inc/state.contract});
+  }
+  const pad=30;
+  ctx.strokeStyle='#e8e8e8'; ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){ const y=pad+(h-pad*2)*i/4; ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(w-pad,y); ctx.stroke(); }
+  const colors = ['#2E75B6','#ff4d4f','#52c41a'];
+  const labels = ['进度','支出','回款'];
+  const datas = [days.map(d=>d.prog),days.map(d=>d.exp),days.map(d=>d.inc)];
+  datas.forEach((data,idx)=>{
+    ctx.strokeStyle=colors[idx]; ctx.lineWidth=2; ctx.beginPath();
+    data.forEach((v,i)=>{
+      const x = pad + (w-pad*2)*i/6;
+      const y = h-pad - (h-pad*2)*v;
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+    ctx.fillStyle=colors[idx]; ctx.font='10px sans-serif';
+    ctx.fillText(labels[idx], w-pad+2, pad+idx*14);
+  });
+  // x轴
+  ctx.fillStyle='#999'; ctx.font='9px sans-serif'; ctx.textAlign='center';
+  days.forEach((d,i)=>{ const x=pad+(w-pad*2)*i/6; ctx.fillText(d.d, x, h-8); });
+}
+
+function drawPieChart() {
+  const cv = document.getElementById('chartPie');
+  const ctx = cv.getContext('2d');
+  const W = cv.width=cv.offsetWidth*2, H=cv.height=320;
+  ctx.scale(2,2); ctx.clearRect(0,0,W,H);
+  const w=cv.offsetWidth,h=160;
+  const cats = {};
+  state.expenses.forEach(e=>{ cats[e.cat]=(cats[e.cat]||0)+e.amount; });
+  const total = Object.values(cats).reduce((s,v)=>s+v,0);
+  if(total===0){ ctx.fillStyle='#999'; ctx.font='13px sans-serif'; ctx.textAlign='center'; ctx.fillText('暂无支出数据',w/2,h/2); return; }
+  const colors=['#2E75B6','#52c41a','#fa8c16','#ff4d4f','#722ed1','#13c2c2','#eb2f96','#faad14'];
+  const cx=w/2-30, cy=h/2, r=55;
+  let angle=-Math.PI/2;
+  const legend=[];
+  Object.entries(cats).sort((a,b)=>b[1]-a[1]).forEach(([cat,val],i)=>{
+    const ang = val/total*Math.PI*2;
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,r,angle,angle+ang); ctx.closePath();
+    ctx.fillStyle=colors[i%colors.length]; ctx.fill();
+    legend.push({cat,val,pct:val/total,color:colors[i%colors.length]});
+    angle+=ang;
+  });
+  // 图例
+  ctx.font='11px sans-serif'; ctx.textAlign='left';
+  legend.forEach((l,i)=>{
+    const y=20+i*18;
+    ctx.fillStyle=l.color; ctx.fillRect(w-90,y,10,10);
+    ctx.fillStyle='#333'; ctx.fillText(`${l.cat} ${fmtPct(l.pct)}`, w-76, y+9);
+  });
+}
+
+// ========== 进度 ==========
+function renderProgress() {
+  const list = state.progress.sort((a,b)=>b.date.localeCompare(a.date));
+  document.getElementById('progressList').innerHTML = list.length ? list.map(p=>`
+    <div class="list-item">
+      <div class="li-main">
+        <div class="li-title">${p.area} · ${p.process}</div>
+        <div class="li-sub">${p.date} | 计划${p.plan}${p.unit} 实际${p.actual}${p.unit} | ${p.people}人</div>
+      </div>
+      <div class="li-amount" style="color:${p.actual/p.plan>=0.8?'var(--green)':'var(--red)'};">${fmtPct(p.actual/p.plan)}</div>
+      <span class="del-btn" onclick="delProgress('${p.id}')">🗑️</span>
+    </div>`).join('') : '<div class="empty"><div class="emoji">📋</div>暂无进度记录</div>';
+  const total = state.progress[0]?.total||0;
+  const done = state.progress.reduce((s,p)=>s+p.actual,0);
+  const pct = total>0?done/total:0;
+  document.getElementById('progressBar').style.width = (pct*100)+'%';
+  document.getElementById('progressText').textContent = `累计 ${done}/${total} ${fmtPct(pct)}`;
+}
+function openProgressModal() {
+  document.getElementById('modalTitle').textContent = '添加工程进度';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-row"><label class="label">日期</label><input type="date" class="input" id="pDate" value="${today()}"></div>
+    <div class="form-row"><label class="label">施工区域/桩位</label><input type="text" class="input" id="pArea" placeholder="A区1-50号桩"></div>
+    <div class="form-row"><label class="label">施工工序</label><select class="select" id="pProcess"><option>桩基础施工</option><option>支架安装</option><option>组件安装</option><option>逆变器安装</option><option>电缆敷设</option><option>接地施工</option><option>调试并网</option><option>其他</option></select></div>
+    <div style="display:flex;gap:8px;">
+      <div class="form-row" style="flex:1;"><label class="label">计划量</label><input type="number" class="input" id="pPlan" placeholder="50"></div>
+      <div class="form-row" style="flex:1;"><label class="label">实际完成</label><input type="number" class="input" id="pActual" placeholder="48"></div>
+      <div class="form-row" style="flex:0.5;"><label class="label">单位</label><input type="text" class="input" id="pUnit" placeholder="根"></div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <div class="form-row" style="flex:1;"><label class="label">施工人数</label><input type="number" class="input" id="pPeople" placeholder="12"></div>
+      <div class="form-row" style="flex:1;"><label class="label">总工程量</label><input type="number" class="input" id="pTotal" placeholder="500"></div>
+    </div>
+    <button class="btn btn-block" onclick="saveProgress()">保存</button>
+  `;
+  document.getElementById('modal').classList.add('show');
+}
+function saveProgress() {
+  const p = {
+    id: uid(), date: pDate.value, area: pArea.value, process: pProcess.value,
+    plan: +pPlan.value||0, actual: +pActual.value||0, unit: pUnit.value,
+    people: +pPeople.value||0, total: +pTotal.value||0
+  };
+  if(!p.area||!p.actual) { toast('请填写区域和实际完成量'); return; }
+  state.progress.push(p); save(); closeModal(); toast('已添加'); renderProgress();
+}
+function delProgress(id) { if(!confirm('删除？'))return; state.progress=state.progress.filter(p=>p.id!==id); save(); renderProgress(); }
+
+// ========== 支出 ==========
+function renderExpense() {
+  const list = state.expenses.sort((a,b)=>b.date.localeCompare(a.date)).slice(0,30);
+  const icons = {'材料':'📦','人工':'👥','机械':'🚜','运输':'🚚','管理费':'🏢','检测费':'🔬','税费':'🧾','其他':'➖'};
+  document.getElementById('expenseList').innerHTML = list.length ? list.map(e=>`
+    <div class="list-item">
+      <div class="li-main">
+        <div class="li-title">${icons[e.cat]||'📝'} ${e.desc}</div>
+        <div class="li-sub">${e.date} | ${e.cat} | ${e.party}</div>
+      </div>
+      <div class="li-amount out">-${fmtMoney(e.amount)}</div>
+      <span class="del-btn" onclick="delExpense('${e.id}')">🗑️</span>
+    </div>`).join('') : '<div class="empty"><div class="emoji">💸</div>暂无支出记录</div>';
+  drawExpCatChart();
+}
+function drawExpCatChart() {
+  const cv = document.getElementById('chartExpCat');
+  const ctx = cv.getContext('2d');
+  const W = cv.width=cv.offsetWidth*2, H=cv.height=320; ctx.scale(2,2); ctx.clearRect(0,0,W,H);
+  const w=cv.offsetWidth,h=160;
+  const cats = {};
+  state.expenses.forEach(e=>{ cats[e.cat]=(cats[e.cat]||0)+e.amount; });
+  const entries = Object.entries(cats).sort((a,b)=>b[1]-a[1]);
+  if(!entries.length){ ctx.fillStyle='#999'; ctx.font='13px sans-serif'; ctx.textAlign='center'; ctx.fillText('暂无数据',w/2,h/2); return; }
+  const max = Math.max(...entries.map(e=>e[1]));
+  const colors=['#2E75B6','#52c41a','#fa8c16','#ff4d4f','#722ed1','#13c2c2','#eb2f96','#faad14'];
+  const barH = 18, gap=6;
+  entries.forEach(([cat,val],i)=>{
+    const y = 10+i*(barH+gap);
+    ctx.fillStyle=colors[i%colors.length];
+    ctx.fillRect(60, y, (w-140)*val/max, barH);
+    ctx.fillStyle='#333'; ctx.font='11px sans-serif'; ctx.textAlign='right';
+    ctx.fillText(cat, 55, y+13);
+    ctx.textAlign='left'; ctx.fillStyle='#666';
+    ctx.fillText(fmtMoney(val), 60+(w-140)*val/max+4, y+13);
+  });
+}
+function openExpenseModal() {
+  document.getElementById('modalTitle').textContent = '添加支出明细';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-row"><label class="label">日期</label><input type="date" class="input" id="eDate" value="${today()}"></div>
+    <div class="form-row"><label class="label">单据号</label><input type="text" class="input" id="eNo" placeholder="PO-001"></div>
+    <div class="form-row"><label class="label">摘要/事项</label><input type="text" class="input" id="eDesc" placeholder="组件采购540Wp"></div>
+    <div class="form-row"><label class="label">往来单位</label><input type="text" class="input" id="eParty" placeholder="隆基供应商"></div>
+    <div style="display:flex;gap:8px;">
+      <div class="form-row" style="flex:1;"><label class="label">垫资类别</label><select class="select" id="eCat"><option>材料</option><option>人工</option><option>机械</option><option>运输</option><option>管理费</option><option>检测费</option><option>税费</option><option>其他</option></select></div>
+      <div class="form-row" style="flex:1;"><label class="label">材料细类</label><select class="select" id="eMat"><option>组件</option><option>支架</option><option>逆变器</option><option>电缆</option><option>汇流箱</option><option>混凝土</option><option>螺栓</option><option>桩基分包</option><option>支架分包</option><option>挖掘机</option><option>吊车</option><option>其他</option></select></div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <div class="form-row" style="flex:1;"><label class="label">金额(含税)</label><input type="number" class="input" id="eAmount" placeholder="850000" step="0.01"></div>
+      <div class="form-row" style="flex:0.5;"><label class="label">税率</label><select class="select" id="eTax"><option>13%</option><option>9%</option><option>6%</option><option>3%</option><option>1%</option><option>0%</option></select></div>
+    </div>
+    <button class="btn btn-block" onclick="saveExpense()">保存</button>
+  `;
+  document.getElementById('modal').classList.add('show');
+}
+function saveExpense() {
+  const e = {
+    id: uid(), date: eDate.value, no: eNo.value, desc: eDesc.value, party: eParty.value,
+    cat: eCat.value, mat: eMat.value, amount: +eAmount.value||0, tax: eTax.value
+  };
+  if(!e.desc||!e.amount) { toast('请填写摘要和金额'); return; }
+  state.expenses.push(e); save(); closeModal(); toast('已记录'); renderExpense();
+}
+function delExpense(id) { if(!confirm('删除？'))return; state.expenses=state.expenses.filter(e=>e.id!==id); save(); renderExpense(); }
+
+// ========== 耗材 ==========
+function renderMaterial() {
+  const list = state.materials.sort((a,b)=>b.date.localeCompare(a.date));
+  document.getElementById('materialList').innerHTML = list.length ? list.map(m=>{
+    const loss = m.actual-m.plan;
+    const rate = m.plan>0?loss/m.plan:0;
+    const std = LOSS_STD[m.cat]||0.01;
+    const cls = rate>std*1.5?'warn':(rate>std?'mat':'ok');
+    return `<div class="list-item">
+      <div class="li-main">
+        <div class="li-title">${m.cat} ${m.spec} <span class="tag ${cls}">损耗${fmtPct(rate)}</span></div>
+        <div class="li-sub">${m.date} | 计划${m.plan}${m.unit} 实际${m.actual}${m.unit} | ${m.team}</div>
+      </div>
+      <div class="li-amount out">-${fmtMoney(loss*m.price)}</div>
+      <span class="del-btn" onclick="delMaterial('${m.id}')">🗑️</span>
+    </div>`;
+  }).join('') : '<div class="empty"><div class="emoji">📦</div>暂无耗材记录</div>';
+  drawLossChart();
+}
+function drawLossChart() {
+  const cv = document.getElementById('chartLoss');
+  const ctx = cv.getContext('2d');
+  const W = cv.width=cv.offsetWidth*2, H=cv.height=320; ctx.scale(2,2); ctx.clearRect(0,0,W,H);
+  const w=cv.offsetWidth,h=160;
+  const cats = {};
+  state.materials.forEach(m=>{
+    if(!cats[m.cat]) cats[m.cat]={plan:0,actual:0};
+    cats[m.cat].plan+=m.plan; cats[m.cat].actual+=m.actual;
+  });
+  const entries = Object.entries(cats);
+  if(!entries.length){ ctx.fillStyle='#999'; ctx.font='13px sans-serif'; ctx.textAlign='center'; ctx.fillText('暂无数据',w/2,h/2); return; }
+  const mats = entries.map(([c,v])=>({c,rate:v.plan>0?(v.actual-v.plan)/v.plan:0,std:LOSS_STD[c]||0.01}));
+  const maxR = Math.max(...mats.map(m=>Math.max(m.rate,m.std)),0.03);
+  const barH=16,gap=6;
+  mats.forEach((m,i)=>{
+    const y=10+i*(barH*2+gap);
+    ctx.fillStyle='#ff4d4f'; ctx.fillRect(50,y,(w-120)*m.rate/maxR,barH);
+    ctx.fillStyle='#999'; ctx.fillRect(50,y+barH,(w-120)*m.std/maxR,barH);
+    ctx.fillStyle='#333'; ctx.font='11px sans-serif'; ctx.textAlign='right'; ctx.fillText(m.c,45,y+barH-2);
+    ctx.textAlign='left'; ctx.fillStyle='#666'; ctx.fillText(fmtPct(m.rate),50+(w-120)*m.rate/maxR+4,y+12);
+  });
+}
+function openMaterialModal() {
+  document.getElementById('modalTitle').textContent = '添加耗材损耗';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-row"><label class="label">日期</label><input type="date" class="input" id="mDate" value="${today()}"></div>
+    <div style="display:flex;gap:8px;">
+      <div class="form-row" style="flex:1;"><label class="label">材料类别</label><select class="select" id="mCat"><option>组件</option><option>支架</option><option>电缆</option><option>混凝土</option><option>螺栓</option><option>逆变器</option><option>汇流箱</option><option>其他</option></select></div>
+      <div class="form-row" style="flex:1;"><label class="label">规格型号</label><input type="text" class="input" id="mSpec" placeholder="540Wp单晶"></div>
+      <div class="form-row" style="flex:0.5;"><label class="label">单位</label><input type="text" class="input" id="mUnit" placeholder="块"></div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <div class="form-row" style="flex:1;"><label class="label">计划用量</label><input type="number" class="input" id="mPlan" placeholder="1000" step="0.01"></div>
+      <div class="form-row" style="flex:1;"><label class="label">实际用量</label><input type="number" class="input" id="mActual" placeholder="1002" step="0.01"></div>
+      <div class="form-row" style="flex:1;"><label class="label">单价(元)</label><input type="number" class="input" id="mPrice" placeholder="850" step="0.01"></div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <div class="form-row" style="flex:1;"><label class="label">供应商</label><input type="text" class="input" id="mSupplier" placeholder="隆基"></div>
+      <div class="form-row" style="flex:1;"><label class="label">责任班组</label><input type="text" class="input" id="mTeam" placeholder="安装1班"></div>
+    </div>
+    <div class="form-row"><label class="label">备注/原因</label><input type="text" class="input" id="mNote" placeholder="2块破损补料"></div>
+    <button class="btn btn-block" onclick="saveMaterial()">保存</button>
+  `;
+  document.getElementById('modal').classList.add('show');
+}
+function saveMaterial() {
+  const m = {
+    id: uid(), date: mDate.value, cat: mCat.value, spec: mSpec.value, unit: mUnit.value,
+    plan: +mPlan.value||0, actual: +mActual.value||0, price: +mPrice.value||0,
+    supplier: mSupplier.value, team: mTeam.value, note: mNote.value
+  };
+  if(!m.spec||!m.plan) { toast('请填写规格和计划量'); return; }
+  state.materials.push(m); save(); closeModal(); toast('已添加'); renderMaterial();
+}
+function delMaterial(id) { if(!confirm('删除？'))return; state.materials=state.materials.filter(m=>m.id!==id); save(); renderMaterial(); }
+
+// ========== 更多(子页) ==========
+let curSub = 'advance';
+function switchSub(s) {
+  curSub = s;
+  document.querySelectorAll('.tab-bar .tb').forEach(t=>t.classList.toggle('active', t.dataset.sub===s));
+  renderSub(s);
+}
+function renderSub(s) {
+  const el = document.getElementById('subContent');
+  if(s==='advance') el.innerHTML = renderAdvance();
+  if(s==='fund') el.innerHTML = renderFund();
+  if(s==='subcontract') el.innerHTML = renderSubcontract();
+  if(s==='salary') el.innerHTML = renderSalary();
+  if(s==='backup') el.innerHTML = renderBackup();
+}
+function renderAdvance() {
+  const list = state.advances.sort((a,b)=>b.date.localeCompare(a.date));
+  const total = state.advances.reduce((s,a)=>s+a.amount,0);
+  const repaid = state.advances.reduce((s,a)=>s+a.repaid,0);
+  const balance = total-repaid;
+  return `
+    <div class="card"><div class="card-title">垫资余额 <span class="badge">${fmtMoney(balance)}</span></div>
+      <div style="font-size:12px;color:var(--gray);">累计垫资 ${fmtMoney(total)} | 已还 ${fmtMoney(repaid)}</div>
+    </div>
+    <div class="card"><div class="card-title">垫资记录 <button class="btn btn-sm" onclick="openAdvanceModal()">+ 添加</button></div>
+      ${list.length ? list.map(a=>{
+        const over = a.repayDate && new Date(a.repayDate)<new Date() && a.amount>a.repaid;
+        return `<div class="list-item">
+          <div class="li-main">
+            <div class="li-title">${a.source} · ${a.cat} ${over?'<span class="tag warn">逾期</span>':''}</div>
+            <div class="li-sub">${a.date} | ${a.purpose} | 还款${a.repayDate||'-'}</div>
+          </div>
+          <div class="li-amount out">${fmtMoney(a.amount-a.repaid)}</div>
+          <span class="del-btn" onclick="delAdvance('${a.id}')">🗑️</span>
+        </div>`;
+      }).join('') : '<div class="empty"><div class="emoji">💰</div>暂无垫资记录</div>'}
+    </div>`;
+}
+function openAdvanceModal() {
+  document.getElementById('modalTitle').textContent = '添加垫资';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-row"><label class="label">垫资日期</label><input type="date" class="input" id="aDate" value="${today()}"></div>
+    <div style="display:flex;gap:8px;">
+      <div class="form-row" style="flex:1;"><label class="label">垫资类别</label><select class="select" id="aCat"><option>材料采购</option><option>人工工资</option><option>机械租赁</option><option>运输</option><option>管理费</option><option>其他</option></select></div>
+      <div class="form-row" style="flex:1;"><label class="label">资金来源</label><select class="select" id="aSource"><option>自有资金</option><option>银行贷款</option><option>民间借款</option><option>供应商账期</option><option>其他</option></select></div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <div class="form-row" style="flex:1;"><label class="label">垫资金额</label><input type="number" class="input" id="aAmount" step="0.01"></div>
+      <div class="form-row" style="flex:1;"><label class="label">年化利率</label><input type="number" class="input" id="aRate" placeholder="6.5" step="0.1"></div>
+    </div>
+    <div class="form-row"><label class="label">用途</label><input type="text" class="input" id="aPurpose"></div>
+    <div class="form-row"><label class="label">约定还款日</label><input type="date" class="input" id="aRepay"></div>
+    <div class="form-row"><label class="label">已还款金额</label><input type="number" class="input" id="aRepaid" value="0" step="0.01"></div>
+    <button class="btn btn-block" onclick="saveAdvance()">保存</button>`;
+  document.getElementById('modal').classList.add('show');
+}
+function saveAdvance() {
+  const a = {id:uid(),date:aDate.value,cat:aCat.value,source:aSource.value,amount:+aAmount.value||0,purpose:aPurpose.value,repayDate:aRepay.value,rate:(+aRate.value||0)/100,repaid:+aRepaid.value||0};
+  if(!a.amount){toast('请输入金额');return;}
+  state.advances.push(a); save(); closeModal(); toast('已添加'); renderSub('advance');
+}
+function delAdvance(id){if(!confirm('删除？'))return;state.advances=state.advances.filter(a=>a.id!==id);save();renderSub('advance');}
+
+function renderFund() {
+  const list = state.records.sort((a,b)=>b.date.localeCompare(a.date));
+  const inc = state.records.filter(r=>r.type==='in').reduce((s,r)=>s+r.amount,0);
+  const out = state.records.filter(r=>r.type==='out').reduce((s,r)=>s+r.amount,0);
+  return `<div class="card"><div class="card-title">资金结余 <span class="badge">${fmtMoney(inc-out)}</span></div>
+    <div style="font-size:12px;color:var(--gray);">收入 ${fmtMoney(inc)} | 支出 ${fmtMoney(out)}</div></div>
+    <div class="card"><div class="card-title">收支流水 <button class="btn btn-sm" onclick="openFundModal()">+ 添加</button></div>
+    ${list.length?list.map(r=>`<div class="list-item">
+      <div class="li-main"><div class="li-title">${r.desc}</div><div class="li-sub">${r.date} | ${r.cat} | ${r.party}</div></div>
+      <div class="li-amount ${r.type==='in'?'in':'out'}">${r.type==='in'?'+':'-'}${fmtMoney(r.amount)}</div>
+      <span class="del-btn" onclick="delFund('${r.id}')">🗑️</span>
+    </div>`).join(''):'<div class="empty"><div class="emoji">💵</div>暂无记录</div>'}</div>`;
+}
+function openFundModal() {
+  document.getElementById('modalTitle').textContent='添加收支';
+  document.getElementById('modalBody').innerHTML=`
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-green" style="flex:1;" id="fTypeIn" onclick="document.getElementById('fType').value='in';this.className='btn btn-green';document.getElementById('fTypeOut').className='btn btn-outline';">收入(回款)</button>
+      <button class="btn btn-outline" style="flex:1;" id="fTypeOut" onclick="document.getElementById('fType').value='out';this.className='btn btn-red';document.getElementById('fTypeIn').className='btn btn-outline';">支出</button>
+    </div>
+    <input type="hidden" id="fType" value="in">
+    <div class="form-row" style="margin-top:10px;"><label class="label">日期</label><input type="date" class="input" id="fDate" value="${today()}"></div>
+    <div class="form-row"><label class="label">分类</label><select class="select" id="fCat"><option>工程款-预付款</option><option>工程款-进度款</option><option>工程款-并网款</option><option>材料-组件</option><option>人工-分包</option><option>机械-租赁</option><option>其他</option></select></div>
+    <div class="form-row"><label class="label">摘要</label><input type="text" class="input" id="fDesc"></div>
+    <div class="form-row"><label class="label">往来单位</label><input type="text" class="input" id="fParty"></div>
+    <div class="form-row"><label class="label">金额</label><input type="number" class="input" id="fAmount" step="0.01"></div>
+    <button class="btn btn-block" onclick="saveFund()">保存</button>`;
+  document.getElementById('modal').classList.add('show');
+}
+function saveFund() {
+  const r={id:uid(),type:fType.value,date:fDate.value,cat:fCat.value,desc:fDesc.value,party:fParty.value,amount:+fAmount.value||0};
+  if(!r.desc||!r.amount){toast('请填写摘要和金额');return;}
+  state.records.push(r);save();closeModal();toast('已记录');renderSub('fund');
+}
+function delFund(id){if(!confirm('删除？'))return;state.records=state.records.filter(r=>r.id!==id);save();renderSub('fund');}
+
+function renderSubcontract() {
+  const list = state.subcontracts;
+  const total = list.reduce((s,c)=>s+c.amount,0);
+  const paid = list.reduce((s,c)=>s+c.paid,0);
+  return `<div class="card"><div class="card-title">分包合同 <span class="badge">${list.length}份</span></div>
+    <div style="font-size:12px;color:var(--gray);">合同总额 ${fmtMoney(total)} | 已付 ${fmtMoney(paid)} | 欠款 ${fmtMoney(total-paid)}</div></div>
+    <div class="card"><div class="card-title">合同清单 <button class="btn btn-sm" onclick="openSubModal()">+ 添加</button></div>
+    ${list.length?list.map(c=>`<div class="list-item">
+      <div class="li-main"><div class="li-title">${c.party} · ${c.cat} <span class="tag ${c.status==='已终止'?'warn':c.status==='已结算'?'ok':''}">${c.status}</span></div>
+      <div class="li-sub">${c.no} | 合同${fmtMoney(c.amount)} 已付${fmtMoney(c.paid)}</div></div>
+      <div class="li-amount out">${fmtMoney(c.amount-c.paid)}</div>
+      <span class="del-btn" onclick="delSub('${c.id}')">🗑️</span>
+    </div>`).join(''):'<div class="empty"><div class="emoji">📄</div>暂无分包合同</div>'}</div>`;
+}
+function openSubModal() {
+  document.getElementById('modalTitle').textContent='添加分包合同';
+  document.getElementById('modalBody').innerHTML=`
+    <div class="form-row"><label class="label">合同编号</label><input type="text" class="input" id="scNo" placeholder="FB-001"></div>
+    <div class="form-row"><label class="label">分包单位</label><input type="text" class="input" id="scParty"></div>
+    <div style="display:flex;gap:8px;">
+      <div class="form-row" style="flex:1;"><label class="label">分包类别</label><select class="select" id="scCat"><option>桩基础分包</option><option>支架安装分包</option><option>组件安装分包</option><option>电缆敷设分包</option><option>调试并网分包</option><option>其他</option></select></div>
+      <div class="form-row" style="flex:1;"><label class="label">履约状态</label><select class="select" id="scStatus"><option>未开工</option><option>履约中</option><option>已完工</option><option>已结算</option><option>已终止</option></select></div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <div class="form-row" style="flex:1;"><label class="label">合同金额</label><input type="number" class="input" id="scAmount" step="0.01"></div>
+      <div class="form-row" style="flex:1;"><label class="label">已付款</label><input type="number" class="input" id="scPaid" value="0" step="0.01"></div>
+    </div>
+    <div class="form-row"><label class="label">备注</label><input type="text" class="input" id="scNote"></div>
+    <button class="btn btn-block" onclick="saveSub()">保存</button>`;
+  document.getElementById('modal').classList.add('show');
+}
+function saveSub(){
+  const c={id:uid(),no:scNo.value,party:scParty.value,cat:scCat.value,status:scStatus.value,amount:+scAmount.value||0,paid:+scPaid.value||0,note:scNote.value};
+  if(!c.party||!c.amount){toast('请填写单位和金额');return;}
+  state.subcontracts.push(c);save();closeModal();toast('已添加');renderSub('subcontract');
+}
+function delSub(id){if(!confirm('删除？'))return;state.subcontracts=state.subcontracts.filter(c=>c.id!==id);save();renderSub('subcontract');}
+
+function renderSalary() {
+  const fund = state.salaryFund;
+  const balance = fund.reduce((s,f)=>s+(f.in||0)-(f.out||0),0);
+  const payList = state.salaryPay;
+  return `<div class="card"><div class="card-title">工资专户余额 <span class="badge">${fmtMoney(balance)}</span></div>
+    <div style="font-size:12px;color:var(--gray);">${balance<0?'<span style="color:var(--red);">⚠余额不足</span>':'专款专用'}</div></div>
+    <div class="card"><div class="card-title">专户流水 <button class="btn btn-sm" onclick="openFundItemModal()">+ 添加</button></div>
+      ${fund.length?fund.map(f=>`<div class="list-item">
+        <div class="li-main"><div class="li-title">${f.desc}</div><div class="li-sub">${f.date} | ${f.handler}</div></div>
+        <div class="li-amount ${f.in?'in':'out'}">${f.in?'+':'-'}${fmtMoney(f.in||f.out)}</div>
+        <span class="del-btn" onclick="delFundItem('${f.id}')">🗑️</span>
+      </div>`).join(''):'<div class="empty"><div class="emoji">🏦</div>暂无流水</div>'}</div>
+    <div class="card"><div class="card-title">工资发放明细 <button class="btn btn-sm" onclick="openPayModal()">+ 添加</button></div>
+      ${payList.length?payList.map(p=>{
+        const diff=p.should-p.actual;
+        return `<div class="list-item">
+          <div class="li-main"><div class="li-title">${p.team} · ${p.month} ${diff>0?'<span class="tag warn">欠发</span>':'<span class="tag ok">已结清</span>'}</div>
+            <div class="li-sub">应发${fmtMoney(p.should)} 实发${fmtMoney(p.actual)} | ${p.method}</div></div>
+          <span class="del-btn" onclick="delPay('${p.id}')">🗑️</span>
+        </div>`;
+      }).join(''):'<div class="empty">暂无发放记录</div>'}</div>`;
+}
+function openFundItemModal(){
+  document.getElementById('modalTitle').textContent='添加专户流水';
+  document.getElementById('modalBody').innerHTML=`
+    <div class="form-row"><label class="label">日期</label><input type="date" class="input" id="sfDate" value="${today()}"></div>
+    <div class="form-row"><label class="label">摘要</label><input type="text" class="input" id="sfDesc" placeholder="业主拨付/工资发放"></div>
+    <div style="display:flex;gap:8px;">
+      <div class="form-row" style="flex:1;"><label class="label">拨入金额</label><input type="number" class="input" id="sfIn" value="0" step="0.01"></div>
+      <div class="form-row" style="flex:1;"><label class="label">支出金额</label><input type="number" class="input" id="sfOut" value="0" step="0.01"></div>
+    </div>
+    <div class="form-row"><label class="label">经办人</label><input type="text" class="input" id="sfHandler"></div>
+    <button class="btn btn-block" onclick="saveFundItem()">保存</button>`;
+  document.getElementById('modal').classList.add('show');
+}
+function saveFundItem(){
+  const f={id:uid(),date:sfDate.value,desc:sfDesc.value,in:+sfIn.value||0,out:+sfOut.value||0,handler:sfHandler.value};
+  if(!f.desc){toast('请填写摘要');return;}
+  state.salaryFund.push(f);save();closeModal();toast('已添加');renderSub('salary');
+}
+function delFundItem(id){if(!confirm('删除？'))return;state.salaryFund=state.salaryFund.filter(f=>f.id!==id);save();renderSub('salary');}
+function openPayModal(){
+  document.getElementById('modalTitle').textContent='添加工资发放';
+  document.getElementById('modalBody').innerHTML=`
+    <div style="display:flex;gap:8px;">
+      <div class="form-row" style="flex:1;"><label class="label">月份</label><input type="month" class="input" id="spMonth" value="${today().slice(0,7)}"></div>
+      <div class="form-row" style="flex:1;"><label class="label">班组</label><select class="select" id="spTeam"><option>桩基班</option><option>支架安装班</option><option>组件安装班</option><option>电缆班</option><option>调试班</option><option>其他</option></select></div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <div class="form-row" style="flex:1;"><label class="label">人数</label><input type="number" class="input" id="spCount"></div>
+      <div class="form-row" style="flex:1;"><label class="label">应发金额</label><input type="number" class="input" id="spShould" step="0.01"></div>
+      <div class="form-row" style="flex:1;"><label class="label">实发金额</label><input type="number" class="input" id="spActual" step="0.01"></div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <div class="form-row" style="flex:1;"><label class="label">发放日期</label><input type="date" class="input" id="spPayDate" value="${today()}"></div>
+      <div class="form-row" style="flex:1;"><label class="label">发放方式</label><select class="select" id="spMethod"><option>银行代发</option><option>现金发放</option><option>混合</option></select></div>
+    </div>
+    <button class="btn btn-block" onclick="savePay()">保存</button>`;
+  document.getElementById('modal').classList.add('show');
+}
+function savePay(){
+  const p={id:uid(),month:spMonth.value,team:spTeam.value,count:+spCount.value||0,should:+spShould.value||0,actual:+spActual.value||0,payDate:spPayDate.value,method:spMethod.value};
+  if(!p.team||!p.should){toast('请填写班组应发');return;}
+  state.salaryPay.push(p);save();closeModal();toast('已添加');renderSub('salary');
+}
+function delPay(id){if(!confirm('删除？'))return;state.salaryPay=state.salaryPay.filter(p=>p.id!==id);save();renderSub('salary');}
+
+function renderBackup() {
+  return `<div class="card"><div class="card-title">数据备份</div>
+    <div style="font-size:12px;color:var(--gray);margin-bottom:10px;">数据存在手机本地，建议每周导出备份一次</div>
+    <button class="btn btn-outline btn-block" style="margin-bottom:8px;" onclick="exportData()">📤 导出备份</button>
+    <button class="btn btn-outline btn-block" onclick="document.getElementById('impFile').click()">📥 导入备份</button>
+    <input type="file" id="impFile" accept=".json" style="display:none;" onchange="importData(event)">
+  </div>
+  <div class="card"><div class="card-title">项目参数</div>
+    <div class="form-row"><label class="label">合同总额(元)</label><input type="number" class="input" id="setContract" value="${state.contract}" step="0.01"></div>
+    <div class="form-row"><label class="label">目标成本率</label><input type="number" class="input" id="setCostRate" value="${state.costRate*100}" step="0.1"> <span style="font-size:11px;color:var(--gray);">%</span></div>
+    <button class="btn btn-block" onclick="saveSettings()">保存参数</button>
+  </div>
+  <div class="card"><div class="card-title">数据统计</div>
+    <div style="font-size:13px;">
+      <div>📋 进度记录：${state.progress.length} 条</div>
+      <div>💸 支出记录：${state.expenses.length} 条</div>
+      <div>📦 耗材记录：${state.materials.length} 条</div>
+      <div>💰 垫资记录：${state.advances.length} 条</div>
+      <div>📄 分包合同：${state.subcontracts.length} 份</div>
+      <div>🏦 工资流水：${state.salaryFund.length} 条</div>
+      <div>👥 工资发放：${state.salaryPay.length} 条</div>
+    </div>
+  </div>`;
+}
+function saveSettings(){
+  state.contract = +document.getElementById('setContract').value||state.contract;
+  state.costRate = (+document.getElementById('setCostRate').value||85)/100;
+  save(); toast('参数已保存'); renderHome();
+}
+function exportData(){
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=`光伏工作台备份_${today()}.json`; a.click();
+  URL.revokeObjectURL(url); toast('已导出');
+}
+function importData(e){
+  const f=e.target.files[0]; if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{try{Object.assign(state,JSON.parse(ev.target.result));save();toast('导入成功');renderHome();}catch(err){toast('文件格式错误');}};
+  r.readAsText(f);
+}
+
+// ========== 通用 ==========
+function closeModal(){document.getElementById('modal').classList.remove('show');}
+document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal();});
+
+// 初始化
+load();
+document.getElementById('todayDate').textContent = new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
+renderHome();
+</script>
+</body>
+</html>

@@ -1,0 +1,2598 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="个人工作台">
+<meta name="theme-color" content="#1F4E78">
+<title>个人成长工作台</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+:root {
+  --primary:#1F4E78; --primary-l:#2E75B6; --bg:#f5f7fa; --card:#fff;
+  --text:#333; --gray:#666; --light:#999; --green:#52c41a; --red:#ff4d4f;
+  --orange:#fa8c16; --yellow:#faad14; --border:#e8e8e8;
+}
+body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; background:var(--bg); color:var(--text); font-size:14px; line-height:1.6; padding-left:0px; }
+.header { background:linear-gradient(135deg,var(--primary),var(--primary-l)); color:#fff; padding:16px 16px 12px; position:sticky; top:0; z-index:100; box-shadow:0 2px 8px rgba(0,0,0,0.15); }
+.header h1 { font-size:18px; font-weight:600; }
+.header .date { font-size:12px; opacity:0.9; margin-top:2px; }
+.tabs { display:flex; background:#fff; border-bottom:1px solid var(--border); position:sticky; top:54px; z-index:99; }
+.tab { flex:1; padding:12px 4px; text-align:center; font-size:12px; color:var(--gray); border-bottom:2px solid transparent; cursor:pointer; transition:all 0.2s; }
+.tab.active { color:var(--primary); border-bottom-color:var(--primary); font-weight:600; }
+.tab .icon { font-size:20px; display:block; margin-bottom:2px; }
+.page { display:none; padding:12px; }
+.page.active { display:block; animation:pageIn 0.01s ease; }
+@keyframes pageIn { from { opacity:0.99; } to { opacity:1; } }
+
+/* 通用卡片 */
+.card { background:var(--card); border-radius:10px; padding:14px; margin-bottom:12px; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
+.card-title { font-size:15px; font-weight:600; color:var(--primary); margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; }
+.card-title .badge { font-size:11px; padding:2px 8px; border-radius:10px; background:var(--primary-l); color:#fff; font-weight:400; }
+
+/* 按钮 */
+.btn { display:inline-block; padding:10px 16px; background:var(--primary); color:#fff; border:none; border-radius:8px; font-size:14px; cursor:pointer; transition:opacity 0.2s; }
+.btn:active { opacity:0.8; }
+.btn-block { display:block; width:100%; }
+.btn-green { background:var(--green); }
+.btn-red { background:var(--red); }
+.btn-outline { background:transparent; color:var(--primary); border:1px solid var(--primary); }
+.btn-sm { padding:6px 10px; font-size:12px; }
+
+/* 表单 */
+.input, .select, .textarea { width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:16px; background:#fff; -webkit-appearance:none; }
+.input:focus, .select:focus, .textarea:focus { outline:none; border-color:var(--primary-l); box-shadow:0 0 0 2px rgba(46,117,182,0.15); }
+/* 体重统计网格 */
+.wg-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.wg-stats .s { background:#f5f7fa; border-radius:8px; padding:8px 4px; text-align:center; }
+.wg-stats .s .v { font-size:16px; font-weight:700; color:var(--primary); }
+.wg-stats .s .l { font-size:11px; color:var(--gray); margin-top:2px; }
+.label { font-size:12px; color:var(--gray); margin-bottom:4px; display:block; }
+.form-row { margin-bottom:10px; }
+
+/* 统计卡 */
+.stat-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:12px; }
+.stat { background:#fff; border-radius:10px; padding:12px 8px; text-align:center; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
+.stat .num { font-size:18px; font-weight:700; }
+.stat .lbl { font-size:11px; color:var(--gray); margin-top:2px; }
+.stat.income .num { color:var(--green); }
+.stat.expense .num { color:var(--red); }
+.stat.balance .num { color:var(--primary); }
+
+/* 列表 */
+.list-item { display:flex; align-items:center; padding:12px; background:#fff; border-bottom:1px solid var(--border); }
+.list-item:last-child { border-bottom:none; }
+.list-item .icon-circle { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; margin-right:10px; flex-shrink:0; }
+.list-item .content { flex:1; min-width:0; }
+.list-item .title { font-size:14px; font-weight:500; }
+.list-item .sub { font-size:12px; color:var(--gray); }
+.list-item .amount { font-size:15px; font-weight:600; }
+.list-item .amount.in { color:var(--green); }
+.list-item .amount.out { color:var(--red); }
+
+/* 任务卡 */
+.task-card { background:#fff; border-radius:10px; margin-bottom:12px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
+.task-header { padding:14px; display:flex; align-items:center; justify-content:space-between; }
+.task-header .t-info { flex:1; }
+.task-header .t-title { font-size:15px; font-weight:600; }
+.task-header .t-meta { font-size:12px; color:var(--gray); margin-top:2px; }
+.task-header .t-check { width:28px; height:28px; border-radius:50%; border:2px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; flex-shrink:0; }
+.task-header .t-check.done { background:var(--green); border-color:var(--green); color:#fff; }
+.task-body { padding:0 14px 14px; display:none; }
+.task-body.show { display:block; }
+.task-progress { height:6px; background:#f0f0f0; border-radius:3px; margin:8px 0; overflow:hidden; }
+.task-progress .bar { height:100%; background:var(--green); border-radius:3px; transition:width 0.3s; }
+
+/* 视频卡 */
+.video-card { background:#fff; border-radius:8px; margin-bottom:10px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
+.video-card .v-thumb { width:100%; height:140px; background:#000; position:relative; cursor:pointer; }
+.video-card .v-thumb img { width:100%; height:100%; object-fit:cover; }
+.video-card .v-play { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:48px; height:48px; background:rgba(0,0,0,0.6); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; color:#fff; }
+.video-card .v-info { padding:10px; }
+.video-card .v-title { font-size:13px; font-weight:500; line-height:1.4; }
+.video-card .v-meta { font-size:11px; color:var(--gray); margin-top:4px; }
+
+/* 英语对话 */
+.dialog-box { background:#f0f7ff; border-radius:10px; padding:14px; margin-bottom:12px; }
+.dialog-box .scene { font-size:12px; color:var(--primary-l); margin-bottom:8px; font-weight:600; }
+.dialog-line { margin-bottom:12px; }
+.dialog-line .speaker { font-size:12px; color:var(--gray); margin-bottom:2px; }
+.dialog-line .text { font-size:15px; line-height:1.6; }
+.dialog-line .actions { margin-top:6px; display:flex; gap:8px; }
+.dialog-line .act-btn { padding:4px 10px; font-size:12px; border-radius:14px; background:var(--primary); color:#fff; border:none; cursor:pointer; }
+.dialog-line .act-btn.slow { background:var(--orange); }
+
+/* 锻炼动作 */
+.exercise-item { display:flex; gap:10px; padding:10px; background:#f9f9f9; border-radius:8px; margin-bottom:8px; }
+.exercise-item .num { width:24px; height:24px; background:var(--primary); color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0; }
+.exercise-item .desc { flex:1; font-size:13px; }
+.exercise-item .desc b { display:block; margin-bottom:2px; }
+
+
+
+/* 弹窗 */
+.modal-mask { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:200; display:none; align-items:center; justify-content:center; padding:20px; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+.modal-mask.show { display:flex; }
+.modal { background:#fff; border-radius:12px; width:100%; max-width:400px; max-height:80vh; overflow-y:auto; }
+.modal-header { padding:14px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+.modal-header h3 { font-size:16px; }
+.modal-header .close { font-size:20px; color:var(--gray); cursor:pointer; }
+.modal-body { padding:14px; }
+
+/* 提示 */
+.toast { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,0.8); color:#fff; padding:10px 20px; border-radius:8px; font-size:14px; z-index:300; display:none; }
+.toast.show { display:block; }
+
+/* 待办事项 */
+.todo-item { display:flex; align-items:center; padding:12px; background:#fff; border-bottom:1px solid var(--border); }
+.todo-item:last-child { border-bottom:none; }
+.todo-item .todo-check { width:24px; height:24px; border-radius:6px; border:2px solid var(--border); margin-right:10px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; font-size:14px; color:#fff; transition:all 0.2s; }
+.todo-item .todo-check.done { background:var(--green); border-color:var(--green); }
+.todo-item .todo-text { flex:1; font-size:14px; }
+.todo-item .todo-text.done { color:var(--light); text-decoration:line-through; }
+.todo-item .todo-del { margin-left:8px; color:var(--light); font-size:16px; cursor:pointer; }
+.todo-item .todo-priority { font-size:10px; padding:1px 6px; border-radius:4px; margin-left:6px; }
+.todo-priority.high { background:#fff1f0; color:var(--red); }
+.todo-priority.mid { background:#fff7e6; color:var(--orange); }
+.todo-priority.low { background:#f6ffed; color:var(--green); }
+
+/* 子tab */
+.sub-tabs { display:flex; background:#fff; border-bottom:1px solid var(--border); overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.sub-tabs::-webkit-scrollbar { display:none; }
+.sub-tab { padding:10px 14px; font-size:13px; color:var(--gray); white-space:nowrap; cursor:pointer; border-bottom:2px solid transparent; }
+.sub-tab.active { color:var(--primary); border-bottom-color:var(--primary); font-weight:600; }
+.sub-page { display:none; }
+.sub-page.active { display:block; }
+
+/* 新媒体 */
+.nm-topic { background:#fff; border-radius:8px; padding:12px; margin-bottom:10px; border-left:3px solid var(--primary-l); box-shadow:0 1px 3px rgba(0,0,0,0.04); }
+.nm-topic .nm-title { font-size:14px; font-weight:600; line-height:1.5; margin-bottom:6px; }
+.nm-topic .nm-cat { display:inline-block; font-size:10px; padding:2px 8px; border-radius:4px; background:var(--primary-l); color:#fff; margin-right:6px; }
+.nm-topic .nm-copy { float:right; font-size:12px; color:var(--primary); cursor:pointer; padding:2px 8px; border:1px solid var(--primary); border-radius:10px; }
+.nm-formula { background:linear-gradient(135deg,#667eea,#764ba2); color:#fff; border-radius:8px; padding:12px; margin-bottom:10px; }
+.nm-formula .fm-name { font-size:12px; opacity:0.8; margin-bottom:4px; }
+.nm-formula .fm-tpl { font-size:14px; font-weight:600; margin-bottom:6px; }
+.nm-formula .fm-eg { font-size:12px; opacity:0.9; line-height:1.5; }
+.nm-persona { background:#fff; border-radius:8px; padding:14px; margin-bottom:10px; box-shadow:0 1px 3px rgba(0,0,0,0.06); border-top:3px solid var(--orange); }
+.nm-persona .p-name { font-size:15px; font-weight:600; color:var(--orange); margin-bottom:8px; }
+.nm-persona .p-row { font-size:12px; line-height:1.6; margin-bottom:4px; }
+.nm-persona .p-row b { color:var(--primary); }
+
+/* 月份选择 */
+.month-nav { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.month-nav .m-btn { width:32px; height:32px; border-radius:50%; background:#fff; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; }
+
+.empty { text-align:center; padding:40px 20px; color:var(--light); font-size:13px; }
+.empty .emoji { font-size:40px; margin-bottom:8px; }
+.tag { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; margin-right:4px; }
+
+/* ===== 待办事项列表（独立页面） ===== */
+.td-add { display:flex; gap:6px; margin-bottom:10px; }
+.td-add input { flex:1; padding:8px 10px; border:1px solid var(--border); border-radius:8px; font-size:13px; }
+.td-add select { width:64px; border:1px solid var(--border); border-radius:8px; font-size:12px; }
+.td-add button { padding:8px 10px; background:var(--primary); color:#fff; border:none; border-radius:8px; font-size:12px; }
+.td-item { display:flex; align-items:flex-start; padding:9px 4px; border-bottom:1px solid #f0f0f0; }
+.td-item .td-check { width:20px; height:20px; border-radius:5px; border:2px solid var(--border); margin-right:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; font-size:12px; color:#fff; margin-top:1px; }
+.td-item .td-check.done { background:var(--green); border-color:var(--green); }
+.td-item .td-text { flex:1; font-size:13px; line-height:1.4; word-break:break-all; }
+.td-item .td-text.done { color:var(--light); text-decoration:line-through; }
+.td-item .td-pri { font-size:9px; padding:1px 5px; border-radius:3px; margin-left:4px; flex-shrink:0; }
+.td-item .td-pri.high { background:#fff1f0; color:var(--red); }
+.td-item .td-pri.mid { background:#fff7e6; color:var(--orange); }
+.td-item .td-pri.low { background:#f6ffed; color:var(--green); }
+.td-item .td-del { margin-left:6px; color:var(--light); font-size:14px; cursor:pointer; flex-shrink:0; }
+.td-empty { text-align:center; color:var(--light); font-size:13px; padding:30px 10px; }
+.td-empty .emoji { font-size:36px; display:block; margin-bottom:6px; }
+.td-stats { font-size:11px; color:var(--gray); text-align:center; margin-top:8px; }
+
+/* ===== 左侧固定菜单栏 ===== */
+.sidebar { position:sticky; top:0; left:0; height:100vh; width:70px; flex-shrink:0; background:#fff; border-right:1px solid var(--border); z-index:100; display:flex; flex-direction:column; align-items:center; padding-top:12px; padding-bottom:env(safe-area-inset-bottom); box-shadow:2px 0 8px rgba(0,0,0,0.05); }
+.sidebar .sb-logo { width:44px; height:44px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--primary-l)); color:#fff; display:flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:16px; box-shadow:0 3px 10px rgba(31,78,120,0.2); }
+.sidebar .sb-item { width:56px; padding:10px 2px; margin-bottom:6px; border-radius:12px; text-align:center; color:var(--gray); cursor:pointer; transition:all 0.2s; }
+.sidebar .sb-item.active { background:#eaf3ff; color:var(--primary); }
+.sidebar .sb-item .sb-icon { font-size:22px; display:block; }
+.sidebar .sb-item .sb-label { font-size:10px; margin-top:3px; }
+.main-content { flex:1; min-width:0; min-height:100vh; }
+.app-row { display:flex; align-items:flex-start; }
+@media (min-width:768px) {
+  .sidebar { width:160px; align-items:flex-start; padding-left:12px; }
+  .sidebar .sb-item { width:136px; display:flex; align-items:center; gap:10px; padding:10px 12px; text-align:left; }
+  .sidebar .sb-item .sb-icon { font-size:20px; }
+  .sidebar .sb-item .sb-label { font-size:13px; margin-top:0; }
+  .main-content { flex:1; min-width:0; }
+}
+.header { padding-left:0; }
+@media (min-width:768px) { .header { padding-left:0; } }
+
+/* ===== 首页仪表盘 ===== */
+.home-dashboard { min-height:calc(100vh - 70px); padding:14px 14px 30px; background:linear-gradient(180deg,#e8f4ff 0%,#f5f7fa 60%); }
+.home-hero { background:linear-gradient(135deg,var(--primary),var(--primary-l)); border-radius:18px; padding:22px 18px; color:#fff; margin-bottom:16px; position:relative; overflow:hidden; }
+.home-hero .hh-date { font-size:12px; opacity:0.9; margin-bottom:6px; }
+.home-hero .hh-name { font-size:24px; font-weight:700; margin-bottom:8px; }
+.home-hero .hh-quote { font-size:15px; line-height:1.6; opacity:0.95; font-style:italic; max-width:90%; }
+.home-hero .hh-progress { position:absolute; top:18px; right:18px; width:64px; height:64px; border-radius:50%; background:rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; flex-direction:column; }
+.home-hero .hh-progress .p-num { font-size:18px; font-weight:700; }
+.home-hero .hh-progress .p-lbl { font-size:9px; opacity:0.85; }
+.home-section-title { font-size:13px; color:var(--gray); margin:18px 0 10px; font-weight:600; letter-spacing:1px; }
+.home-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.home-card { background:#fff; border-radius:14px; padding:14px; box-shadow:0 2px 8px rgba(0,0,0,0.05); cursor:pointer; transition:transform 0.15s; }
+.home-card:active { transform:scale(0.98); }
+.home-card .hc-icon { width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; margin-bottom:10px; background:#f0f7ff; }
+.home-card .hc-title { font-size:14px; font-weight:600; color:#333; margin-bottom:4px; }
+.home-card .hc-sub { font-size:12px; color:var(--gray); line-height:1.4; }
+.home-card .hc-badge { display:inline-block; margin-top:6px; font-size:10px; padding:2px 8px; border-radius:10px; background:#f6ffed; color:var(--green); }
+
+/* ===== 玫瑰花海 ===== */
+.rose-garden { position:relative; border-radius:16px; overflow:hidden; min-height:140px; background:linear-gradient(180deg,#ffeef5 0%,#fff0f6 40%,#f6ffed 100%); box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+.rose-garden .rose-sky { position:absolute; top:0; left:0; right:0; height:50%; background:radial-gradient(ellipse at 30% 100%, rgba(255,182,193,0.4), transparent 70%); }
+.rose-garden .rose-ground { position:absolute; bottom:0; left:0; right:0; height:28%; background:linear-gradient(180deg,transparent,#86c548 60%); }
+.rose-garden .rose-field { position:relative; display:flex; flex-wrap:wrap; align-items:flex-end; gap:2px; padding:50px 8px 4px; min-height:140px; }
+.rose-flower { font-size:20px; line-height:1; animation:roseBloom 0.5s ease; filter:drop-shadow(0 1px 2px rgba(0,0,0,0.1)); }
+@keyframes roseBloom { 0%{transform:scale(0) rotate(-30deg);opacity:0;} 60%{transform:scale(1.3) rotate(10deg);} 100%{transform:scale(1) rotate(0);opacity:1;} }
+.rose-stats { display:flex; justify-content:space-around; margin-top:8px; font-size:12px; color:var(--gray); }
+.rose-stats .rs-item { text-align:center; }
+.rose-stats .rs-num { font-size:18px; font-weight:700; }
+.rose-stats .rs-rose .rs-num { color:#eb2f96; }
+.rose-stats .rs-today .rs-num { color:var(--green); }
+.rose-stats .rs-streak .rs-num { color:var(--orange); }
+.rose-milestone { text-align:center; font-size:11px; color:var(--gray); margin-top:6px; padding:4px 10px; background:#fff0f6; border-radius:8px; }
+
+/* ===== 宠物养成场景 ===== */
+.pet-scene { position:relative; border-radius:16px; overflow:hidden; height:300px; background:linear-gradient(180deg,#87ceeb 0%,#b0e0e6 40%,#d4f1d4 65%,#a8e065 100%); box-shadow:0 4px 16px rgba(0,0,0,0.1); margin-bottom:12px; }
+.pet-sky { position:absolute; top:0; left:0; right:0; height:55%; }
+.pet-sun { position:absolute; top:25px; right:35px; width:48px; height:48px; border-radius:50%; background:radial-gradient(circle,#fff5a0,#ffd700); box-shadow:0 0 35px #ffd700, 0 0 70px rgba(255,200,0,0.3); animation:sunGlow 3s ease-in-out infinite alternate; }
+.pet-cloud1, .pet-cloud2 { position:absolute; background:rgba(255,255,255,0.9); border-radius:30px; }
+.pet-cloud1 { top:50px; left:20px; width:60px; height:18px; animation:cloudFloat 15s linear infinite; }
+.pet-cloud2 { top:80px; left:200px; width:42px; height:14px; animation:cloudFloat 20s linear infinite reverse; }
+.pet-ground { position:absolute; bottom:0; left:0; right:0; height:35%; background:linear-gradient(180deg,#7ec850 0%,#5ba840 100%); }
+.pet-ground::before { content:''; position:absolute; top:-8px; left:0; right:0; height:16px; background:radial-gradient(ellipse at 50% 100%, #8fde6a, #7ec850); border-radius:50% 50% 0 0; }
+.pet-character { position:absolute; bottom:35px; left:50%; transform:translateX(-50%); font-size:64px; line-height:1; z-index:5; animation:petBounce 2s ease-in-out infinite; filter:drop-shadow(0 6px 8px rgba(0,0,0,0.25)); }
+@keyframes petBounce { 0%,100%{transform:translateX(-50%) translateY(0);} 50%{transform:translateX(-50%) translateY(-8px);} }
+.pet-character.growing { animation:petGrow 0.8s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes petGrow { 0%{transform:translateX(-50%) scale(0.3);opacity:0.5;} 50%{transform:translateX(-50%) scale(1.3);} 100%{transform:translateX(-50%) scale(1);opacity:1;} }
+.pet-name { position:absolute; bottom:14px; left:50%; transform:translateX(-50%); font-size:13px; font-weight:700; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,0.3); white-space:nowrap; }
+.pet-mood { position:absolute; top:15px; left:50%; transform:translateX(-50%); font-size:12px; background:rgba(255,255,255,0.9); padding:4px 12px; border-radius:12px; color:#333; white-space:nowrap; }
+.garden-progress { height:10px; background:#f0f0f0; border-radius:5px; overflow:hidden; }
+.garden-bar { height:100%; background:linear-gradient(90deg,#ff9a56,#ff6b9d); border-radius:5px; transition:width 0.5s ease; }
+
+</style>
+<link rel="apple-touch-icon" href="data:image/png;base64,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">
+</head>
+<body>
+
+
+<!-- 左侧固定菜单栏 -->
+<div class="app-row">
+<div class="sidebar" id="sidebar">
+  <div class="sb-logo">🌟</div>
+  <div class="sb-item active" data-page="home"><span class="sb-icon">🏠</span><span class="sb-label">首页</span></div>
+  <div class="sb-item" data-page="finance"><span class="sb-icon">📈</span><span class="sb-label">理财规划</span></div>
+  <div class="sb-item" data-page="todo"><span class="sb-icon">📋</span><span class="sb-label">今日待办</span></div>
+  <div class="sb-item" data-page="learn"><span class="sb-icon">📖</span><span class="sb-label">学习</span></div>
+  <div class="sb-item" data-page="fitness"><span class="sb-icon">💪</span><span class="sb-label">健身运动</span></div>
+  <div class="sb-item" data-page="dress"><span class="sb-icon">👗</span><span class="sb-label">穿搭达人</span></div>
+  <div class="sb-item" data-page="newmedia"><span class="sb-icon">📱</span><span class="sb-label">新媒体</span></div>
+  <div class="sb-item" data-page="garden"><span class="sb-icon">🐾</span><span class="sb-label">宠物</span></div>
+  <div class="sb-item" data-page="stats"><span class="sb-icon">📊</span><span class="sb-label">统计</span></div>
+</div>
+
+<div class="main-content">
+
+<!-- ===== 首页仪表盘 ===== -->
+<div class="page active" id="page-home">
+  <div class="home-dashboard">
+    <div class="home-hero">
+      <div class="hh-date" id="homeDate">7月27日 · 周一</div>
+      <div class="hh-name">嗨，Echo</div>
+      <div class="hh-quote" id="homeQuote">路漫漫其修远兮，吾将上下而求索。</div>
+      <div class="hh-progress">
+        <div class="p-num" id="homePct">0%</div>
+        <div class="p-lbl">今日进度</div>
+      </div>
+    </div>
+
+    <div class="home-section-title">今日完成情况</div>
+    <div class="home-grid">
+      <div class="home-card" onclick="switchPage('finance')">
+        <div class="hc-icon" style="background:#fff7e6;">📈</div>
+        <div class="hc-title">今日记账</div>
+        <div class="hc-sub" id="hc-finance">记录今天的一笔收支</div>
+      </div>
+      <div class="home-card" onclick="switchPage('learn')">
+        <div class="hc-icon" style="background:#f0f7ff;">📖</div>
+        <div class="hc-title">技能学习</div>
+        <div class="hc-sub" id="hc-learn">英语 / AI / 自媒体</div>
+        <span class="hc-badge" id="hc-learn-badge">0/4 完成</span>
+      </div>
+      <div class="home-card" onclick="switchPage('todo')">
+        <div class="hc-icon" style="background:#f6ffed;">✅</div>
+        <div class="hc-title">今日待办</div>
+        <div class="hc-sub" id="hc-todo">还没有添加待办</div>
+      </div>
+      <div class="home-card" onclick="switchPage('newmedia')">
+        <div class="hc-icon" style="background:#fff0f6;">📱</div>
+        <div class="hc-title">新媒体副业</div>
+        <div class="hc-sub" id="hc-newmedia">今日热门选题与模板</div>
+      </div>
+      <div class="home-card" onclick="switchPage('fitness')">
+        <div class="hc-icon" style="background:#e6fffb;">💪</div>
+        <div class="hc-title">健身运动</div>
+        <div class="hc-sub" id="hc-fitness">欧阳春晓 / 帕梅拉</div>
+      </div>
+      <div class="home-card" onclick="switchPage('stats')">
+        <div class="hc-icon" style="background:#f6ffed;">📊</div>
+        <div class="hc-title">数据复盘</div>
+        <div class="hc-sub" id="hc-stats">查看本周完成趋势</div>
+      </div>
+      <div class="home-card" onclick="switchPage('fitness')">
+        <div class="hc-icon" style="background:#fff2f0;">⚖️</div>
+        <div class="hc-title">今日体重</div>
+        <div class="hc-sub" id="hc-weight">记录今日体重</div>
+      </div>
+      <div class="home-card" onclick="switchPage('finance')">
+        <div class="hc-icon" style="background:#fff2e8;">🎯</div>
+        <div class="hc-title">年度理财</div>
+        <div class="hc-sub" id="hc-goal">设定年度目标</div>
+      </div>
+    </div>
+
+    <div id="appVersion" style="text-align:center;font-size:11px;color:var(--light);margin-top:18px;"></div>
+  </div>
+</div>
+
+
+<!-- ===== 理财规划页 ===== -->
+<div class="page" id="page-finance">
+  <div class="card">
+    <div class="card-title">📊 年度理财计划 <span class="badge" id="goalYear"></span></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <div style="font-size:13px;color:var(--gray);">年度结余目标达成</div>
+      <div style="font-size:18px;font-weight:700;color:var(--primary);" id="saveRate">0%</div>
+    </div>
+    <div class="task-progress" style="height:10px;"><div class="bar" id="saveBar" style="width:0%"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--gray);margin-top:8px;">
+      <span>已攒 <b id="saveDone" style="color:var(--green);">¥0</b></span>
+      <span>目标 <b id="saveGoal" style="color:var(--primary);">¥0</b></span>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:12px;">
+      <button class="btn btn-sm btn-outline" style="flex:1;" onclick="setFinanceGoal()">⚙️ 设定目标</button>
+      <button class="btn btn-sm btn-outline" style="flex:1;" onclick="setMonthlyPlan()">📅 月计划</button>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat income"><div class="num" id="yearIncome">0</div><div class="lbl">年度累计收入</div></div>
+    <div class="stat expense"><div class="num" id="yearExpense">0</div><div class="lbl">年度累计支出</div></div>
+    <div class="stat balance"><div class="num" id="yearBalance">0</div><div class="lbl">年度结余</div></div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat income"><div class="num" id="monthIncome">0</div><div class="lbl">本月收入</div></div>
+    <div class="stat expense"><div class="num" id="monthExpense">0</div><div class="lbl">本月支出</div></div>
+    <div class="stat balance"><div class="num" id="monthBalance">0</div><div class="lbl">本月结余</div></div>
+  </div>
+
+  <div class="month-nav">
+    <div class="m-btn" onclick="changeMonth(-1)">‹</div>
+    <div class="m-label" id="monthLabel"></div>
+    <div class="m-btn" onclick="changeMonth(1)">›</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">今日记录 <span class="badge" id="todayCount">0笔</span></div>
+    <div id="todayList"></div>
+    <button class="btn btn-block" style="margin-top:10px;" onclick="openRecordModal()">+ 添加收支</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">本月明细</div>
+    <div id="monthList"></div>
+  </div>
+</div>
+
+<!-- ===== 待办事项（已移至左侧抽屉，此容器保留统计功能） ===== -->
+<div style="display:none;">
+  <div id="todoPending">0</div>
+  <div id="todoDone">0</div>
+  <div id="todoRate">0%</div>
+  <div id="todoList"></div>
+  <div id="todoWeekView"></div>
+  <div id="todoCount">0项</div>
+  <div id="todoDateBadge"></div>
+  <input type="text" id="todoInput">
+  <select id="todoPriority"></select>
+</div>
+
+<!-- ===== 学习页（子tab: 英语/锻炼/管理/知识） ===== -->
+<div class="page" id="page-learn">
+  <div class="sub-tabs" id="learnSubTabs">
+    <div class="sub-tab active" data-sub="english">🗣️ 英语口语</div>
+    <div class="sub-tab" data-sub="manage">📚 管理学习</div>
+    <div class="sub-tab" data-sub="knowledge">🏛️ 知识学习</div>
+  </div>
+
+  <!-- 英语口语 -->
+  <div class="sub-page active" id="sub-english">
+    <div class="card">
+      <div class="card-title">今日任务 <span class="badge" id="engBadge">未完成</span></div>
+      <div style="font-size:13px;color:var(--gray);margin-bottom:8px;">每日30分钟 · 日常交流场景 · 点标准发音跟读</div>
+      <div class="task-progress"><div class="bar" id="engBar" style="width:0%"></div></div>
+      <button class="btn btn-block btn-green" id="engDoneBtn" onclick="completeTask('english')">完成今日学习</button>
+    </div>
+    <div class="card">
+      <div class="card-title">今日对话场景</div>
+      <div id="dialogContent"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">场景切换</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;" id="sceneTags"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">推荐学习视频</div>
+      <div id="engVideos"></div>
+    </div>
+  </div>
+
+  <!-- 管理学习 -->
+  <div class="sub-page" id="sub-manage">
+    <div class="card">
+      <div class="card-title">今日任务 <span class="badge" id="mngBadge">未完成</span></div>
+      <div style="font-size:13px;color:var(--gray);margin-bottom:8px;">每日20分钟 · 历史+现代管理 · 团队+向上管理</div>
+      <div class="task-progress"><div class="bar" id="mngBar" style="width:0%"></div></div>
+      <button class="btn btn-block btn-green" id="mngDoneBtn" onclick="completeTask('manage')">完成今日学习</button>
+    </div>
+    <div class="card">
+      <div class="card-title">今日学习要点</div>
+      <div id="manageTip"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">推荐学习视频</div>
+      <div id="mngVideos"></div>
+    </div>
+  </div>
+
+  <!-- 知识学习 -->
+  <div class="sub-page" id="sub-knowledge">
+    <div class="card">
+      <div class="card-title">今日任务 <span class="badge" id="knowBadge">未完成</span></div>
+      <div style="font-size:13px;color:var(--gray);margin-bottom:8px;">每日20分钟 · 历史朝代/人物/圆桌派/十三邀/辩论赛</div>
+      <div class="task-progress"><div class="bar" id="knowBar" style="width:0%"></div></div>
+      <button class="btn btn-block btn-green" id="knowDoneBtn" onclick="completeTask('knowledge')">完成今日学习</button>
+    </div>
+    <div class="card">
+      <div class="card-title">📖 今日推荐</div>
+      <div id="knowDaily"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🏛️ 历史朝代</div>
+      <div id="knowHistory"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">👤 历史人物</div>
+      <div id="knowFigure"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🟢 圆桌派</div>
+      <div id="knowRoundtable"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🎯 十三邀</div>
+      <div id="knowThirteen"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">⚡ 辩论赛</div>
+      <div id="knowDebate"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 新媒体副业页 ===== -->
+<!-- ===== 穿搭达人页 ===== -->
+<div class="page" id="page-dress">
+  <div class="card">
+    <div class="card-title">👗 穿搭达人 · 方圆脸157女生</div>
+    <div style="font-size:12px;color:var(--gray);line-height:1.6;">专属方圆脸型 + 157cm 小个子的饰品 / 妆容 / 穿搭 / 发型视频推荐，每天变美一点点 ✨</div>
+  </div>
+  <div class="card">
+    <div class="card-title">💍 饰品推荐</div>
+    <div id="dressJewelry"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">💄 妆容教程</div>
+    <div id="dressMakeup"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">👚 穿搭技巧</div>
+    <div id="dressWear"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">💇 发型推荐</div>
+    <div id="dressHair"></div>
+  </div>
+</div>
+
+<div class="page" id="page-newmedia">
+  <div class="card" style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;">
+    <div style="font-size:16px;font-weight:600;margin-bottom:4px;">📱 新媒体副业 · 30岁清醒女孩计划</div>
+    <div style="font-size:12px;opacity:0.85;">每日可复制的爆款选题 · 人设定位 · 标题公式 · 起号指南</div>
+  </div>
+
+  <div class="sub-tabs" id="nmSubTabs">
+    <div class="sub-tab active" data-sub="nm-daily">🔥 今日选题</div>
+    <div class="sub-tab" data-sub="nm-persona">🎯 人设定位</div>
+    <div class="sub-tab" data-sub="nm-topics">📝 选题库</div>
+    <div class="sub-tab" data-sub="nm-formula">⚡ 标题公式</div>
+    <div class="sub-tab" data-sub="nm-guide">📚 起号指南</div>
+  </div>
+
+  <div class="sub-page active" id="sub-nm-daily">
+    <div class="card">
+      <div class="card-title">今日推送 <span class="badge" id="nmDailyBadge"></span></div>
+      <div id="nmDailyContent"></div>
+    </div>
+  </div>
+
+  <div class="sub-page" id="sub-nm-persona">
+    <div class="card">
+      <div class="card-title">5个人设方向</div>
+      <div id="nmPersonaList"></div>
+    </div>
+  </div>
+
+  <div class="sub-page" id="sub-nm-topics">
+    <div class="card">
+      <div class="card-title">爆款选题模板库</div>
+      <div style="font-size:12px;color:var(--gray);margin-bottom:10px;">点击选题可复制到剪贴板</div>
+      <div id="nmTopicList"></div>
+    </div>
+  </div>
+
+  <div class="sub-page" id="sub-nm-formula">
+    <div class="card">
+      <div class="card-title">10个爆款标题公式</div>
+      <div id="nmFormulaList"></div>
+    </div>
+  </div>
+
+  <div class="sub-page" id="sub-nm-guide">
+    <div class="card">
+      <div class="card-title">新手起号30天计划</div>
+      <div id="nmGuideList"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===== 今日待办页 ===== -->
+<div class="page" id="page-todo">
+  <div class="card">
+    <div class="card-title">📋 今日待办 <span class="badge" id="todoPageStats">0/0</span></div>
+    <div style="display:flex;gap:6px;margin-bottom:10px;">
+      <input type="text" id="todoPageInput" class="input" placeholder="添加今日待办..." onkeypress="if(event.key==='Enter')addPageTodo()">
+      <select id="todoPagePriority" class="select" style="width:72px;"><option value="low">低</option><option value="mid" selected>中</option><option value="high">高</option></select>
+      <button class="btn" onclick="addPageTodo()">+</button>
+    </div>
+    <div id="todoPageList"></div>
+    <div id="todoFeedback" style="font-size:14px;color:var(--green);min-height:20px;margin-top:4px;"></div>
+    <div style="margin-top:10px;"><button class="btn btn-sm btn-outline btn-block" onclick="clearDoneTodos()">🗑️ 清除已完成</button></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🎁 完成任务赚积分 <span class="badge" id="rewardPoints">0</span></div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;">
+      <div style="flex:1;text-align:center;background:#f6ffed;border-radius:8px;padding:8px;"><div style="font-size:11px;color:var(--gray);">今日获得</div><div style="font-size:18px;font-weight:700;color:var(--green);" id="rewardToday">0</div></div>
+      <div style="flex:1;text-align:center;background:#fff7e6;border-radius:8px;padding:8px;"><div style="font-size:11px;color:var(--gray);">连续全完成</div><div style="font-size:18px;font-weight:700;color:var(--orange);" id="rewardStreak">🔥0天</div></div>
+    </div>
+    <div style="font-size:12px;color:var(--gray);margin-bottom:6px;">用积分兑换你的小确幸：</div>
+    <div id="rewardList"></div>
+    <button class="btn btn-sm btn-outline btn-block" style="margin-top:8px;" onclick="openRewardModal()">+ 添加心愿奖励</button>
+  </div>
+</div>
+
+<!-- ===== 健身运动页 ===== -->
+<div class="page" id="page-fitness">
+  <div class="card">
+    <div class="card-title">今日打卡 <span class="badge" id="fitBadge">未完成</span></div>
+    <div style="font-size:13px;color:var(--gray);margin-bottom:8px;">每日30分钟 · 欧阳春晓 / 帕梅拉 · 全身/肩背/腰腹/瘦腿</div>
+    <div class="task-progress"><div class="bar" id="fitBar" style="width:0%"></div></div>
+    <button class="btn btn-block btn-green" id="fitDoneBtn" onclick="completeTask('fitness')">完成今日运动打卡</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">每日体重记录</div>
+    <div style="display:flex;gap:8px;margin-bottom:4px;">
+      <input type="number" step="0.1" id="weightInput" class="input" placeholder="今日体重(kg)" style="flex:1;">
+      <button class="btn" onclick="addWeight()">记录</button>
+    </div>
+    <div id="weightFeedback" style="font-size:14px;color:var(--green);min-height:20px;margin-bottom:8px;"></div>
+    <div id="weightHistory" style="max-height:160px;overflow-y:auto;"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🎯 体重目标 <button class="btn btn-sm btn-outline" style="float:right;margin-top:-2px;" onclick="openWeightGoal()">设目标</button></div>
+    <div id="weightGoalStat" style="font-size:13px;color:var(--gray);margin-bottom:10px;">还没设定目标体重</div>
+    <div class="wg-stats" id="weightStats"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📉 体重走势（全程）</div>
+    <div id="weightChart" style="margin:6px 0 12px;"></div>
+    <div style="font-size:12px;color:var(--gray);" id="weightMonthStat"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">推荐跟练视频</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+      <span class="tag" style="background:#e6f7ff;color:var(--primary-l);">全身燃脂</span>
+      <span class="tag" style="background:#fff7e6;color:var(--orange);">瘦肩背</span>
+      <span class="tag" style="background:#f6ffed;color:var(--green);">腰腹</span>
+      <span class="tag" style="background:#fff0f6;color:#eb2f96;">瘦腿</span>
+    </div>
+    <div id="fitnessVideos"></div>
+  </div>
+</div>
+
+<!-- ===== 宠物养成页 ===== -->
+<div class="page" id="page-garden">
+  <div class="pet-scene" id="petScene">
+    <div class="pet-sky">
+      <div class="pet-sun"></div>
+      <div class="pet-cloud1"></div>
+      <div class="pet-cloud2"></div>
+    </div>
+    <div class="pet-ground"></div>
+    <div class="pet-character" id="petCharacter">🥚</div>
+    <div class="pet-name" id="petName">小可爱</div>
+    <div class="pet-mood" id="petMood">💤 还在蛋里...</div>
+  </div>
+  <div class="card">
+    <div class="card-title">🐾 成长进度 <span class="badge" id="petStage">蛋</span></div>
+    <div class="garden-progress"><div class="garden-bar" id="petBar" style="width:0%"></div></div>
+    <div style="font-size:12px;color:var(--gray);margin-top:6px;" id="petProgressText">完成打卡让宠物成长</div>
+  </div>
+  <div class="card">
+    <div class="card-title">📊 宠物状态</div>
+    <div class="wg-stats" id="petStats"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">🍽️ 今日喂养</div>
+    <div id="petTodayList" style="max-height:200px;overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- ===== 统计页 ===== -->
+<div class="page" id="page-stats">
+  <div class="card">
+    <div class="card-title">本周任务完成情况</div>
+    <div id="weekTasks"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">本月收支分类</div>
+    <div id="categoryStats"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">数据管理</div>
+    <button class="btn btn-outline btn-block" style="margin-bottom:8px;" onclick="exportData()">📤 导出备份</button>
+    <button class="btn btn-outline btn-block" onclick="document.getElementById('importFile').click()">📥 导入备份</button>
+    <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importData(event)">
+  </div>
+</div>
+</div><!-- /.app-row -->
+
+<!-- 记录弹窗 -->
+<div class="modal-mask" id="recordModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>添加收支</h3>
+      <span class="close" onclick="closeModal('recordModal')">×</span>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-green" id="typeInBtn" style="flex:1;" onclick="selectType('in')">收入</button>
+          <button class="btn btn-outline" id="typeOutBtn" style="flex:1;" onclick="selectType('out')">支出</button>
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="label">金额（元）</label>
+        <input type="number" class="input" id="recAmount" placeholder="0.00" step="0.01">
+      </div>
+      <div class="form-row">
+        <label class="label">分类</label>
+        <select class="select" id="recCategory"></select>
+      </div>
+      <div class="form-row">
+        <label class="label">备注</label>
+        <input type="text" class="input" id="recNote" placeholder="选填">
+      </div>
+      <div class="form-row">
+        <label class="label">日期</label>
+        <input type="date" class="input" id="recDate">
+      </div>
+      <button class="btn btn-block" onclick="saveRecord()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 年度理财目标弹窗 -->
+<div class="modal-mask" id="goalModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>年度理财目标</h3>
+      <span class="close" onclick="closeModal('goalModal')">×</span>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label class="label">本年度收入目标（元）</label>
+        <input type="number" class="input" id="goalIncome" placeholder="例如 120000" step="0.01">
+      </div>
+      <div class="form-row">
+        <label class="label">本年度结余（攒钱）目标（元）</label>
+        <input type="number" class="input" id="goalSave" placeholder="例如 30000" step="0.01">
+      </div>
+      <button class="btn btn-block" onclick="saveFinanceGoal()">保存目标</button>
+    </div>
+  </div>
+</div>
+
+<!-- 月度攒钱计划弹窗 -->
+<div class="modal-mask" id="monthlyModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>每月攒钱计划</h3>
+      <span class="close" onclick="closeModal('monthlyModal')">×</span>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label class="label">每月攒钱计划（元）</label>
+        <input type="number" class="input" id="goalMonthly" placeholder="例如 2500" step="0.01">
+      </div>
+      <button class="btn btn-block" onclick="saveMonthlyPlan()">保存计划</button>
+    </div>
+  </div>
+</div>
+
+<!-- 通用确认弹窗 -->
+<div class="modal-mask" id="confirmModal">
+  <div class="modal">
+    <div class="modal-body" style="padding:22px 18px;">
+      <div id="confirmMsg" style="font-size:15px;line-height:1.6;text-align:center;white-space:pre-wrap;"></div>
+      <div style="display:flex;gap:10px;margin-top:20px;">
+        <button class="btn btn-outline" style="flex:1;" onclick="closeModal('confirmModal')">取消</button>
+        <button class="btn btn-red" style="flex:1;" onclick="confirmYes()">确定</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 首次使用引导弹窗 -->
+<div class="modal-mask" id="guideModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>欢迎使用 👋</h3>
+      <span class="close" onclick="closeModal('guideModal')">×</span>
+    </div>
+    <div class="modal-body" style="font-size:14px;line-height:1.8;color:#333;">
+      📌 <b>使用提示</b><br>
+      1. 点击 Safari 底部「分享」→「添加到主屏幕」，即可像 App 一样使用<br>
+      2. 所有数据存在手机本地，完全离线可用<br>
+      3. 视频学习需要联网，其他功能离线也能用<br><br>
+      <button class="btn btn-block" onclick="closeModal('guideModal');showToast('请点击 Safari 底部分享按钮 → 添加到主屏幕')">好的，开始使用</button>
+    </div>
+  </div>
+</div>
+
+<!-- 心愿奖励弹窗 -->
+<div class="modal-mask" id="rewardModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>添加心愿奖励</h3>
+      <span class="close" onclick="closeModal('rewardModal')">×</span>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label class="label">奖励名称</label>
+        <input type="text" class="input" id="rewardName" placeholder="例如 看一集剧">
+      </div>
+      <div class="form-row">
+        <label class="label">所需积分</label>
+        <input type="number" class="input" id="rewardCost" placeholder="例如 50">
+      </div>
+      <button class="btn btn-block" onclick="saveRewardItem()">添加</button>
+    </div>
+  </div>
+</div>
+
+<!-- 体重目标弹窗 -->
+<div class="modal-mask" id="weightGoalModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>体重目标</h3>
+      <span class="close" onclick="closeModal('weightGoalModal')">×</span>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label class="label">目标体重（kg）</label>
+        <input type="number" class="input" id="wGoalTarget" placeholder="例如 50.0" step="0.1">
+      </div>
+      <div class="form-row">
+        <label class="label">身高（cm，用于 BMI）</label>
+        <input type="number" class="input" id="wGoalHeight" placeholder="例如 157" step="0.1">
+      </div>
+      <button class="btn btn-block" onclick="saveWeightGoal()">保存目标</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============ 数据层 ============
+const STORE_KEY = 'daily_workbench_data';
+const APP_VERSION = 'v4.3 · DOM重写版';
+let state = {
+  records: [],      // {id,type,amount,category,note,date}
+  tasks: {},        // {date: {english:bool, fitness:bool, manage:bool, knowledge:bool}}
+  todos: {},        // {todo_date: [{id,text,done,priority,created}]}
+  weights: [],      // [{date, weight}]
+  weightGoal: {target:0, height:157},
+  rewards: { points:0, items:[], log:[], lastBonusDate:null, lastStreak:0, lastStreakDate:null },
+  garden: { roses:0, flowers:[], log:[], lastBonusDate:null },  // roses=总玫瑰数, flowers=[{date,type,source}], log=当日
+  financeGoal: {year:new Date().getFullYear(), incomeGoal:0, saveGoal:0, monthlySave:0},
+  currentMonth: new Date(),
+  currentScene: 0,
+  recordType: 'out'
+};
+
+function load() {
+  try {
+    const s = localStorage.getItem(STORE_KEY);
+    if (s) {
+      const d = JSON.parse(s);
+      state.records = d.records || [];
+      state.tasks = d.tasks || {};
+      state.todos = d.todos || [];
+      state.weights = d.weights || [];
+      if(d.weightGoal) state.weightGoal = d.weightGoal;
+      if(d.rewards) state.rewards = Object.assign({points:0, items:[], log:[], lastBonusDate:null, lastStreak:0, lastStreakDate:null}, d.rewards);
+      if(!state.rewards.items || !state.rewards.items.length) state.rewards.items = defaultRewards();
+      if(d.garden) state.garden = Object.assign({roses:0, flowers:[], log:[], lastBonusDate:null}, d.garden);
+    } else {
+      state.rewards.items = defaultRewards();
+      state.garden = {roses:0, flowers:[], log:[], lastBonusDate:null};
+    }
+  } catch(e) {}
+}
+function defaultRewards() {
+  return [
+    {id:uid(), name:'看一集喜欢的剧', cost:50, icon:'📺'},
+    {id:uid(), name:'一杯奶茶/咖啡', cost:80, icon:'🧋'},
+    {id:uid(), name:'周末睡到自然醒', cost:120, icon:'😴'},
+    {id:uid(), name:'买一件心仪小物', cost:200, icon:'🛍️'}
+  ];
+}
+function save() {
+  localStorage.setItem(STORE_KEY, JSON.stringify({records:state.records, tasks:state.tasks, todos:state.todos, weights:state.weights, financeGoal:state.financeGoal, weightGoal:state.weightGoal, rewards:state.rewards, garden:state.garden}));
+}
+function today() { return new Date().toISOString().slice(0,10); }
+function fmtDate(d) {
+  const w = ['日','一','二','三','四','五','六'];
+  return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 星期${w[d.getDay()]}`;
+}
+function fmtMoney(n) { return parseFloat(n||0).toFixed(2); }
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2000);
+}
+function showToast(msg) { toast(msg); }
+function uid() { return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+// 强制重绘：解决 iOS Web Clip 下 innerHTML 更新后不立即显示的问题
+function forceRepaint(el) {
+  const node = el || document.body;
+  // 方法1：强制 reflow
+  void node.offsetHeight;
+  // 方法2：toggle 临时 class
+  node.classList.add('__r');
+  void node.offsetHeight;
+  node.classList.remove('__r');
+  // 方法3：创建并移除空节点
+  const s = document.createElement('span');
+  s.style.cssText = 'position:fixed;top:0;left:0;width:0;height:0;visibility:hidden;';
+  node.appendChild(s);
+  void node.offsetHeight;
+  node.removeChild(s);
+  // 方法4：滚动强制重绘（iOS Web Clip 最可靠）——滚动 window
+  const oldY = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+  window.scrollTo(0, oldY + 1);
+  window.scrollTo(0, oldY);
+  // 方法5：transform hack 触发合成层
+  node.style.webkitTransform = 'translateZ(0)';
+  void node.offsetHeight;
+  node.style.webkitTransform = '';
+}
+// 同步渲染 + 立即强制重绘
+function renderNow(fn) {
+  fn();
+  forceRepaint();
+  // iOS Web Clip 下同步重绘可能不够，再用 setTimeout 兜底
+  setTimeout(forceRepaint, 0);
+  setTimeout(forceRepaint, 50);
+}
+
+// ============ 导航 ============
+function switchPage(p) {
+  document.querySelectorAll('.sb-item').forEach(n=>n.classList.remove('active'));
+  const target = document.querySelector('.sb-item[data-page="'+p+'"]');
+  if(target) target.classList.add('active');
+  document.querySelectorAll('.page').forEach(pg=>pg.classList.remove('active'));
+  const pageEl = document.getElementById('page-'+p);
+  if(pageEl) pageEl.classList.add('active');
+  if(p==='home') renderNow(renderHome);
+  if(p==='finance') renderNow(renderFinance);
+  if(p==='learn') renderLearn();
+  if(p==='newmedia') renderNewMedia();
+  if(p==='fitness') renderNow(renderFitness);
+  if(p==='todo') renderNow(renderTodoPage);
+  if(p==='dress') renderDress();
+  if(p==='stats') renderNow(renderStats);
+  if(p==='garden') renderNow(renderPetPage);
+}
+document.querySelectorAll('.sidebar .sb-item').forEach(item => {
+  item.addEventListener('click', () => switchPage(item.dataset.page));
+});
+
+// 子tab切换（学习页 + 新媒体页）
+document.querySelectorAll('.sub-tabs').forEach(tabBar => {
+  tabBar.querySelectorAll('.sub-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const parent = tabBar.parentElement;
+      parent.querySelectorAll('.sub-tab').forEach(t=>t.classList.remove('active'));
+      tab.classList.add('active');
+      parent.querySelectorAll('.sub-page').forEach(sp=>sp.classList.remove('active'));
+      document.getElementById('sub-'+tab.dataset.sub).classList.add('active');
+      // 懒加载
+      const sub = tab.dataset.sub;
+      if(sub==='english') renderEnglish();
+      if(sub==='manage') renderManage();
+      if(sub==='knowledge') renderKnowledge();
+      if(sub.startsWith('nm-')) renderNewMediaTab(sub);
+    });
+  });
+});
+
+function renderLearn() {
+  // 默认渲染英语
+  renderEnglish();
+}
+
+// ============ 财务 ============
+const CATEGORIES = {
+  in: ['工资','奖金','理财收益','兼职','红包','其他收入'],
+  out: ['餐饮','交通','购物','房租水电','娱乐','医疗','教育','社交','生活用品','其他支出']
+};
+let editId = null;
+
+function openRecordModal(id) {
+  editId = id || null;
+  const r = id ? state.records.find(x=>x.id===id) : null;
+  selectType(r ? r.type : 'out');
+  document.getElementById('recAmount').value = r ? r.amount : '';
+  document.getElementById('recNote').value = r ? r.note : '';
+  document.getElementById('recDate').value = r ? r.date : today();
+  document.getElementById('recordModal').classList.add('show');
+}
+function openModal(id) { const el=document.getElementById(id); if(el) el.classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+function selectType(t) {
+  state.recordType = t;
+  document.getElementById('typeInBtn').className = 'btn ' + (t==='in'?'btn-green':'btn-outline');
+  document.getElementById('typeOutBtn').className = 'btn ' + (t==='out'?'btn-red':'btn-outline');
+  const sel = document.getElementById('recCategory');
+  sel.innerHTML = CATEGORIES[t].map(c=>`<option>${c}</option>`).join('');
+  if(editId) {
+    const r = state.records.find(x=>x.id===editId);
+    if(r) sel.value = r.category;
+  }
+}
+function saveRecord() {
+  const amount = parseFloat(document.getElementById('recAmount').value);
+  if(!amount || amount<=0) { toast('请输入有效金额'); return; }
+  const rec = {
+    id: editId || uid(),
+    type: state.recordType,
+    amount: amount,
+    category: document.getElementById('recCategory').value,
+    note: document.getElementById('recNote').value,
+    date: document.getElementById('recDate').value
+  };
+  if(editId) {
+    const idx = state.records.findIndex(x=>x.id===editId);
+    state.records[idx] = rec;
+  } else {
+    state.records.push(rec);
+  }
+  if(!editId) {
+    plantRose('finance', '记账：' + rec.category);
+    checkGardenBonus();
+  }
+  save();
+  closeModal('recordModal');
+  toast(editId?'已修改':'已记录 🪷 种下一朵花！');
+  renderNow(() => { renderFinance(); renderHome(); renderGarden(); });
+}
+function deleteRecord(id) {
+  showConfirm('删除这条记录？', () => {
+    state.records = state.records.filter(x=>x.id!==id);
+    save(); renderNow(() => { renderFinance(); renderHome(); });
+  });
+}
+function changeMonth(delta) {
+  state.currentMonth = new Date(state.currentMonth.getFullYear(), state.currentMonth.getMonth()+delta, 1);
+  renderFinance();
+}
+function renderFinance() {
+  const now = state.currentMonth;
+  const y = now.getFullYear(), m = now.getMonth();
+  document.getElementById('monthLabel').textContent = `${y}年${m+1}月`;
+
+  // ===== 年度理财计划 =====
+  const goal = state.financeGoal;
+  if(goal.year !== y) { goal.year = y; }
+  document.getElementById('goalYear').textContent = y + '年';
+  const yearRecs = state.records.filter(r => {
+    const d = new Date(r.date);
+    return d.getFullYear()===y;
+  });
+  const yearIncome = yearRecs.filter(r=>r.type==='in').reduce((s,r)=>s+r.amount,0);
+  const yearExpense = yearRecs.filter(r=>r.type==='out').reduce((s,r)=>s+r.amount,0);
+  const yearBalance = yearIncome - yearExpense;
+  document.getElementById('yearIncome').textContent = fmtMoney(yearIncome);
+  document.getElementById('yearExpense').textContent = fmtMoney(yearExpense);
+  document.getElementById('yearBalance').textContent = fmtMoney(yearBalance);
+  // 年结余目标达成
+  const saveGoal = goal.saveGoal || 0;
+  const saveRate = saveGoal>0 ? Math.round(yearBalance/saveGoal*100) : 0;
+  document.getElementById('saveRate').textContent = (saveRate>100?100:saveRate) + '%';
+  document.getElementById('saveBar').style.width = (saveRate>100?100:saveRate) + '%';
+  document.getElementById('saveBar').style.background = saveRate>=100?'var(--green)':'linear-gradient(90deg,var(--primary-l),#52c41a)';
+  document.getElementById('saveDone').textContent = '¥' + fmtMoney(yearBalance);
+  document.getElementById('saveGoal').textContent = '¥' + fmtMoney(saveGoal);
+
+  const monthRecs = state.records.filter(r => {
+    const d = new Date(r.date);
+    return d.getFullYear()===y && d.getMonth()===m;
+  });
+  const income = monthRecs.filter(r=>r.type==='in').reduce((s,r)=>s+r.amount,0);
+  const expense = monthRecs.filter(r=>r.type==='out').reduce((s,r)=>s+r.amount,0);
+  document.getElementById('monthIncome').textContent = fmtMoney(income);
+  document.getElementById('monthExpense').textContent = fmtMoney(expense);
+  document.getElementById('monthBalance').textContent = fmtMoney(income-expense);
+
+  // 今日
+  const t = today();
+  const todayRecs = state.records.filter(r=>r.date===t).sort((a,b)=>b.id>a.id?1:-1);
+  document.getElementById('todayCount').textContent = todayRecs.length+'笔';
+  const icons = {'餐饮':'🍱','交通':'🚗','购物':'🛍️','房租水电':'🏠','娱乐':'🎮','医疗':'💊','教育':'📖','社交':'👥','生活用品':'🧴','工资':'💰','奖金':'🎁','理财收益':'📈','兼职':'💼','红包':'🧧','其他收入':'➕','其他支出':'➖'};
+  document.getElementById('todayList').innerHTML = todayRecs.length ? todayRecs.map(r=>`
+    <div class="list-item" style="padding:10px 0;">
+      <div class="icon-circle" style="background:#f0f7ff;">${icons[r.category]||'📝'}</div>
+      <div class="content">
+        <div class="title">${r.category}${r.note?' · '+r.note:''}</div>
+        <div class="sub">${r.date}</div>
+      </div>
+      <div class="amount ${r.type==='in'?'in':'out'}">${r.type==='in'?'+':'-'}${fmtMoney(r.amount)}</div>
+      <div style="margin-left:8px;">
+        <span style="font-size:18px;color:var(--gray);cursor:pointer;" onclick="deleteRecord('${r.id}')">🗑️</span>
+      </div>
+    </div>`).join('') : '<div class="empty"><div class="emoji">📝</div>今日还没有记录</div>';
+
+  // 本月明细
+  const sorted = monthRecs.sort((a,b)=>b.date.localeCompare(a.date)||b.id.localeCompare(a.id));
+  document.getElementById('monthList').innerHTML = sorted.length ? sorted.map(r=>`
+    <div class="list-item" style="padding:10px 0;">
+      <div class="icon-circle" style="background:#f0f7ff;width:30px;height:30px;font-size:14px;">${icons[r.category]||'📝'}</div>
+      <div class="content">
+        <div class="title" style="font-size:13px;">${r.category}${r.note?' · '+r.note:''}</div>
+        <div class="sub">${r.date}</div>
+      </div>
+      <div class="amount ${r.type==='in'?'in':'out'}" style="font-size:14px;">${r.type==='in'?'+':'-'}${fmtMoney(r.amount)}</div>
+    </div>`).join('') : '<div class="empty" style="padding:20px;">本月暂无记录</div>';
+}
+
+function setFinanceGoal() {
+  const g = state.financeGoal || (state.financeGoal={year:new Date().getFullYear(), incomeGoal:0, saveGoal:0, monthlySave:0});
+  document.getElementById('goalIncome').value = g.incomeGoal || '';
+  document.getElementById('goalSave').value = g.saveGoal || '';
+  openModal('goalModal');
+}
+function saveFinanceGoal() {
+  const g = state.financeGoal;
+  g.year = new Date().getFullYear();
+  g.incomeGoal = parseFloat(document.getElementById('goalIncome').value) || 0;
+  g.saveGoal = parseFloat(document.getElementById('goalSave').value) || 0;
+  save(); closeModal('goalModal'); renderNow(() => { renderFinance(); renderHome(); });
+  toast('年度理财目标已设定 ✓');
+}
+function setMonthlyPlan() {
+  const g = state.financeGoal || (state.financeGoal={year:new Date().getFullYear(), incomeGoal:0, saveGoal:0, monthlySave:0});
+  document.getElementById('goalMonthly').value = g.monthlySave || '';
+  openModal('monthlyModal');
+}
+function saveMonthlyPlan() {
+  const g = state.financeGoal;
+  g.monthlySave = parseFloat(document.getElementById('goalMonthly').value) || 0;
+  save(); closeModal('monthlyModal'); renderNow(() => { renderFinance(); renderHome(); });
+  toast('月攒钱计划已设定 ✓');
+}
+
+// 通用确认弹窗逻辑
+let _confirmCallback = null;
+function showConfirm(msg, cb) {
+  document.getElementById('confirmMsg').textContent = msg;
+  _confirmCallback = cb;
+  openModal('confirmModal');
+}
+function confirmYes() {
+  closeModal('confirmModal');
+  const cb = _confirmCallback;
+  _confirmCallback = null;
+  if(cb) cb();
+}
+
+// ============ 任务系统 ============
+function getTodayTasks() {
+  const t = today();
+  if(!state.tasks[t]) state.tasks[t] = {english:false, fitness:false, manage:false, knowledge:false};
+  return state.tasks[t];
+}
+function completeTask(type) {
+  const tt = getTodayTasks();
+  const wasDone = tt[type];
+  tt[type] = !tt[type];
+  if(!wasDone) {
+    plantRose(type, '完成' + ({english:'英语',fitness:'健身',manage:'管理',knowledge:'知识'}[type]||type) + '任务');
+    checkGardenBonus();
+  } else {
+    removeRose(type, '完成' + ({english:'英语',fitness:'健身',manage:'管理',knowledge:'知识'}[type]||type) + '任务');
+  }
+  save();
+  if(type==='english') renderEnglish();
+  if(type==='fitness') { renderFitness(); renderHome(); }
+  if(type==='manage') renderManage();
+  if(type==='knowledge') renderKnowledge();
+  renderGarden();
+  toast(tt[type]?'已完成 🌹 种下一朵花！':'已取消');
+}
+function renderTaskStatus(type, badgeId, barId, btnId) {
+  const tt = getTodayTasks();
+  const done = tt[type];
+  document.getElementById(badgeId).textContent = done?'已完成 ✓':'未完成';
+  document.getElementById(badgeId).style.background = done?'#52c41a':'#fa8c16';
+  document.getElementById(barId).style.width = done?'100%':'0%';
+  const btn = document.getElementById(btnId);
+  btn.textContent = done?'✓ 今日已完成（点击取消）':'完成今日学习';
+  btn.className = done?'btn btn-block btn-outline':'btn btn-block btn-green';
+}
+
+// ============ 英语口语 ============
+const SCENES = [
+  {
+    name: '咖啡店点单',
+    icon: '☕',
+    lines: [
+      {speaker:'你', text:'Hi, could I get a latte, please?', cn:'你好，请给我一杯拿铁。'},
+      {speaker:'店员', text:'Sure. What size would you like?', cn:'好的，您要什么杯型？'},
+      {speaker:'你', text:'A medium, please. And can I have it with oat milk?', cn:'中杯，麻烦用燕麦奶。'},
+      {speaker:'店员', text:'Of course. That\'ll be 5 dollars.', cn:'没问题，一共5美元。'},
+      {speaker:'你', text:'Here you go. Thanks!', cn:'给你，谢谢！'}
+    ]
+  },
+  {
+    name: '工作打招呼',
+    icon: '💼',
+    lines: [
+      {speaker:'同事', text:'Hey, how was your weekend?', cn:'嘿，周末过得怎么样？'},
+      {speaker:'你', text:'It was great! I went hiking. How about yours?', cn:'很棒！我去爬山了。你呢？'},
+      {speaker:'同事', text:'Pretty good. Just relaxed at home. Did you do anything fun?', cn:'挺好的，就在家放松。有做什么有趣的事吗？'},
+      {speaker:'你', text:'Yeah, the view from the top was amazing. We should go together sometime!', cn:'有啊，山顶风景超棒。下次一起去！'},
+      {speaker:'同事', text:'Sounds great! Let me know when.', cn:'听起来不错！到时候告诉我。'}
+    ]
+  },
+  {
+    name: '超市购物',
+    icon: '🛒',
+    lines: [
+      {speaker:'你', text:'Excuse me, where can I find the milk?', cn:'打扰一下，牛奶在哪里？'},
+      {speaker:'店员', text:'It\'s in aisle 3, right next to the juice.', cn:'在3号通道，果汁旁边。'},
+      {speaker:'你', text:'Thanks. And do you have any fresh bread?', cn:'谢谢。有新鲜面包吗？'},
+      {speaker:'店员', text:'Yes, just baked this morning. It\'s over there.', cn:'有，今早刚烤的，在那边。'},
+      {speaker:'你', text:'Perfect. I\'ll take a loaf. Thank you!', cn:'太好了，我要一条。谢谢！'}
+    ]
+  },
+  {
+    name: '问路',
+    icon: '🗺️',
+    lines: [
+      {speaker:'你', text:'Excuse me, how do I get to the train station?', cn:'打扰一下，去火车站怎么走？'},
+      {speaker:'路人', text:'Go straight for two blocks, then turn left. It\'s on your right.', cn:'直走两个街区，然后左转，就在你右边。'},
+      {speaker:'你', text:'Is it far? Can I walk there?', cn:'远吗？能走过去吗？'},
+      {speaker:'路人', text:'About 10 minutes on foot. You can\'t miss it.', cn:'走路大概10分钟，你不会错过的。'},
+      {speaker:'你', text:'Great, thanks a lot for your help!', cn:'太好了，非常感谢！'}
+    ]
+  },
+  {
+    name: '餐厅点餐',
+    icon: '🍽️',
+    lines: [
+      {speaker:'服务员', text:'Are you ready to order?', cn:'您准备好点餐了吗？'},
+      {speaker:'你', text:'Yes, I\'ll have the grilled salmon, please.', cn:'是的，我要一份烤三文鱼。'},
+      {speaker:'服务员', text:'Would you like anything to drink?', cn:'要喝点什么吗？'},
+      {speaker:'你', text:'A glass of water and an orange juice, please.', cn:'一杯水和一杯橙汁。'},
+      {speaker:'服务员', text:'Excellent choice. I\'ll get that right away.', cn:'很好的选择，马上为您准备。'}
+    ]
+  },
+  {
+    name: '电话沟通',
+    icon: '📞',
+    lines: [
+      {speaker:'你', text:'Hi, this is Li. May I speak to Mr. Smith?', cn:'你好，我是李。请找史密斯先生。'},
+      {speaker:'对方', text:'Hold on, please. I\'ll put you through.', cn:'请稍等，我帮您转接。'},
+      {speaker:'史密斯', text:'Hello, Li. How can I help you?', cn:'你好，李。有什么事吗？'},
+      {speaker:'你', text:'I\'m calling about the project. Do you have a minute?', cn:'我打来是想聊项目，您有时间吗？'},
+      {speaker:'史密斯', text:'Sure, go ahead. I\'m all ears.', cn:'当然，你说吧，我听着。'}
+    ]
+  }
+];
+
+const ENG_VIDEOS = [
+  {title:'工作英语全系列 BBC English at Work', channel:'BBC Learning English', dur:'70集', url:'https://www.bilibili.com/video/BV1GF4m1V7S1/', scene:'职场英语'},
+  {title:'日常英语口语练习素材合集', channel:'Easy English', dur:'48集', url:'https://www.bilibili.com/video/BV1Q3gY6gEgo/', scene:'日常对话'},
+  {title:'地道英语口语 Speak English with Vanessa', channel:'Vanessa', dur:'25集', url:'https://www.bilibili.com/video/BV1P6N96VEoa/', scene:'地道表达'},
+  {title:'BBC 6分钟英语 沟通技巧合集', channel:'BBC 6 Minute English', dur:'30分钟', url:'https://www.bilibili.com/video/BV1C9ge68Ej6/', scene:'听力口语'},
+  {title:'2小时英语对话练习', channel:'EnglishClass101', dur:'2小时', url:'https://www.youtube.com/watch?v=5M9g9nXwQpc', scene:'综合练习'}
+];
+
+function renderEnglish() {
+  renderTaskStatus('english', 'engBadge', 'engBar', 'engDoneBtn');
+  const scene = SCENES[state.currentScene];
+  document.getElementById('dialogContent').innerHTML = `
+    <div class="dialog-box">
+      <div class="scene">${scene.icon} ${scene.name}</div>
+      ${scene.lines.map((l,i)=>`
+        <div class="dialog-line">
+          <div class="speaker">${l.speaker}${l.speaker==='你'?' 👤':' 💬'}</div>
+          <div class="text">${l.text}</div>
+          <div class="text" style="color:var(--gray);font-size:13px;margin-top:2px;">${l.cn}</div>
+          <div class="actions">
+            <button class="act-btn" onclick="speak(${i}, 1)">🔊 标准发音</button>
+            <button class="act-btn slow" onclick="speak(${i}, 0.6)">🐢 慢速</button>
+          </div>
+        </div>`).join('')}
+    </div>
+    <div style="font-size:12px;color:var(--gray);margin-top:8px;">💡 点击「标准发音」听一遍，再点击「慢速」跟读模仿</div>
+  `;
+  document.getElementById('sceneTags').innerHTML = SCENES.map((s,i)=>`
+    <span class="tag" style="padding:6px 12px;background:${i===state.currentScene?'var(--primary)':'#f0f0f0'};color:${i===state.currentScene?'#fff':'var(--gray)'};cursor:pointer;border-radius:16px;font-size:13px;" onclick="switchScene(${i})">${s.icon} ${s.name}</span>
+  `).join('');
+  document.getElementById('engVideos').innerHTML = ENG_VIDEOS.map(v=>`
+    <div class="video-card" onclick="window.open('${v.url}','_blank')">
+      <div class="v-info">
+        <div class="v-title">${v.title}</div>
+        <div class="v-meta">${v.channel} · ${v.dur} · ${v.scene}</div>
+      </div>
+    </div>`).join('');
+}
+function switchScene(i) { state.currentScene = i; renderEnglish(); }
+function speak(lineIdx, rate) {
+  const line = SCENES[state.currentScene].lines[lineIdx];
+  if('speechSynthesis' in window) {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(line.text);
+    u.lang = 'en-US';
+    u.rate = rate;
+    // 尝试选英文语音
+    const voices = speechSynthesis.getVoices();
+    const enVoice = voices.find(v=>v.lang.startsWith('en'));
+    if(enVoice) u.voice = enVoice;
+    speechSynthesis.speak(u);
+    toast('🔊 播放中，请跟读');
+  } else {
+    toast('当前浏览器不支持语音播放');
+  }
+}
+
+// ============ 健身运动 ============
+const FITNESS_VIDEOS = [
+  // 全身燃脂
+  {title:'帕梅拉 15分钟全身燃脂训练 新手友好', channel:'Pamela Reif', dur:'15分钟', tag:'全身燃脂', url:'https://www.bilibili.com/video/BV1T4411H7sE'},
+  {title:'欧阳春晓 30分钟无跳跃全身燃脂', channel:'欧阳春晓Aurora', dur:'30分钟', tag:'全身燃脂', url:'https://www.bilibili.com/video/BV1S54y1L7XL'},
+  {title:'帕梅拉 20分钟全身有氧燃脂', channel:'Pamela Reif', dur:'20分钟', tag:'全身燃脂', url:'https://www.bilibili.com/video/BV1X54y1L7XL'},
+  // 瘦肩背
+  {title:'欧阳春晓 少女背+直角肩 每天10分钟', channel:'欧阳春晓Aurora', dur:'10分钟', tag:'瘦肩背', url:'https://www.bilibili.com/video/BV1HK411N7sP'},
+  {title:'帕梅拉 10分钟背部训练 改善体态', channel:'Pamela Reif', dur:'10分钟', tag:'瘦肩背', url:'https://www.bilibili.com/video/BV1vK411N7FL'},
+  {title:'欧阳春晓 15分钟肩颈拉伸 消除斜方肌', channel:'欧阳春晓Aurora', dur:'15分钟', tag:'瘦肩背', url:'https://www.bilibili.com/video/BV1S54y1L7XL'},
+  // 腰腹
+  {title:'帕梅拉 10分钟腹肌训练 初学者', channel:'Pamela Reif', dur:'10分钟', tag:'腰腹', url:'https://www.bilibili.com/video/BV1oK411N7FL'},
+  {title:'欧阳春晓 沙漏腰 每天20分钟', channel:'欧阳春晓Aurora', dur:'20分钟', tag:'腰腹', url:'https://www.bilibili.com/video/BV1S54y1L7XL'},
+  {title:'帕梅拉 12分钟核心训练 紧致腰腹', channel:'Pamela Reif', dur:'12分钟', tag:'腰腹', url:'https://www.bilibili.com/video/BV1r54y1L7XL'},
+  // 瘦腿
+  {title:'帕梅拉 12分钟瘦腿训练 梨形友好', channel:'Pamela Reif', dur:'12分钟', tag:'瘦腿', url:'https://www.bilibili.com/video/BV1S54y1L7XL'},
+  {title:'欧阳春晓 根本性瘦小腿 脂包肌', channel:'欧阳春晓Aurora', dur:'15分钟', tag:'瘦腿', url:'https://www.bilibili.com/video/BV1S54y1L7XL'},
+  {title:'帕梅拉 10分钟腿部拉伸 放松肌肉腿', channel:'Pamela Reif', dur:'10分钟', tag:'瘦腿', url:'https://www.bilibili.com/video/BV1S54y1L7XL'}
+];
+const FIT_TAG_COLOR = {'全身燃脂':'#1890ff','瘦肩背':'#fa8c16','腰腹':'#52c41a','瘦腿':'#eb2f96'};
+
+function renderFitness() {
+  renderTaskStatus('fitness', 'fitBadge', 'fitBar', 'fitDoneBtn');
+  // 渲染推荐视频
+  const fv = document.getElementById('fitnessVideos');
+  if(fv) fv.innerHTML = FITNESS_VIDEOS.map(v=>`
+    <div class="video-card" onclick="window.open('${v.url}','_blank')">
+      <div class="v-info" style="display:flex;align-items:center;gap:8px;">
+        <span class="tag" style="background:${FIT_TAG_COLOR[v.tag]}20;color:${FIT_TAG_COLOR[v.tag]};flex-shrink:0;">${v.tag}</span>
+        <div style="flex:1;min-width:0;">
+          <div class="v-title">${v.title}</div>
+          <div class="v-meta">${v.channel} · ${v.dur}</div>
+        </div>
+      </div>
+    </div>`).join('');
+  renderWeightHistory();
+  renderWeightStats();
+}
+
+function addWeight() {
+  const input = document.getElementById('weightInput');
+  const w = parseFloat(input.value);
+  if(!w || w<=0 || w>300) { toast('请输入有效的体重数值'); return; }
+  const ds = today();
+  const idx = state.weights.findIndex(x=>x.date===ds);
+  const prevW = idx>=0 ? state.weights[idx].weight : null;
+  if(idx>=0) state.weights[idx].weight = w;
+  else state.weights.push({date:ds, weight:w});
+  state.weights.sort((a,b)=>a.date.localeCompare(b.date));
+  plantRose('weight', '记录体重 ' + w + 'kg');
+  checkGardenBonus();
+  // 即时反馈（不依赖列表重绘）
+  let fb = '✅ 已记录 ' + w + 'kg';
+  if(prevW !== null) { const diff = (w - prevW).toFixed(1); fb += (diff>0 ? '（较上次 +'+diff+'kg）' : diff<0 ? '（较上次 '+diff+'kg 👍）' : '（与上次持平）'); }
+  const fbEl = document.getElementById('weightFeedback');
+  if(fbEl) { fbEl.textContent = fb; fbEl.style.color = (prevW!==null && w < prevW) ? 'var(--green)' : 'var(--primary)'; }
+  save();
+  input.value = '';
+  renderNow(() => { renderWeightHistory(); renderWeightStats(); renderHome(); renderGarden(); });
+  toast('体重已保存 💐 喂养宠物 +1');
+}
+function deleteWeight(date) {
+  state.weights = state.weights.filter(x=>x.date!==date);
+  save();
+  renderNow(() => { renderWeightHistory(); renderWeightStats(); renderHome(); });
+}
+function renderWeightHistory() {
+  const el = document.getElementById('weightHistory');
+  if(!el) return;
+  // 先清空（用 removeChild 而非 innerHTML=''）
+  while(el.firstChild) el.removeChild(el.firstChild);
+  const list = state.weights.slice().reverse();
+  if(!list.length) {
+    const empty = document.createElement('div');
+    empty.className = 'empty';
+    empty.style.cssText = 'padding:20px;';
+    empty.textContent = '还没有体重记录';
+    el.appendChild(empty);
+    return;
+  }
+  list.forEach((x, i) => {
+    const prev = list[i+1];
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f0f0f0;';
+    const left = document.createElement('div');
+    const dateDiv = document.createElement('div');
+    dateDiv.style.cssText = 'font-size:13px;font-weight:500;';
+    dateDiv.textContent = x.date;
+    const weightDiv = document.createElement('div');
+    weightDiv.style.cssText = 'font-size:16px;font-weight:700;color:var(--primary);';
+    weightDiv.textContent = x.weight + ' kg';
+    if(prev) {
+      const d = (x.weight - prev.weight).toFixed(1);
+      const diff = document.createElement('span');
+      diff.style.cssText = 'color:' + (d>0?'var(--red)':(d<0?'var(--green)':'var(--gray)')) + ';font-size:11px;margin-left:6px;';
+      diff.textContent = (d>0?'↑':(d<0?'↓':'-')) + Math.abs(d) + 'kg';
+      weightDiv.appendChild(diff);
+    }
+    left.appendChild(dateDiv);
+    left.appendChild(weightDiv);
+    const del = document.createElement('span');
+    del.style.cssText = 'color:var(--light);font-size:14px;cursor:pointer;';
+    del.textContent = '×';
+    del.onclick = () => deleteWeight(x.date);
+    row.appendChild(left);
+    row.appendChild(del);
+    el.appendChild(row);
+  });
+}
+
+function openWeightGoal() {
+  const g = state.weightGoal || (state.weightGoal={target:0, height:157});
+  document.getElementById('wGoalTarget').value = g.target || '';
+  document.getElementById('wGoalHeight').value = g.height || '';
+  openModal('weightGoalModal');
+}
+function saveWeightGoal() {
+  const g = state.weightGoal;
+  g.target = parseFloat(document.getElementById('wGoalTarget').value) || 0;
+  g.height = parseFloat(document.getElementById('wGoalHeight').value) || 0;
+  save(); closeModal('weightGoalModal'); renderNow(() => { renderWeightStats(); renderHome(); });
+  toast('体重目标已保存 ✓');
+}
+function renderWeightStats() {
+  const goalStat = document.getElementById('weightGoalStat');
+  const statsEl = document.getElementById('weightStats');
+  const chart = document.getElementById('weightChart');
+  const stat = document.getElementById('weightMonthStat');
+  if(!chart) return;
+  const ws = state.weights.slice().sort((a,b)=>a.date.localeCompare(b.date));
+  const g = state.weightGoal || {target:0, height:0};
+  if(goalStat) {
+    if(g.target>0 && ws.length) {
+      const cur = ws[ws.length-1].weight;
+      const diff = cur - g.target;
+      goalStat.innerHTML = `目标 <b style="color:var(--primary);">${g.target}kg</b> · 当前距目标 <b style="color:${diff>0?'var(--red)':'var(--green)'}">${diff>0?'+':''}${diff.toFixed(1)}kg</b>`;
+    } else if(g.target>0) {
+      goalStat.innerHTML = `目标 <b style="color:var(--primary);">${g.target}kg</b>`;
+    } else {
+      goalStat.textContent = '还没设定目标体重（点右上「设目标」）';
+    }
+  }
+  if(!ws.length) {
+    if(statsEl) statsEl.innerHTML = '';
+    chart.innerHTML = '<div class="empty" style="padding:16px;">还没有体重记录</div>';
+    if(stat) stat.textContent = '';
+    return;
+  }
+  const weights = ws.map(w=>w.weight);
+  const min = Math.min(...weights), max = Math.max(...weights);
+  const avg = weights.reduce((s,x)=>s+x,0)/weights.length;
+  const latest = ws[ws.length-1].weight;
+  const first = ws[0].weight;
+  const totalDiff = latest - first;
+  const now = new Date(); const y=now.getFullYear(), m=now.getMonth();
+  const monthWs = ws.filter(w=>{const d=new Date(w.date);return d.getFullYear()===y&&d.getMonth()===m;});
+  let monthDiff = null;
+  if(monthWs.length>1) monthDiff = monthWs[monthWs.length-1].weight - monthWs[0].weight;
+  let bmi = '';
+  if(g.height>0) bmi = (latest/((g.height/100)*(g.height/100))).toFixed(1);
+  if(statsEl) {
+    const cell = (v,l)=>`<div class="s"><div class="v">${v}</div><div class="l">${l}</div></div>`;
+    statsEl.innerHTML = cell(latest+'kg','最新') + cell(avg.toFixed(1)+'kg','平均') + cell(min+'kg','最低') + cell(max+'kg','最高') + cell((totalDiff>0?'+':'')+totalDiff.toFixed(1)+'kg','累计') + (bmi?cell(bmi,'BMI'):cell((monthDiff!==null?(monthDiff>0?'+':'')+monthDiff.toFixed(1)+'kg':'—'),'本月'));
+  }
+  // 全程折线图 + 目标线
+  const H=120, W=300, pad=14;
+  const allVals = weights.slice();
+  if(g.target>0) allVals.push(g.target);
+  const cmin = Math.min(...allVals), cmax = Math.max(...allVals);
+  const range = (cmax-cmin)||1;
+  const xOf = i => pad + (ws.length===1 ? (W/2-pad) : i/(ws.length-1)*(W-2*pad));
+  const yOf = v => H - pad - (v-cmin)/range*(H-2*pad);
+  const pts = ws.map((w,i)=>[xOf(i), yOf(w.weight), w]);
+  const path = pts.map((p,i)=>(i===0?'M':'L')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+  const area = path + ` L ${pts[pts.length-1][0].toFixed(1)} ${H-pad} L ${pts[0][0].toFixed(1)} ${H-pad} Z`;
+  let dots = pts.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3" fill="var(--primary)"><title>${p[2].date} ${p[2].weight}kg</title></circle>`).join('');
+  let goalLine = '';
+  if(g.target>0){
+    const gy = yOf(g.target);
+    goalLine = `<line x1="${pad}" y1="${gy.toFixed(1)}" x2="${W-pad}" y2="${gy.toFixed(1)}" stroke="var(--orange)" stroke-width="1.5" stroke-dasharray="4 3"/><text x="${W-pad}" y="${(gy-4).toFixed(1)}" text-anchor="end" font-size="9" fill="var(--orange)">目标 ${g.target}kg</text>`;
+  }
+  chart.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block;">
+    <defs><linearGradient id="wg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--primary-l)" stop-opacity="0.25"/><stop offset="100%" stop-color="var(--primary-l)" stop-opacity="0"/></linearGradient></defs>
+    <line x1="${pad}" y1="${H-pad}" x2="${W-pad}" y2="${H-pad}" stroke="#eee"/>
+    ${goalLine}
+    <path d="${area}" fill="url(#wg)"/>
+    <path d="${path}" fill="none" stroke="var(--primary-l)" stroke-width="2"/>
+    ${dots}
+  </svg>`;
+  if(stat) {
+    const tColor = totalDiff>0?'var(--red)':(totalDiff<0?'var(--green)':'var(--gray)');
+    let s = `共 ${ws.length} 天记录 · 最低 <b>${min}kg</b> 最高 <b>${max}kg</b> · 累计 <b style="color:${tColor}">${(totalDiff>0?'+':'')}${totalDiff.toFixed(1)}kg</b>`;
+    if(monthDiff!==null) s += ` · 本月 <b style="color:${monthDiff>0?'var(--red)':'var(--green)'}">${(monthDiff>0?'+':'')}${monthDiff.toFixed(1)}kg</b>`;
+    stat.innerHTML = s;
+  }
+}
+
+// ============ 管理学习 ============
+const MANAGE_TIPS = [
+  {title:'曾国藩：结硬寨，打呆仗', content:'曾国藩带兵打仗，每到一个地方先扎营挖壕沟，不贪功冒进。管理也是如此——把基础流程做扎实，不追求奇谋妙计。团队管理上，选人要慢、用人要稳、育人要久。', source:'《曾国藩的团队管理》'},
+  {title:'诸葛亮：事必躬亲的教训', content:'诸葛亮鞠躬尽瘁，但事必躬亲导致后继无人。向上管理要学会授权，向下管理要培养接班人。管理者最大价值不是自己能干多少，而是让团队干多少。', source:'三国管理智慧'},
+  {title:'刘邦：用人的三件事', content:'刘邦说自己运筹帷幄不如张良，镇国家不如萧何，战必胜不如韩信，但他能用好这三人。管理核心是：知人善任、容人所短、用人所长。', source:'《史记·高祖本纪》'},
+  {title:'德鲁克：管理就是做对的事', content:'效率是「把事情做对」，效果是「做对的事」。管理者首先要保证方向正确，其次才是效率。向上管理时要确认目标一致，避免做了一堆无效工作。', source:'《卓有成效的管理者》'},
+  {title:'曹操：唯才是举的魄力', content:'曹操发布《求贤令》，不论出身品行，只要有才就用。现代团队管理也要打破「按资排辈」，让有能力的人上位。但要注意：用人不疑是授权，不是放任。', source:'《三国志·武帝纪》'},
+  {title:'柯维：以终为始', content:'做任何事之前先想清楚目标是什么。向上管理时，先理解上级的真实意图（不是字面要求），再制定方案。向下管理时，让团队明白「为什么做」比「怎么做」更重要。', source:'《高效能人士的七个习惯》'},
+  {title:'李世民：兼听则明', content:'唐太宗善听谏言，魏征直言进谏200多次。好的管理者要营造「敢说真话」的氛围。向上管理也要敢于提不同意见，但要讲究方式——先肯定再建议，私下提公开挺。', source:'《贞观政要》'},
+  {title:'任正非：让听得见炮声的人决策', content:'华为让一线有决策权，后方提供支援。管理不是控制，是赋能。给团队清晰的目标和边界，让他们在授权范围内自主决策，错了共同复盘，不追个案责任。', source:'华为管理法'}
+];
+
+const MNG_VIDEOS = [
+  {title:'曾仕强讲三国演义 古人智慧人物合集', channel:'曾仕强', dur:'97集', url:'https://www.bilibili.com/video/BV1L1421171c/'},
+  {title:'曾仕强《中国式管理》完整版12集', channel:'曾仕强', dur:'12集', url:'https://www.bilibili.com/video/BV1J5qbY2EnL/'},
+  {title:'曾国藩带团队的6个"笨功夫"', channel:'夏鹏本鹏', dur:'单集', url:'https://www.bilibili.com/video/BV1Gmgk6qEgN/'},
+  {title:'向上管理与向下管理实战课', channel:'B站知识UP主', dur:'22集', url:'https://www.bilibili.com/video/BV1pUgC6dEDr/'},
+  {title:'易中天品三国 全52集', channel:'易中天', dur:'52集', url:'https://www.bilibili.com/video/BV1MLojBiEDa/'},
+  {title:'什么是向上管理？', channel:'比奇堡观察局', dur:'短视频', url:'https://www.bilibili.com/video/BV1rrgx6iEzX/'}
+];
+
+function renderManage() {
+  renderTaskStatus('manage', 'mngBadge', 'mngBar', 'mngDoneBtn');
+  // 按日期轮换tip
+  const dayIdx = new Date().getDate() % MANAGE_TIPS.length;
+  const tip = MANAGE_TIPS[dayIdx];
+  document.getElementById('manageTip').innerHTML = `
+    <div style="background:#fff7e6;border-radius:8px;padding:12px;">
+      <div style="font-size:15px;font-weight:600;color:var(--orange);margin-bottom:8px;">📖 ${tip.title}</div>
+      <div style="font-size:13px;line-height:1.7;color:var(--text);">${tip.content}</div>
+      <div style="font-size:11px;color:var(--gray);margin-top:8px;">—— ${tip.source}</div>
+    </div>
+  `;
+  document.getElementById('mngVideos').innerHTML = MNG_VIDEOS.map(v=>`
+    <div class="video-card" onclick="window.open('${v.url}','_blank')">
+      <div class="v-info">
+        <div class="v-title">${v.title}</div>
+        <div class="v-meta">${v.channel} · ${v.dur}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ============ 待办事项 ============
+function getTodos(date) {
+  const key = 'todo_' + (date || today());
+  return state.todos && state.todos[key] ? state.todos[key] : [];
+}
+function addTodo() {
+  const input = document.getElementById('todoInput');
+  const text = input.value.trim();
+  if(!text) { toast('请输入待办内容'); return; }
+  const priority = document.getElementById('todoPriority').value;
+  if(!state.todos) state.todos = {};
+  const key = 'todo_' + today();
+  if(!state.todos[key]) state.todos[key] = [];
+  state.todos[key].push({id:uid(), text:text, done:false, priority:priority, created:new Date().toISOString()});
+  input.value = '';
+  save();
+  renderTodo();
+  toast('已添加 ✓');
+}
+function toggleTodo(id) {
+  const key = 'todo_' + today();
+  if(!state.todos || !state.todos[key]) return;
+  const todo = state.todos[key].find(t=>t.id===id);
+  if(todo) {
+    const wasDone = todo.done;
+    todo.done = !todo.done;
+    const pv = {high:15, mid:10, low:5}[todo.priority] || 10;
+    if(!wasDone) {
+      awardPoints(pv, '完成待办：' + todo.text);
+      plantRose('todo', '待办：' + todo.text);
+      checkTodoBonus();
+      checkGardenBonus();
+    } else {
+      awardPoints(-pv, '取消完成：' + todo.text);
+      removeRose('todo', '待办：' + todo.text);
+    }
+    save();
+    renderNow(() => { renderTodo(); renderTodoPage(); renderGarden(); });
+  }
+}
+function deleteTodo(id) {
+  const key = 'todo_' + today();
+  if(!state.todos || !state.todos[key]) return;
+  state.todos[key] = state.todos[key].filter(t=>t.id!==id);
+  save();
+  renderNow(() => { renderTodo(); renderTodoPage(); });
+}
+function clearDoneTodos() {
+  const key = 'todo_' + today();
+  if(!state.todos || !state.todos[key]) return;
+  const before = state.todos[key].length;
+  state.todos[key] = state.todos[key].filter(t=>!t.done);
+  if(state.todos[key].length < before) {
+    save();
+    renderNow(() => { renderTodo(); renderTodoPage(); });
+    toast('已清除'+(before-state.todos[key].length)+'项');
+  } else {
+    toast('没有已完成的待办');
+  }
+}
+
+// ============ 玫瑰花海 ============
+// 不同模块对应不同花
+const ROSE_TYPES = {
+  todo:     {icon:'🌹', name:'待办之花', color:'#eb2f96'},
+  english:  {icon:'🌷', name:'英语之花', color:'#e8497c'},
+  fitness:  {icon:'🌺', name:'运动之花', color:'#ff4d6d'},
+  manage:   {icon:'🌸', name:'管理之花', color:'#ff8fab'},
+  knowledge:{icon:'🌻', name:'知识之花', color:'#ffc300'},
+  weight:   {icon:'💐', name:'体重之花', color:'#c77dff'},
+  finance:  {icon:'🪷', name:'理财之花', color:'#ff70a6'},
+  all:      {icon:'🏵️', name:'全勤之花', color:'#ff006e'},
+};
+const ROSE_MILESTONES = [
+  {n:1,   title:'第一朵玫瑰 🌹 你种下了希望！'},
+  {n:7,   title:'7朵玫瑰 🌹 一周坚持，花开始成片！'},
+  {n:14,  title:'14朵玫瑰 🌹 两周不懈，花海初现！'},
+  {n:30,  title:'30朵玫瑰 🌹 一个月坚持，已是花田！'},
+  {n:50,  title:'50朵玫瑰 🌹 半百花海，惊艳绽放！'},
+  {n:100, title:'100朵玫瑰 🌹 百花齐放，你做到了！'},
+  {n:200, title:'200朵玫瑰 🌹 玫瑰花海，传奇！'},
+];
+function plantRose(type, source) {
+  const g = state.garden;
+  if(!g.flowers) g.flowers = [];
+  const ds = today();
+  const exists = g.flowers.find(f => f.date===ds && f.type===type && f.source===source);
+  if(exists) return false;
+  const flower = {date: ds, type: type, source: source};
+  g.flowers.push(flower);
+  g.roses = g.flowers.length;
+  g.log = g.log || [];
+  g.log.unshift({date: ds, type: type, source: source});
+  if(g.log.length > 200) g.log.pop();
+  // 直接往 DOM append 一朵花（绕开 innerHTML 不重绘的问题）
+  appendFlowerToGarden(flower);
+  // 更新统计数字
+  updateGardenStats();
+  // 检查里程碑
+  const milestone = ROSE_MILESTONES.find(m => m.n === g.roses);
+  if(milestone) {
+    setTimeout(() => toast('🎉 ' + milestone.title), 300);
+  }
+  return true;
+}
+// 直接往花海 DOM 里追加一朵花（不用 innerHTML）
+function appendFlowerToGarden(flower) {
+  const field = document.getElementById('roseField');
+  if(!field) return;
+  // 如果是第一朵，清掉占位文字
+  if(field.querySelector('div[style*="完成任务种下"]')) {
+    field.innerHTML = '';
+  }
+  const rt = ROSE_TYPES[flower.type] || ROSE_TYPES.todo;
+  const span = document.createElement('span');
+  span.className = 'rose-flower';
+  span.title = rt.name + ' · ' + flower.source + ' · ' + flower.date;
+  span.textContent = rt.icon;
+  field.appendChild(span);
+  // 限制最多 60 朵显示
+  while(field.children.length > 60) {
+    field.removeChild(field.firstChild);
+  }
+  // 同步刷新宠物页面
+  const pc = document.getElementById('petCharacter');
+  if(pc) { petGrowAnimation(); renderPetPage(); }
+}
+// 只更新统计数字（不重绘整个区域）
+function updateGardenStats() {
+  const stats = document.getElementById('roseStats');
+  if(!stats) return;
+  const g = state.garden;
+  const flowers = g.flowers || [];
+  const todayFlowers = flowers.filter(f=>f.date===today());
+  let streak = 0;
+  for(let i=0;i<366;i++){
+    const d=new Date(); d.setDate(d.getDate()-i);
+    const ds=d.toISOString().slice(0,10);
+    const dayFlowers = flowers.filter(f=>f.date===ds);
+    if(dayFlowers.length>=3) streak++; else if(i===0) continue; else break;
+  }
+  stats.innerHTML = '<div class="rs-item rs-rose"><div class="rs-num">'+flowers.length+'</div><div>🌹 总花数</div></div><div class="rs-item rs-today"><div class="rs-num">'+todayFlowers.length+'</div><div>今日新种</div></div><div class="rs-item rs-streak"><div class="rs-num">'+streak+'</div><div>连续天数</div></div>';
+}
+function removeRose(type, source) {
+  const g = state.garden;
+  if(!g.flowers) return;
+  const ds = today();
+  // 从数据里移除
+  g.flowers = g.flowers.filter(f => !(f.date===ds && f.type===type && f.source===source));
+  g.roses = g.flowers.length;
+  // 从 DOM 里移除最后一朵同类型花
+  const field = document.getElementById('roseField');
+  if(field) {
+    const rt = ROSE_TYPES[type] || ROSE_TYPES.todo;
+    const spans = field.querySelectorAll('.rose-flower');
+    for(let i=spans.length-1; i>=0; i--) {
+      if(spans[i].title.indexOf(rt.name) >= 0) {
+        field.removeChild(spans[i]);
+        break;
+      }
+    }
+    if(!field.children.length) {
+      field.innerHTML = '<div style="text-align:center;color:var(--gray);font-size:13px;padding:30px 10px;">🌱 完成任务种下第一朵玫瑰吧</div>';
+    }
+  }
+  updateGardenStats();
+}
+function checkGardenBonus() {
+  // 检查今天是否所有模块都完成了（全勤花）
+  const g = state.garden;
+  const ds = today();
+  if(g.lastBonusDate === ds) return; // 今天已领
+  const tt = state.tasks[ds] || {};
+  const todos = getTodos();
+  const todoAllDone = todos.length > 0 && todos.every(t=>t.done);
+  // 检查今天是否记录了体重和收支
+  const hasWeight = state.weights.some(w=>w.date===ds);
+  const hasFinance = state.records.some(r=>r.date===ds);
+  const allDone = tt.english && tt.fitness && tt.manage && tt.knowledge && todoAllDone && hasWeight && hasFinance;
+  if(allDone) {
+    g.lastBonusDate = ds;
+    plantRose('all', '全勤');
+    save();
+    setTimeout(() => toast('🏵️ 今日全勤！种下一朵全勤之花！'), 500);
+  }
+}
+function renderGarden() {
+  const field = document.getElementById('roseField');
+  if(!field) return;
+  const g = state.garden || {flowers:[], roses:0};
+  const flowers = g.flowers || [];
+  if(!flowers.length) {
+    field.innerHTML = '<div style="text-align:center;color:var(--gray);font-size:13px;padding:30px 10px;">🌱 完成任务种下第一朵玫瑰吧</div>';
+    updateGardenStats();
+    return;
+  }
+  // 初始化时全量构建（之后种花/取消用 append/remove 增量更新）
+  const display = flowers.slice(-60);
+  field.innerHTML = display.map(f => {
+    const rt = ROSE_TYPES[f.type] || ROSE_TYPES.todo;
+    return `<span class="rose-flower" title="${rt.name} · ${f.source} · ${f.date}">${rt.icon}</span>`;
+  }).join('');
+  updateGardenStats();
+}
+
+// ============ 宠物养成页面 ============
+// 宠物成长阶段：打卡次数 = 喂养次数，决定宠物形态
+const PET_STAGES = [
+  {n:0,  icon:'🥚', name:'蛋', pet:'神秘蛋', mood:'💤 还在蛋里，需要被唤醒...', size:48},
+  {n:1,  icon:'🐤', name:'幼崽', pet:'小鸡仔', mood:'🐣 破壳了！好可爱！', size:52},
+  {n:5,  icon:'🐰', name:'幼年', pet:'小兔叽', mood:'🐰 蹦蹦跳跳好开心！', size:56},
+  {n:12, icon:'🐱', name:'少年', pet:'小猫咪', mood:'🐱 开始好奇探索世界了', size:60},
+  {n:20, icon:'🦊', name:'青年', pet:'小狐狸', mood:'🦊 变聪明了，会撒娇！', size:64},
+  {n:30, icon:'🐼', name:'成年', pet:'团团圆圆', mood:'🐼 圆滚滚的，好想抱！', size:68},
+  {n:45, icon:'🦁', name:'壮年', pet:'小狮王', mood:'🦁 威风凛凛！', size:72},
+  {n:60, icon:'🐲', name:'传奇', pet:'小龙人', mood:'🐲 神龙降世！', size:76},
+  {n:80, icon:'🦄', name:'神话', pet:'独角兽', mood:'🦄 传说级伙伴！你做到了！', size:80},
+];
+function getPetStage(count) {
+  let stage = PET_STAGES[0];
+  for(let i=PET_STAGES.length-1; i>=0; i--) {
+    if(count >= PET_STAGES[i].n) { stage = PET_STAGES[i]; break; }
+  }
+  return stage;
+}
+function renderPetPage() {
+  const charEl = document.getElementById('petCharacter');
+  const nameEl = document.getElementById('petName');
+  const moodEl = document.getElementById('petMood');
+  const stageEl = document.getElementById('petStage');
+  const barEl = document.getElementById('petBar');
+  const progressText = document.getElementById('petProgressText');
+  const statsEl = document.getElementById('petStats');
+  const todayList = document.getElementById('petTodayList');
+  if(!charEl) return;
+  const g = state.garden || {flowers:[], roses:0};
+  const flowers = g.flowers || [];
+  const feedCount = flowers.length;
+  const stage = getPetStage(feedCount);
+  // 宠物形象
+  charEl.textContent = stage.icon;
+  charEl.style.fontSize = stage.size + 'px';
+  if(nameEl) nameEl.textContent = stage.pet;
+  if(moodEl) moodEl.textContent = stage.mood;
+  if(stageEl) stageEl.textContent = stage.name;
+  // 成长进度
+  const stageIdx = PET_STAGES.indexOf(stage);
+  const nextStage = PET_STAGES[stageIdx+1];
+  if(nextStage) {
+    const pct = Math.round((feedCount - stage.n) / (nextStage.n - stage.n) * 100);
+    if(barEl) barEl.style.width = pct + '%';
+    if(progressText) progressText.textContent = '再喂 ' + (nextStage.n - feedCount) + ' 次成长为「' + nextStage.pet + '」';
+  } else {
+    if(barEl) barEl.style.width = '100%';
+    if(progressText) progressText.textContent = '🏆 满级！你的' + stage.pet + '已是传说！';
+  }
+  // 统计
+  const todayFlowers = flowers.filter(f=>f.date===today());
+  let streak = 0;
+  for(let i=0;i<366;i++){
+    const d=new Date(); d.setDate(d.getDate()-i);
+    const ds=d.toISOString().slice(0,10);
+    const dayFlowers = flowers.filter(f=>f.date===ds);
+    if(dayFlowers.length>=1) streak++; else if(i===0) continue; else break;
+  }
+  if(statsEl) {
+    const cell = (v,l)=>'<div class="s"><div class="v">'+v+'</div><div class="l">'+l+'</div></div>';
+    statsEl.innerHTML = cell(feedCount,'总喂养') + cell(todayFlowers.length,'今日喂养') + cell(streak,'连续天数');
+  }
+  // 今日喂养列表
+  if(todayList) {
+    if(!todayFlowers.length) {
+      todayList.innerHTML = '<div class="empty" style="padding:16px;">今天还没喂养，去完成一个任务吧 🍽️</div>';
+    } else {
+      todayList.innerHTML = todayFlowers.slice().reverse().map(f => {
+        const rt = ROSE_TYPES[f.type] || ROSE_TYPES.todo;
+        return '<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #f5f5f5;"><span style="font-size:24px;">'+rt.icon+'</span><div><div style="font-size:13px;font-weight:500;color:'+rt.color+';">'+rt.name+'</div><div style="font-size:11px;color:var(--gray);">'+f.source+'</div></div></div>';
+      }).join('');
+    }
+  }
+}
+// 宠物成长动画
+function petGrowAnimation() {
+  const char = document.getElementById('petCharacter');
+  if(!char) return;
+  char.classList.add('growing');
+  setTimeout(() => char.classList.remove('growing'), 800);
+}
+function awardPoints(delta, text) {
+  const r = state.rewards;
+  r.points = Math.max(0, (r.points||0) + delta);
+  r.log = r.log || [];
+  r.log.unshift({date: today(), text: text, delta: delta});
+  if(r.log.length > 100) r.log.pop();
+}
+function checkTodoBonus() {
+  const todos = getTodos();
+  if(!todos.length) return;
+  const allDone = todos.every(t=>t.done);
+  if(!allDone) return;
+  const r = state.rewards;
+  // 每日「全部完成」奖励（每天一次）
+  if(r.lastBonusDate !== today()) {
+    r.lastBonusDate = today();
+    awardPoints(20, '🎉 今日全部完成 +20');
+    toast('太棒了！今日全部完成 +20 积分 🎉');
+  }
+  // 连续全完成天数（动态计算）
+  let streak = 0;
+  for(let i=0; i<366; i++) {
+    const d = new Date(); d.setDate(d.getDate()-i);
+    const ds = d.toISOString().slice(0,10);
+    const td = getTodos(ds);
+    if(!td.length) { if(i===0) continue; else break; }
+    if(td.every(t=>t.done)) streak++; else break;
+  }
+  if(streak > (r.lastStreak||0)) {
+    if(streak > 1) {
+      const bonus = streak * 5;
+      awardPoints(bonus, '🔥 连续'+streak+'天全完成 +'+bonus);
+      toast('连续 '+streak+' 天全完成，奖励 '+bonus+' 积分 🔥');
+    }
+    r.lastStreak = streak;
+    r.lastStreakDate = today();
+  }
+}
+function openRewardModal() {
+  document.getElementById('rewardName').value = '';
+  document.getElementById('rewardCost').value = '';
+  openModal('rewardModal');
+}
+function saveRewardItem() {
+  const name = document.getElementById('rewardName').value.trim();
+  const cost = parseInt(document.getElementById('rewardCost').value) || 0;
+  if(!name) { toast('请输入奖励名称'); return; }
+  if(cost <= 0) { toast('请输入有效积分'); return; }
+  const r = state.rewards;
+  if(!r.items) r.items = [];
+  r.items.push({id: uid(), name: name, cost: cost, icon: '🎁'});
+  save(); closeModal('rewardModal'); renderNow(() => renderReward());
+  toast('心愿已添加 ✓');
+}
+function redeemReward(id) {
+  const r = state.rewards;
+  const item = r.items.find(x=>x.id===id);
+  if(!item) return;
+  if((r.points||0) < item.cost) { toast('积分不足，还差'+(item.cost - r.points)+'分'); return; }
+  showConfirm('用 '+item.cost+' 积分兑换「'+item.name+'」？', () => {
+    awardPoints(-item.cost, '兑换：'+item.name);
+    save(); renderNow(() => { renderReward(); renderTodoPage(); });
+    toast('兑换成功 🎁 去享受吧');
+  });
+}
+function renderReward() {
+  const r = state.rewards;
+  const ptsEl = document.getElementById('rewardPoints');
+  const todayEl = document.getElementById('rewardToday');
+  const streakEl = document.getElementById('rewardStreak');
+  const listEl = document.getElementById('rewardList');
+  if(!ptsEl) return;
+  ptsEl.textContent = r.points||0;
+  const todayGain = (r.log||[]).filter(l=>l.date===today() && l.delta>0).reduce((s,l)=>s+l.delta,0);
+  todayEl.textContent = '+' + todayGain;
+  // 连续全完成天数
+  let streak = 0;
+  for(let i=0; i<366; i++) {
+    const d = new Date(); d.setDate(d.getDate()-i);
+    const ds = d.toISOString().slice(0,10);
+    const td = getTodos(ds);
+    if(!td.length) { if(i===0) continue; else break; }
+    if(td.every(t=>t.done)) streak++; else break;
+  }
+  streakEl.textContent = '🔥' + streak + '天';
+  if(!r.items || !r.items.length) {
+    listEl.innerHTML = '<div class="empty" style="padding:14px;">还没有心愿奖励，点下方添加</div>';
+    return;
+  }
+  listEl.innerHTML = r.items.map(it=>{
+    const can = (r.points||0) >= it.cost;
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f0f0f0;">
+      <div style="font-size:14px;">${it.icon||'🎁'} ${it.name}</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:12px;color:var(--gray);">${it.cost}分</span>
+        <button class="btn btn-sm ${can?'':'btn-outline'}" style="${can?'':'opacity:.5;'}" onclick="redeemReward('${it.id}')">兑换</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ===== 今日待办独立页面 =====
+function addPageTodo() {
+  const input = document.getElementById('todoPageInput');
+  const text = input.value.trim();
+  if(!text) { toast('请输入待办内容'); return; }
+  const priority = document.getElementById('todoPagePriority').value;
+  if(!state.todos) state.todos = {};
+  const key = 'todo_' + today();
+  if(!state.todos[key]) state.todos[key] = [];
+  state.todos[key].push({id:uid(), text:text, done:false, priority:priority, created:new Date().toISOString()});
+  input.value = '';
+  // 即时反馈
+  const fbEl = document.getElementById('todoFeedback');
+  if(fbEl) fbEl.textContent = '✅ 已添加：' + text;
+  save();
+  renderNow(() => { renderTodo(); renderTodoPage(); });
+  toast('已添加 ✓');
+}
+function renderTodoPage() {
+  const el = document.getElementById('todoPageList');
+  if(!el) return;
+  const todos = getTodos();
+  const done = todos.filter(t=>t.done).length;
+  const stat = document.getElementById('todoPageStats');
+  if(stat) stat.textContent = done + '/' + todos.length;
+  const pOrder = {high:0, mid:1, low:2};
+  const pName = {high:'高', mid:'中', low:'低'};
+  const sorted = [...todos].sort((a,b)=>{
+    if(a.done!==b.done) return a.done?1:-1;
+    return pOrder[a.priority]-pOrder[b.priority];
+  });
+  // 用 DOM API 而非 innerHTML（iOS data URI 下更可靠）
+  while(el.firstChild) el.removeChild(el.firstChild);
+  if(!sorted.length) {
+    const empty = document.createElement('div');
+    empty.className = 'td-empty';
+    empty.innerHTML = '<span class="emoji">🐱</span>今天还没有待办<br>在上方输入框添加一个吧';
+    el.appendChild(empty);
+    renderReward();
+    return;
+  }
+  sorted.forEach(t => {
+    const row = document.createElement('div');
+    row.className = 'td-item';
+    const check = document.createElement('div');
+    check.className = 'td-check' + (t.done?' done':'');
+    if(t.done) check.textContent = '✓';
+    check.onclick = () => toggleTodo(t.id);
+    const text = document.createElement('div');
+    text.className = 'td-text' + (t.done?' done':'');
+    text.textContent = t.text;
+    const pri = document.createElement('span');
+    pri.className = 'td-pri ' + t.priority;
+    pri.textContent = pName[t.priority];
+    text.appendChild(pri);
+    const del = document.createElement('span');
+    del.className = 'td-del';
+    del.textContent = '🗑️';
+    del.onclick = () => deleteTodo(t.id);
+    row.appendChild(check);
+    row.appendChild(text);
+    row.appendChild(del);
+    el.appendChild(row);
+  });
+  renderReward();
+}
+
+// ===== 穿搭达人：方圆脸157女生 =====
+const DRESS_DATA = {
+  jewelry: [
+    {title:'方圆脸适合什么耳环？显脸小耳饰推荐', kw:'方圆脸 耳环 显脸小 推荐'},
+    {title:'方圆脸项链怎么选？V领/长链修饰脸型', kw:'方圆脸 项链 推荐 V领'},
+    {title:'方圆脸帽子搭配 贝雷帽/鸭舌帽显脸小', kw:'方圆脸 帽子 搭配 显脸小'},
+    {title:'方圆脸适合戴墨镜吗？镜框选择', kw:'方圆脸 墨镜 镜框 选择'}
+  ],
+  makeup: [
+    {title:'方圆脸修容教程 三步瘦脸显轮廓', kw:'方圆脸 修容教程 瘦脸'},
+    {title:'方圆脸日常妆容 鼻影腮红正确画法', kw:'方圆脸 日常妆容 鼻影 腮红'},
+    {title:'方圆脸怎么画眉显脸长 野生眉教程', kw:'方圆脸 画眉 显脸长'},
+    {title:'方圆脸底妆 高光阴影位置', kw:'方圆脸 底妆 高光 阴影'}
+  ],
+  wear: [
+    {title:'157小个子穿搭显高 上短下长法则', kw:'157 小个子 穿搭 显高'},
+    {title:'方圆脸身材穿搭 扬长避短', kw:'方圆脸 身材 穿搭'},
+    {title:'小个子秋冬通勤穿搭 显高又气质', kw:'小个子 秋冬 通勤 穿搭'},
+    {title:'157女生显瘦穿搭 梨形身材救星', kw:'157 女生 显瘦 穿搭 梨形'}
+  ],
+  hair: [
+    {title:'方圆脸发型推荐 8款修饰脸型', kw:'方圆脸 发型 推荐'},
+    {title:'方圆脸短发怎么剪 层次感很重要', kw:'方圆脸 短发 剪 层次'},
+    {title:'方圆脸扎发 显脸小丸子头/马尾', kw:'方圆脸 扎发 丸子头 马尾'},
+    {title:'方圆脸刘海选择 八字/法式刘海', kw:'方圆脸 刘海 八字 法式'}
+  ]
+};
+function renderDress() {
+  const map = {jewelry:'dressJewelry', makeup:'dressMakeup', wear:'dressWear', hair:'dressHair'};
+  for(const k in map) {
+    const el = document.getElementById(map[k]);
+    if(!el) continue;
+    el.innerHTML = DRESS_DATA[k].map(v=>`
+      <div class="video-card" onclick="window.open('https://search.bilibili.com/all?keyword=${encodeURIComponent(v.kw)}','_blank')">
+        <div class="v-info">
+          <div class="v-title">${v.title}</div>
+          <div class="v-meta">🔍 ${v.kw}</div>
+        </div>
+      </div>`).join('');
+  }
+}
+function copyTodos() {
+  const todos = getTodos();
+  if(!todos.length) { toast('今日没有待办'); return; }
+  const text = '📋 今日待办 '+today()+'\n' + todos.map((t,i)=>`${t.done?'✅':'⬜'} ${i+1}. ${t.text}`).join('\n');
+  if(navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(()=>toast('已复制到剪贴板')).catch(()=>fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); toast('已复制到剪贴板'); }
+  catch(e) { toast('复制失败，请手动复制'); }
+  document.body.removeChild(ta);
+}
+function renderTodo() {
+  const todos = getTodos();
+  const done = todos.filter(t=>t.done);
+  const pending = todos.filter(t=>!t.done);
+  const rate = todos.length ? Math.round(done.length/todos.length*100) : 0;
+
+  document.getElementById('todoPending').textContent = pending.length;
+  document.getElementById('todoDone').textContent = done.length;
+  document.getElementById('todoRate').textContent = rate+'%';
+  document.getElementById('todoDateBadge').textContent = today().slice(5);
+  document.getElementById('todoCount').textContent = todos.length+'项';
+  document.getElementById('todoList').innerHTML = todos.length ? 'ok' : '';
+
+  // 近7天完成情况（保留统计数据）
+  const weekDays = [];
+  for(let i=6;i>=0;i--) {
+    const d = new Date(); d.setDate(d.getDate()-i);
+    const ds = d.toISOString().slice(0,10);
+    const td = getTodos(ds);
+    const tdDone = td.filter(t=>t.done).length;
+    weekDays.push({date:d, ds, total:td.length, done:tdDone});
+  }
+  document.getElementById('todoWeekView').innerHTML = weekDays.map(w=>{
+    const wd = w.date.getDay();
+    const lbl = ['日','一','二','三','四','五','六'][wd];
+    const isToday = w.ds===today();
+    const r = w.total ? w.done/w.total : 0;
+    const color = w.total===0 ? '#f0f0f0' : r===1 ? '#52c41a' : r>=0.5 ? '#faad14' : '#fa8c16';
+    return `<span style="display:inline-block;padding:4px;border-radius:6px;background:${color};color:${w.total>0?'#fff':'var(--gray)'};${isToday?'border:2px solid var(--primary);':''};margin:0 2px;font-size:10px;">${lbl} ${w.done}/${w.total}</span>`;
+  }).join('');
+}
+
+// ============ 知识学习 ============
+const KNOW_VIDEOS = {
+  history: [
+    {title:'中国通史 纪录片100集', channel:'央视CCTV', dur:'100集', url:'https://www.bilibili.com/bangumi/media/md28229010/'},
+    {title:'百家讲坛：易中天品三国 全55讲', channel:'易中天', dur:'55集', url:'https://www.bilibili.com/bangumi/media/md28224109'},
+    {title:'百家讲坛：王立群读史记之秦始皇', channel:'王立群', dur:'37集', url:'https://www.bilibili.com/bangumi/play/ep299605'},
+    {title:'沙盘上的战争：大唐开国第一战', channel:'沙盘上的战争', dur:'20分钟', url:'https://www.bilibili.com/video/BV17b4y1h7Ha/'},
+    {title:'沙盘上的战争：安史之乱', channel:'沙盘上的战争', dur:'30分钟', url:'https://www.bilibili.com/video/BV1A8411C7Ho/'},
+    {title:'渤海小吏：三国争霸系列', channel:'渤海小吏', dur:'系列合集', url:'https://space.bilibili.com/504934876'},
+    {title:'稚嫩的魔法师：东晋与十六国', channel:'稚嫩的魔法师', dur:'系列合集', url:'https://space.bilibili.com/1276787'}
+  ],
+  figure: [
+    {title:'历史调研室：拿破仑系列', channel:'历史调研室', dur:'30-40分钟/集', url:'https://space.bilibili.com/4767/channel/series'},
+    {title:'从囚徒到总统！拿破仑侄子如何问鼎法国', channel:'历史调研室', dur:'35分钟', url:'https://www.bilibili.com/video/BV1nAG9zPEGk/'},
+    {title:'木鱼水心：经典名著与历史人物解读', channel:'木鱼水心', dur:'30-60分钟', url:'https://space.bilibili.com/927587/channel/collectiondetail'},
+    {title:'御史房：历史人物深度解读', channel:'御史房', dur:'20-30分钟', url:'https://space.bilibili.com/34264408'},
+    {title:'百家讲坛：易中天品三国人物', channel:'易中天', dur:'含在55讲中', url:'https://www.bilibili.com/bangumi/play/ep299707'},
+    {title:'王立群读史记之秦始皇人物系列', channel:'王立群', dur:'37集', url:'https://www.bilibili.com/bangumi/play/ep299605'}
+  ],
+  roundtable: [
+    {title:'圆桌派 第一季 全24集', channel:'窦文涛/看理想', dur:'24集', url:'https://search.bilibili.com/all?keyword=%E5%9C%86%E6%A1%8C%E6%B4%BE%20%E7%AC%AC%E4%B8%80%E5%AD%A3'},
+    {title:'圆桌派 第二季 全24集', channel:'窦文涛/看理想', dur:'24集', url:'https://search.bilibili.com/all?keyword=%E5%9C%86%E6%A1%8C%E6%B4%BE%20%E7%AC%AC%E4%BA%8C%E5%AD%A3'},
+    {title:'圆桌派 第三季 全24集', channel:'窦文涛/看理想', dur:'24集', url:'https://search.bilibili.com/all?keyword=%E5%9C%86%E6%A1%8C%E6%B4%BE%20%E7%AC%AC%E4%B8%89%E5%AD%A3'},
+    {title:'圆桌派 第四季', channel:'窦文涛/看理想', dur:'全季合集', url:'https://search.bilibili.com/all?keyword=%E5%9C%86%E6%A1%8C%E6%B4%BE%20%E7%AC%AC%E5%9B%9B%E5%AD%A3'},
+    {title:'圆桌派 第五季', channel:'窦文涛/看理想', dur:'全季合集', url:'https://search.bilibili.com/all?keyword=%E5%9C%86%E6%A1%8C%E6%B4%BE%20%E7%AC%AC%E4%BA%94%E5%AD%A3'},
+    {title:'圆桌派 第六季', channel:'窦文涛/优酷', dur:'全季合集', url:'https://search.bilibili.com/all?keyword=%E5%9C%86%E6%A1%8C%E6%B4%BE%20%E7%AC%AC%E5%85%AD%E5%AD%A3'},
+    {title:'圆桌派 第七季 2024', channel:'窦文涛/优酷', dur:'全季合集', url:'https://search.bilibili.com/all?keyword=%E5%9C%86%E6%A1%8C%E6%B4%BE%20%E7%AC%AC%E4%B8%83%E5%AD%A3'},
+    {title:'圆桌派：谈失恋', channel:'窦文涛', dur:'40分钟', url:'https://www.bilibili.com/video/BV19wVP6eE4H/'}
+  ],
+  thirteen: [
+    {title:'十三邀：许知远对话罗翔 正义到底是什么', channel:'十三邀', dur:'40分钟', url:'https://www.bilibili.com/video/BV1fv41147pe/'},
+    {title:'十三邀：许知远对话罗振宇 完整版', channel:'许知远', dur:'2小时47分', url:'https://www.bilibili.com/video/BV1UJiFBKESS/'},
+    {title:'许知远对话罗振宇：五年之后再答', channel:'许知远', dur:'1小时52分', url:'https://www.bilibili.com/video/BV1Km4y1Q7Be/'},
+    {title:'十三邀：李诞访谈完整版', channel:'许知远', dur:'2小时53分', url:'https://www.bilibili.com/video/BV1hDDgYjEni/'},
+    {title:'十三邀：许知远对话蔡澜 纯享版', channel:'许知远', dur:'1小时20分', url:'https://www.bilibili.com/video/BV1jeypBvEnR/'},
+    {title:'十三邀第九季 完整合集', channel:'许知远', dur:'5小时50分', url:'https://www.bilibili.com/video/BV15XF8zbEab/'},
+    {title:'十三邀×咏梅：我不能变成自己不喜欢的人', channel:'十三邀官方', dur:'5分钟', url:'https://www.bilibili.com/video/BV1MoBVYdEJC/'}
+  ],
+  debate: [
+    {title:'1993国际大专辩论赛决赛：人性本善/恶', channel:'央视', dur:'1小时', url:'https://www.bilibili.com/video/BV1Tx411A75q/'},
+    {title:'2001国际大专辩论赛决赛：钱是不是万恶之源', channel:'央视', dur:'1小时', url:'https://www.bilibili.com/video/BV1L1gy62EVy/'},
+    {title:'国际大专辩论赛经典赛事合集', channel:'B站合集', dur:'多场', url:'https://www.bilibili.com/list/ml1319874935?oid=52565596&bvid=BV1H4411J76B'},
+    {title:'詹青云VS陈铭开杠名场面', channel:'奇葩说', dur:'5-10分钟', url:'https://www.bilibili.com/video/BV1gAsJzJEXz/'},
+    {title:'神级辩论名场面 史上最强辩论赛', channel:'辩论说', dur:'5分钟', url:'https://www.bilibili.com/video/BV1xTVizhEaz/'},
+    {title:'奇葩说第六季：如果一生平凡你会后悔吗', channel:'奇葩说', dur:'1小时', url:'https://www.iqiyi.com/playlist1070103902.html'}
+  ]
+};
+
+const KNOW_DAILY = [
+  {cat:'历史朝代', tip:'今天看一集《中国通史》或《易中天品三国》，了解一个朝代的兴衰规律。历史不会重复，但会押韵。', icon:'🏛️'},
+  {cat:'历史人物', tip:'今天看一期「历史调研室」或「木鱼水心」，从历史人物的抉择中学习决策智慧。', icon:'👤'},
+  {cat:'圆桌派', tip:'今天看一集《圆桌派》，听窦文涛和嘉宾聊人生百态。好的谈话节目是思想的盛宴。', icon:'🟢'},
+  {cat:'十三邀', tip:'今天看一期《十三邀》，许知远带着偏见去对话不同领域的人，打开认知边界。', icon:'🎯'},
+  {cat:'辩论赛', tip:'今天看一场经典辩论赛，学习逻辑思辨和语言表达。1993年决赛是永恒经典。', icon:'⚡'}
+];
+
+function renderKnowledge() {
+  renderTaskStatus('knowledge', 'knowBadge', 'knowBar', 'knowDoneBtn');
+  // 今日推荐（按星期轮换）
+  const dayIdx = (new Date().getDay()+6) % 5; // 周一=0
+  const daily = KNOW_DAILY[dayIdx];
+  document.getElementById('knowDaily').innerHTML = `
+    <div style="background:linear-gradient(135deg,#667eea22,#764ba222);border-radius:8px;padding:12px;">
+      <div style="font-size:14px;font-weight:600;margin-bottom:6px;">${daily.icon} 今日学习方向：${daily.cat}</div>
+      <div style="font-size:13px;color:var(--gray);line-height:1.6;">${daily.tip}</div>
+    </div>
+  `;
+  // 渲染各类视频
+  const renderVideoList = (arr) => arr.map(v=>`
+    <div class="video-card" onclick="window.open('${v.url}','_blank')">
+      <div class="v-info">
+        <div class="v-title">${v.title}</div>
+        <div class="v-meta">${v.channel} · ${v.dur}</div>
+      </div>
+    </div>`).join('');
+  document.getElementById('knowHistory').innerHTML = renderVideoList(KNOW_VIDEOS.history);
+  document.getElementById('knowFigure').innerHTML = renderVideoList(KNOW_VIDEOS.figure);
+  document.getElementById('knowRoundtable').innerHTML = renderVideoList(KNOW_VIDEOS.roundtable);
+  document.getElementById('knowThirteen').innerHTML = renderVideoList(KNOW_VIDEOS.thirteen);
+  document.getElementById('knowDebate').innerHTML = renderVideoList(KNOW_VIDEOS.debate);
+}
+
+// ============ 新媒体副业 ============
+const NM_PERSONAS = [
+  {name:'职场清醒派', tag:'30岁+管理层/职场清醒剂', audience:'25-35岁职场女性', direction:'职场潜规则、向上管理、薪资谈判、跳槽决策', monetization:'1v1咨询299-999元、简历修改、职场训练营、品牌广告'},
+  {name:'搞钱女孩/副业实操派', tag:'下班后搞钱达人/副业亲测者', audience:'月薪5K-1.5W想突破收入的女性', direction:'副业实测复盘、搞钱路径拆解、存款进度公开', monetization:'陪跑社群199-999元/月、电子书、工具推广分成'},
+  {name:'大龄单身清醒派', tag:'30岁未婚清醒人/不将就', audience:'28-35岁未婚、被催婚的都市女性', direction:'未婚清醒观点、独居技能、催婚应对、单身财务规划', monetization:'清醒聊天室、独居好物带货、付费社群'},
+  {name:'独立女性生活技能派', tag:'独居能手/生活主权捍卫者', audience:'独居女性、租房年轻女性', direction:'家居维修、租房攻略、生活技能、独居安全', monetization:'品牌广告1.5万/条、生活好物带货、线下课程'},
+  {name:'认知成长/觉醒派', tag:'30岁觉醒者/认知升级', audience:'想突破认知局限的成长型女性', direction:'30岁觉醒、社会潜规则、读书改变命运、思维模型', monetization:'读书会年费制、知识付费课程、企业培训'}
+];
+
+const NM_TOPICS = {
+  '职场干货': [
+    '30岁做到管理层，我踩过的3个致命坑','裸辞前必看的5个真相（附存款计算公式）','月薪5K到3W，我做对了这4件事',
+    '领导不说但你必须懂的6个职场潜规则','30岁还没当上管理层？可能是你犯了这5个错','向上管理的3个话术，让领导主动给你加薪',
+    '辞职前，请先算清这笔账（附裸辞成本清单）','在大厂5年，我学到的最值钱的3个能力','职场新人前3年，千万别做这7件事',
+    '被领导PUA后，我用这4步完成逆袭','30岁转行来得及吗？我亲测的3个路径','开会发言的5个万能公式，从此不被忽视',
+    '你的简历为什么石沉大海？HR视角的3个真相','体制内vs体制外，30岁女性的真实对比','下班后坚持做这3件事，半年后薪资翻倍'
+  ],
+  '独立女性/情感清醒': [
+    '30岁未婚，我过得比同龄人好的5个习惯','不结婚不丢人，丢人的是30岁还没搞钱能力','被催婚7年，我总结了5句万能回怼话术',
+    '独居3年，我学会的10个保命技能','放弃渴望被爱，是女性成长的第一步','30岁后，我把这5种人请出了生命',
+    '单身女孩的财务规划：30岁存款XX万路径','不将就的人生有多爽？30岁未婚女性的清醒日常','为什么越独立的女性越难脱单？3个扎心真相',
+    '被前任PUA后，我花2年重建了自我价值','30岁不焦虑的底层逻辑：把人生掌控权拿回来','独居女孩的安全清单：这15件事必须会',
+    '比起嫁得好，这3个能力才是女人最大的底气','我不结婚不是因为挑，是因为这4个清醒认知','从讨好型人格到清醒大女主，我做对了这5件事'
+  ],
+  '搞钱/副业': [
+    '下班后2小时，我靠小红书月入过万的3个方法','30岁存款50万，我的搞钱路径全公开','2025年最适合女生做的5个副业（亲测有效）',
+    '从月薪4K到副业收入超主业，我只用了这3个工具','AI时代搞钱新思路：用这3个工具每月多赚5K','小红书0粉起号，30天接到第一单的完整复盘',
+    '我不靠颜值不靠人脉，靠这4个技能月入2万','30岁女性的搞钱清醒：这5个副业千万别碰','把月薪花光到存款破30万，我的3年理财复盘',
+    '抖音/小红书/视频号，哪个平台最适合理财小白搞钱','下班后做这3件事，比刷手机值钱100倍','靠知识付费月入过万？我踩过的5个坑你别踩',
+    '30岁搞钱女孩的时间管理术：一天当两天用','从0到月入1万，我做自媒体用了多少天？（附每日收入明细）','普通打工女孩如何建立3条收入管道？我的实操路径'
+  ],
+  '生活方式': [
+    '独居女孩的高效早晨routine（5:30起床版）','30岁后的极简生活清单：我扔掉了这50样东西','月薪8K也能过的精致生活：我的月度预算分配',
+    '独居3年，这些好物让我的幸福值拉满（附清单）','30岁女性的年度体检清单：这8项必须查','下班后的独居治愈routine：3小时充满电',
+    '租房女孩的厨房改造：500元搞定一个月伙食','30岁后我不再买的10样东西，省钱又省心','独居女孩的一周备餐指南：2小时搞定5天午餐',
+    '从乱到治：30岁后我建立的5个生活系统','一个人住的安全感清单：门锁/监控/应急包','30岁后的高质量独居：早晨冲咖啡+晚上泡脚+周末徒步',
+    '我的月度复盘模板：30岁后靠这3页纸管理人生','独居女孩搬家指南：这15个细节没人告诉你','30岁后才知道，独居是最好的自我投资'
+  ],
+  '认知成长': [
+    '30岁才明白的10个社会潜规则','读过的书如何改变了我？5本书+5次人生转折','30岁觉醒，爆发式的人生有多爽',
+    '女生不内耗，人生真的会赢麻','起床后黄金1小时，超越同龄人的5个习惯','30岁后才懂的6个人性真相',
+    '自律一年，我变成大家羡慕的样子（附执行清单）','这5个思维模型，让我的决策质量提升10倍','30岁女性的认知突围：从打工思维到资产思维',
+    '我花3万学的运营课，核心就这5个方法','为什么有的人30岁就开窍了？3个底层逻辑','停止内耗的5个方法，30岁后我的人生开挂了',
+    '30岁后必须建立的4个系统：健康/财务/人脉/认知','从焦虑到清醒：30岁女性的认知升级地图','你30岁的人生走向，藏在每天的这3个选择里'
+  ]
+};
+
+const NM_FORMULAS = [
+  {name:'数字+痛点+解决', tpl:'X个方法/技巧 + 解决Y痛点 + 获得Z结果', eg:'7个方法让你的小红书笔记上热门（点击率提升200%）'},
+  {name:'时间限定+紧迫感', tpl:'X天 + 可视化结果 + 方法/计划', eg:'30天小红书起号，从0粉到接第一单'},
+  {name:'身份认同+情感共鸣', tpl:'特定人群标签 + 痛点 + 情感词', eg:'30+未婚女性必看！这5个搞钱习惯让我多活2年'},
+  {name:'对比反差+认知冲突', tpl:'被误认为X + 其实是Y + 方法差异', eg:'同事以为我月入3万，其实我靠副业月入5万'},
+  {name:'否定句式+逆向思维', tpl:'千万别/别再 + 常见做法 + 正确方法', eg:'别再存钱了！30岁女性最该投资的是这3件事'},
+  {name:'提问引导+答案预告', tpl:'为什么 + 现象 + ？答案出乎意料', eg:'为什么有的女生30岁就财务自由了？真相让我意外'},
+  {name:'情绪词+夸张对比', tpl:'情绪词 + 具体事物 + 效果', eg:'绝了！这个时间管理法让20小时看起来像48小时'},
+  {name:'独家揭秘+稀缺性', tpl:'行业秘密/内部资料 + 很少人知道', eg:'HR不会告诉你的3个薪资谈判技巧'},
+  {name:'前后对比+具体数字', tpl:'从X到Y + 时间/方法', eg:'从月薪3千到月入2万，我做对了这3件事'},
+  {name:'场景化+可视化描述', tpl:'具体场景 + 画面感 + 结果', eg:'下班回家10分钟搞定晚餐，比外卖好吃还省钱'}
+];
+
+const NM_DAILY_PLAN = [
+  {day:'周一', type:'职场干货', reason:'周一上班焦虑，用户需要"打鸡血+实用方法"'},
+  {day:'周二', type:'认知成长', reason:'工作进入状态，适合深度思考类内容'},
+  {day:'周三', type:'搞钱/副业', reason:'周中疲劳期，用"搞钱希望"重新激活动力'},
+  {day:'周四', type:'独立女性/情感清醒', reason:'接近周末，情绪需求上升'},
+  {day:'周五', type:'生活方式', reason:'周末即将到来，搜索"周末/生活/独居"高峰'},
+  {day:'周六', type:'人物/故事', reason:'周末有更多时间看长内容'},
+  {day:'周日', type:'总结/计划', reason:'周日做下周规划，搜索"计划/复盘"高峰'}
+];
+
+const NM_GUIDE = [
+  {phase:'第1-7天：定位基建期', tasks:[
+    'Day1 确定赛道：从5个人设方向选1个主赛道+1个副赛道（主70%+副30%）',
+    'Day2 账号四件套：昵称（领域+记忆点）、简介（身份+价值+钩子）、头像（真人露脸）、封面（统一风格）',
+    'Day3 对标拆解：关注20个同赛道中腰部账号（1万-10万粉），拆解爆款标题/封面/结构/发布时间',
+    'Day4 选题库搭建：5类内容各准备5个选题，共25个选题入库',
+    'Day5 模板制作：用Canva做3-5套封面模板，确定视觉风格（配色/字体/排版统一）',
+    'Day6 发布测试：发第1条测试笔记，检查24小时流量是否>200（达标则账号正常）',
+    'Day7 数据复盘：分析测试笔记的点击率、完读率、互动率，确定优化方向'
+  ]},
+  {phase:'第8-21天：内容攻坚期', tasks:[
+    '5:3:2内容比例：50%专业干货+30%泛流量内容+20%人设内容',
+    '脚本模板：开头10秒抛钩子→中间60秒分点干货→结尾10秒引导互动',
+    '发布时间：小红书早7-9点/晚6-9点，抖音晚6-9点，视频号晚8-10点',
+    '种子互动：发布后1小时内引导3-5个种子用户评论+收藏，触发算法推荐',
+    '选题记录：每天花30分钟刷对标内容，记录3个选题灵感'
+  ]},
+  {phase:'第22-30天：数据优化期', tasks:[
+    '点击率≥8%：标题加强引导词，前10字必须含关键词',
+    '互动率≥5%：评论区主动回复前20条，设置互动问题',
+    '涨粉率≥1%：简介突出关注福利（"关注后回复资料领模板"）',
+    '收藏率≥15%：干货内容必须附可下载模板/清单/表格',
+    '爆款复用：高赞图文转视频，或拆解成系列内容',
+    '私域搭建：评论区引导加微信，开始沉淀第一批50-100人'
+  ]}
+];
+
+let nmCurrentCat = '职场干货';
+
+function renderNewMedia() {
+  renderNewMediaTab('nm-daily');
+}
+
+function renderNewMediaTab(sub) {
+  if(sub==='nm-daily') {
+    const dayIdx = (new Date().getDay()+6) % 7; // 周一=0
+    const plan = NM_DAILY_PLAN[dayIdx];
+    document.getElementById('nmDailyBadge').textContent = plan.day;
+    // 从对应类型中选3个选题
+    let topics = NM_TOPICS[plan.type];
+    if(!topics && plan.type==='人物/故事') topics = NM_TOPICS['认知成长'];
+    if(!topics && plan.type==='总结/计划') topics = NM_TOPICS['认知成长'];
+    const startIdx = new Date().getDate() % Math.max(1, topics.length-2);
+    const daily3 = topics.slice(startIdx, startIdx+3);
+    document.getElementById('nmDailyContent').innerHTML = `
+      <div style="background:#fff7e6;border-radius:8px;padding:12px;margin-bottom:12px;">
+        <div style="font-size:13px;color:var(--gray);">今天是<strong style="color:var(--orange);">${plan.day}</strong>，适合发</div>
+        <div style="font-size:18px;font-weight:700;color:var(--primary);margin:4px 0;">${plan.type}</div>
+        <div style="font-size:12px;color:var(--gray);">${plan.reason}</div>
+      </div>
+      <div style="font-size:14px;font-weight:600;margin-bottom:10px;">🔥 今日3个可复制选题：</div>
+      ${daily3.map((t,i)=>`
+        <div class="nm-topic">
+          <span class="nm-cat">${plan.type}</span>
+          <span class="nm-copy" onclick="copyText('${t.replace(/'/g,"\\'")}')">复制</span>
+          <div class="nm-title">${i+1}. ${t}</div>
+        </div>
+      `).join('')}
+      <div style="font-size:12px;color:var(--gray);margin-top:10px;text-align:center;">💡 点击"复制"直接使用，结合自己的经历改编效果更好</div>
+    `;
+  }
+  if(sub==='nm-persona') {
+    document.getElementById('nmPersonaList').innerHTML = NM_PERSONAS.map(p=>`
+      <div class="nm-persona">
+        <div class="p-name">🎯 ${p.name}</div>
+        <div class="p-row"><b>标签：</b>${p.tag}</div>
+        <div class="p-row"><b>受众：</b>${p.audience}</div>
+        <div class="p-row"><b>方向：</b>${p.direction}</div>
+        <div class="p-row"><b>变现：</b>${p.monetization}</div>
+      </div>
+    `).join('');
+  }
+  if(sub==='nm-topics') {
+    // 分类切换按钮
+    const cats = Object.keys(NM_TOPICS);
+    const catBtns = cats.map(c=>`<span class="tag" style="padding:6px 12px;background:${c===nmCurrentCat?'var(--primary)':'#f0f0f0'};color:${c===nmCurrentCat?'#fff':'var(--gray)'};cursor:pointer;border-radius:16px;font-size:13px;" onclick="nmSwitchCat('${c}')">${c}</span>`).join('');
+    const topics = NM_TOPICS[nmCurrentCat] || [];
+    document.getElementById('nmTopicList').innerHTML = `
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;">${catBtns}</div>
+      ${topics.map((t,i)=>`
+        <div class="nm-topic">
+          <span class="nm-cat">${nmCurrentCat}</span>
+          <span class="nm-copy" onclick="copyText('${t.replace(/'/g,"\\'")}')">复制</span>
+          <div class="nm-title">${i+1}. ${t}</div>
+        </div>
+      `).join('')}
+    `;
+  }
+  if(sub==='nm-formula') {
+    document.getElementById('nmFormulaList').innerHTML = NM_FORMULAS.map((f,i)=>`
+      <div class="nm-formula">
+        <div class="fm-name">公式${i+1}：${f.name}</div>
+        <div class="fm-tpl">${f.tpl}</div>
+        <div class="fm-eg">📌 示例：${f.eg}</div>
+      </div>
+    `).join('');
+  }
+  if(sub==='nm-guide') {
+    document.getElementById('nmGuideList').innerHTML = NM_GUIDE.map(g=>`
+      <div class="card" style="margin-bottom:10px;">
+        <div class="card-title" style="font-size:14px;">${g.phase}</div>
+        ${g.tasks.map((t,i)=>`<div class="exercise-item"><div class="num">${i+1}</div><div class="desc">${t}</div></div>`).join('')}
+      </div>
+    `).join('');
+  }
+}
+function nmSwitchCat(cat) {
+  nmCurrentCat = cat;
+  renderNewMediaTab('nm-topics');
+}
+function copyText(text) {
+  if(navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(()=>toast('已复制：'+text.slice(0,20)+'...')).catch(()=>fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+// ============ 统计 ============
+function renderStats() {
+  // 本周任务
+  const weekDays = [];
+  for(let i=6;i>=0;i--) {
+    const d = new Date(); d.setDate(d.getDate()-i);
+    const ds = d.toISOString().slice(0,10);
+    const t = state.tasks[ds] || {english:false,fitness:false,manage:false,knowledge:false};
+    const cnt = (t.english?1:0)+(t.manage?1:0)+(t.knowledge?1:0);
+    weekDays.push({date:d, ds, cnt, t});
+  }
+  document.getElementById('weekTasks').innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;">
+      ${weekDays.map(w=>{
+        const wd = w.date.getDay();
+        const lbl = ['日','一','二','三','四','五','六'][wd];
+        const isToday = w.ds===today();
+        const color = w.cnt===4?'#52c41a':w.cnt===3?'#73d13d':w.cnt===2?'#faad14':w.cnt===1?'#fa8c16':'#f0f0f0';
+        return `<div style="padding:8px 2px;border-radius:6px;background:${color};color:${w.cnt>0?'#fff':'var(--gray)'};${isToday?'border:2px solid var(--primary);':''}">
+          <div style="font-size:11px;">${lbl}</div>
+          <div style="font-size:11px;margin-top:2px;">${w.date.getMonth()+1}/${w.date.getDate()}</div>
+          <div style="font-size:14px;font-weight:700;margin-top:4px;">${w.cnt}/3</div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div style="font-size:12px;color:var(--gray);margin-top:10px;text-align:center;">近7天学习任务完成情况（绿=3项全完成）<br>英语·管理·知识</div>
+  `;
+
+  // 本月分类统计
+  const now = new Date();
+  const y = now.getFullYear(), m = now.getMonth();
+  const monthRecs = state.records.filter(r => {
+    const d = new Date(r.date);
+    return d.getFullYear()===y && d.getMonth()===m;
+  });
+  const catStats = {};
+  monthRecs.forEach(r => {
+    if(!catStats[r.category]) catStats[r.category] = {in:0, out:0};
+    catStats[r.category][r.type] += r.amount;
+  });
+  const totalOut = monthRecs.filter(r=>r.type==='out').reduce((s,r)=>s+r.amount,0);
+  const cats = Object.entries(catStats).filter(([k,v])=>v.out>0).sort((a,b)=>b[1].out-a[1].out);
+  document.getElementById('categoryStats').innerHTML = cats.length ? cats.map(([cat,v])=>{
+    const pct = totalOut>0 ? (v.out/totalOut*100).toFixed(0) : 0;
+    return `<div style="margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+        <span>${cat}</span><span style="color:var(--red);">-${fmtMoney(v.out)} (${pct}%)</span>
+      </div>
+      <div class="task-progress"><div class="bar" style="width:${pct}%;background:var(--red);"></div></div>
+    </div>`;
+  }).join('') : '<div class="empty">本月暂无支出数据</div>';
+}
+
+// ============ 首页仪表盘 ============
+const QUOTES = [
+  '路漫漫其修远兮，吾将上下而求索。——屈原',
+  '长风破浪会有时，直挂云帆济沧海。——李白',
+  '不积跬步，无以至千里；不积小流，无以成江海。——荀子',
+  '博观而约取，厚积而薄发。——苏轼',
+  '宝剑锋从磨砺出，梅花香自苦寒来。——《警世贤文》',
+  '腹有诗书气自华，读书万卷始通神。——苏轼',
+  '千磨万击还坚劲，任尔东西南北风。——郑燮',
+  '莫等闲，白了少年头，空悲切。——岳飞',
+  '三更灯火五更鸡，正是男儿读书时。——颜真卿',
+  '海纳百川，有容乃大；壁立千仞，无欲则刚。——林则徐',
+  '业精于勤，荒于嬉；行成于思，毁于随。——韩愈',
+  '非淡泊无以明志，非宁静无以致远。——诸葛亮',
+  '问渠那得清如许？为有源头活水来。——朱熹',
+  '会当凌绝顶，一览众山小。——杜甫',
+  '黑发不知勤学早，白首方悔读书迟。——颜真卿',
+  '锲而不舍，金石可镂。——荀子',
+  '老骥伏枥，志在千里；烈士暮年，壮心不已。——曹操',
+  '志不强者智不达，言不信者行不果。——墨子',
+  '大鹏一日同风起，扶摇直上九万里。——李白',
+  '纸上得来终觉浅，绝知此事要躬行。——陆游'
+];
+function dailyQuote() {
+  const day = new Date().getDate() + new Date().getMonth()*31;
+  return QUOTES[day % QUOTES.length];
+}
+
+function renderHome() {
+  const now = new Date();
+  const week = ['日','一','二','三','四','五','六'][now.getDay()];
+  const dateStr = `${now.getMonth()+1}月${now.getDate()}日 · 周${week}`;
+  const hd = document.getElementById('homeDate');
+  if(hd) hd.textContent = dateStr;
+  const td = document.getElementById('todayDate');
+  if(td) td.textContent = dateStr;
+
+  // 每日诗词语录
+  const q = document.getElementById('homeQuote');
+  if(q) q.textContent = dailyQuote();
+
+  // —— 汇总数据 ——
+  const ds = today();
+  // 1. 待办
+  const todos = getTodos();
+  const tdDone = todos.filter(t=>t.done).length;
+  const tdSub = document.getElementById('hc-todo');
+  if(tdSub) tdSub.textContent = todos.length ? `${tdDone}/${todos.length} 项已完成` : '还没有添加待办';
+  // 2. 今日进度（待办+学习+健身综合完成率）
+  const t = state.tasks[ds] || {english:false,fitness:false,manage:false,knowledge:false};
+  const learnDone = (t.english?1:0)+(t.manage?1:0)+(t.knowledge?1:0);
+  const fitnessDone = t.fitness?1:0;
+  const totalItems = 5; // 3学习 + 1健身 + 1待办（以是否有待办为准）
+  const todoWeight = todos.length?1:0;
+  const todoDoneVal = todos.length?tdDone/todos.length:0;
+  const pct = Math.round((learnDone + fitnessDone + (todoWeight?todoDoneVal:0)) / (3 + 1 + todoWeight) * 100) || 0;
+  const pEl = document.getElementById('homePct');
+  if(pEl) pEl.textContent = pct + '%';
+  // 3. 学习（3项）
+  const lb = document.getElementById('hc-learn-badge');
+  if(lb) lb.textContent = `${learnDone}/3 完成`;
+  // 4. 财务 - 今日记账笔数
+  const todayRecs = (state.records||[]).filter(r=>r.date===ds);
+  const fc = document.getElementById('hc-finance');
+  if(fc) fc.textContent = todayRecs.length ? `今日已记 ${todayRecs.length} 笔` : '记录今天的一笔收支';
+  // 5. 年度理财目标达成
+  const y = now.getFullYear();
+  const yearRecs = (state.records||[]).filter(r=>{const d=new Date(r.date);return d.getFullYear()===y;});
+  let yearBal = 0;
+  yearRecs.forEach(r=> yearBal += (r.type==='in'? r.amount : -r.amount));
+  const goal = state.financeGoal || {saveGoal:0};
+  const goalRate = goal.saveGoal>0 ? Math.round(yearBal/goal.saveGoal*100) : 0;
+  const be = document.getElementById('hc-goal');
+  if(be) be.textContent = goal.saveGoal>0 ? `年度攒钱达成 ${goalRate>100?100:goalRate}%` : '设定年度目标';
+  // 6. 健身打卡
+  const fs = document.getElementById('hc-fitness');
+  if(fs) fs.textContent = t.fitness ? '今日已打卡 ✓' : '欧阳春晓 / 帕梅拉';
+  // 7. 今日体重
+  const todayW = (state.weights||[]).slice().reverse().find(w=>w.date===ds);
+  const wh = document.getElementById('hc-weight');
+  if(wh) wh.textContent = todayW ? `今日 ${todayW.weight} kg` : '记录今日体重';
+}
+
+// ============ 数据导入导出 ============
+function exportData() {
+  const data = {records:state.records, tasks:state.tasks, todos:state.todos, weights:state.weights, financeGoal:state.financeGoal, exportDate:new Date().toISOString()};
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `工作台备份_${today()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('已导出备份文件');
+}
+function importData(e) {
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if(data.records) state.records = data.records;
+      if(data.tasks) state.tasks = data.tasks;
+      if(data.todos) state.todos = data.todos;
+      save();
+      toast('导入成功');
+      renderFinance(); renderStats();
+    } catch(err) {
+      toast('文件格式错误');
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ============ 初始化 ============
+load();
+// 预加载语音
+if('speechSynthesis' in window) {
+  speechSynthesis.getVoices();
+  speechSynthesis.onvoiceschanged = () => {};
+}
+renderHome();
+renderTodo(); // 初始化待办抽屉
+renderReward(); // 初始化奖励卡片
+renderGarden(); // 初始化花海
+renderPetPage(); // 初始化宠物
+// 版本徽标（用于确认安装的是哪一版）
+const _av = document.getElementById('appVersion');
+if(_av) _av.textContent = '版本 ' + APP_VERSION + '（用 DOM API 替代 innerHTML）';
+// 输入加固：兼容 iOS Web Clip / iOS26 键盘
+document.querySelectorAll('input, textarea').forEach(el => {
+  el.setAttribute('autocomplete', 'off');
+  el.setAttribute('autocorrect', 'off');
+  el.setAttribute('autocapitalize', 'off');
+  el.setAttribute('spellcheck', 'false');
+  if(el.type === 'number') el.setAttribute('inputmode', 'decimal');
+  // iOS Web Clip 下点击强制聚焦
+  el.addEventListener('touchend', function(e){ this.focus({preventScroll:true}); });
+});
+
+// ============ 离线检测 ============
+function updateOnlineStatus() {
+  const isOnline = navigator.onLine;
+  if(!isOnline) {
+    showToast('📡 当前离线模式，视频链接暂不可用，其他功能正常使用');
+  }
+}
+window.addEventListener('offline', updateOnlineStatus);
+window.addEventListener('online', () => showToast('🌐 已恢复网络连接'));
+
+// ============ 视频点击离线提示 ============
+// 重写 window.open，离线时给出提示
+const _originalOpen = window.open;
+window.open = function(url, target) {
+  if(!navigator.onLine) {
+    showToast('📡 当前离线，请联网后查看视频');
+    return null;
+  }
+  return _originalOpen.call(this, url, target);
+};
+
+// ============ 首次使用引导 ============
+function showFirstUseGuide() {
+  const KEY = '_guide_shown';
+  if(localStorage.getItem(KEY)) return;
+  localStorage.setItem(KEY, '1');
+  setTimeout(() => { openModal('guideModal'); }, 1000);
+}
+showFirstUseGuide();
+
+// 首次打开提示
+setTimeout(() => {
+  if(!localStorage.getItem('_first_tip')) {
+    localStorage.setItem('_first_tip','1');
+    showToast('💡 点击左侧「📋今日待办」开始记录');
+  }
+}, 3000);
+</script>
+</div>
+</body>
+</html>

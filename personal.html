@@ -831,7 +831,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Mi
 <script>
 // ============ 数据层 ============
 const STORE_KEY = 'daily_workbench_data';
-const APP_VERSION = 'v5.0 · 离线持久版';
+const APP_VERSION = 'v5.1 · 在线持久版';
 let state = {
   records: [],      // {id,type,amount,category,note,date}
   tasks: {},        // {date: {english:bool, fitness:bool, manage:bool, knowledge:bool}}
@@ -2546,7 +2546,7 @@ renderGarden(); // 初始化花海
 renderPetPage(); // 初始化宠物
 // 版本徽标（用于确认安装的是哪一版）
 const _av = document.getElementById('appVersion');
-if(_av) _av.textContent = '版本 ' + APP_VERSION + '（离线可用，数据多重存储）';
+if(_av) _av.textContent = '版本 ' + APP_VERSION + '（数据持久保存，首次后离线可用）';
 // 输入加固：兼容 iOS Web Clip / iOS26 键盘
 document.querySelectorAll('input, textarea').forEach(el => {
   el.setAttribute('autocomplete', 'off');
@@ -2595,6 +2595,11 @@ setTimeout(() => {
     showToast('💡 点击左侧「📋今日待办」开始记录');
   }
 }, 3000);
+
+// Service Worker: 缓存页面实现离线访问
+if('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('https://lr9456.github.io/workbench/sw.js').catch(function(){});
+}
 </script>
 </div>
 </body>

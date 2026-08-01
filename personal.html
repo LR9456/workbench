@@ -831,7 +831,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Mi
 <script>
 // ============ 数据层 ============
 const STORE_KEY = 'daily_workbench_data';
-const APP_VERSION = 'v5.1 · 在线持久版';
+const APP_VERSION = 'v6.0 · 离线缓存版';
 let state = {
   records: [],      // {id,type,amount,category,note,date}
   tasks: {},        // {date: {english:bool, fitness:bool, manage:bool, knowledge:bool}}
@@ -2596,9 +2596,9 @@ setTimeout(() => {
   }
 }, 3000);
 
-// Service Worker: 缓存页面实现离线访问
+// Service Worker: 缓存页面实现离线访问（相对路径，适配任何域名）
 if('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('https://lr9456.github.io/workbench/sw.js').catch(function(){});
+  navigator.serviceWorker.register('sw.js').catch(function(){});
 }
 </script>
 </div>

@@ -55,21 +55,21 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Mi
 /* 打卡日历 */
 .cal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
 .cal-month { font-size:14px; font-weight:600; color:var(--primary); }
-.cal-nav { display:flex; gap:6px; }
-.cal-nav button { width:28px; height:28px; border-radius:6px; border:1px solid var(--border); background:#fff; font-size:14px; cursor:pointer; }
+.cal-nav { display:flex; gap:4px; }
+.cal-nav button { width:24px; height:24px; border-radius:5px; border:1px solid var(--border); background:#fff; font-size:12px; cursor:pointer; }
 .cal-nav button:active { background:var(--primary); color:#fff; }
-.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
-.cal-dow { text-align:center; font-size:10px; color:var(--light); padding:2px 0; }
-.cal-day { aspect-ratio:1; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:12px; cursor:pointer; background:#f5f7fa; color:#666; position:relative; }
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
+.cal-dow { text-align:center; font-size:9px; color:var(--light); padding:1px 0; }
+.cal-day { height:26px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:10px; cursor:pointer; background:#f5f7fa; color:#666; position:relative; }
 .cal-day.done { background:var(--green); color:#fff; font-weight:600; }
-.cal-day.today { border:2px solid var(--primary); }
-.cal-day.today.done { border:2px solid var(--primary); }
+.cal-day.today { border:1.5px solid var(--primary); }
+.cal-day.today.done { border:1.5px solid var(--primary); }
 .cal-day.empty { background:transparent; }
 .cal-day:active { transform:scale(0.9); }
-.cal-stats { display:flex; gap:8px; margin-top:8px; }
-.cal-stats .cs { flex:1; text-align:center; background:#f5f7fa; border-radius:6px; padding:6px; }
-.cal-stats .cs .v { font-size:16px; font-weight:700; color:var(--primary); }
-.cal-stats .cs .l { font-size:10px; color:var(--gray); }
+.cal-stats { display:flex; gap:6px; margin-top:6px; }
+.cal-stats .cs { flex:1; text-align:center; background:#f5f7fa; border-radius:5px; padding:4px 2px; }
+.cal-stats .cs .v { font-size:14px; font-weight:700; color:var(--primary); }
+.cal-stats .cs .l { font-size:9px; color:var(--gray); }
 
 /* 统计卡 */
 .stat-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:12px; }
@@ -268,12 +268,12 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Mi
 .td-stats { font-size:11px; color:var(--gray); text-align:center; margin-top:8px; }
 
 /* ===== 左侧固定菜单栏 ===== */
-.sidebar { position:sticky; top:0; left:0; height:100vh; width:70px; flex-shrink:0; background:#fff; border-right:1px solid var(--border); z-index:100; display:flex; flex-direction:column; align-items:center; padding-top:12px; padding-bottom:env(safe-area-inset-bottom); box-shadow:2px 0 8px rgba(0,0,0,0.05); }
-.sidebar .sb-logo { width:44px; height:44px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--primary-l)); color:#fff; display:flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:16px; box-shadow:0 3px 10px rgba(31,78,120,0.2); }
-.sidebar .sb-item { width:56px; padding:10px 2px; margin-bottom:6px; border-radius:12px; text-align:center; color:var(--gray); cursor:pointer; transition:all 0.2s; }
+.sidebar { position:sticky; top:0; left:0; height:100vh; width:60px; flex-shrink:0; background:#fff; border-right:1px solid var(--border); z-index:100; display:flex; flex-direction:column; align-items:center; padding-top:8px; padding-bottom:env(safe-area-inset-bottom); box-shadow:2px 0 8px rgba(0,0,0,0.05); }
+.sidebar .sb-logo { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--primary-l)); color:#fff; display:flex; align-items:center; justify-content:center; font-size:16px; margin-bottom:8px; box-shadow:0 2px 6px rgba(31,78,120,0.2); }
+.sidebar .sb-item { width:50px; padding:6px 2px; margin-bottom:3px; border-radius:10px; text-align:center; color:var(--gray); cursor:pointer; transition:all 0.2s; }
 .sidebar .sb-item.active { background:#eaf3ff; color:var(--primary); }
-.sidebar .sb-item .sb-icon { font-size:22px; display:block; }
-.sidebar .sb-item .sb-label { font-size:10px; margin-top:3px; }
+.sidebar .sb-item .sb-icon { font-size:18px; display:block; }
+.sidebar .sb-item .sb-label { font-size:9px; margin-top:2px; }
 .main-content { flex:1; min-width:0; min-height:100vh; }
 .app-row { display:flex; align-items:flex-start; }
 @media (min-width:768px) {
@@ -1000,7 +1000,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Mi
 <script>
 // ============ 数据层 ============
 const STORE_KEY = 'daily_workbench_data';
-const APP_VERSION = 'v6.3 · 新闻播客+日历+TED';
+const APP_VERSION = 'v6.4 · 日历适配+情景对话';
 let state = {
   records: [],      // {id,type,amount,category,note,date}
   tasks: {},        // {date: {english:bool, fitness:bool, manage:bool, knowledge:bool}}
@@ -2116,25 +2116,232 @@ function getDailyArticle() {
   return TED_ARTICLES[dayNum % TED_ARTICLES.length];
 }
 
+// 日常情景对话库
+const DAILY_SCENES = [
+  {
+    title: 'At the Airport - Airport Check-in',
+    icon: '✈️',
+    desc: '机场值机场景',
+    segs: [
+      {en:'Good morning. Where are you flying today?', cn:'早上好。您今天飞往哪里？'},
+      {en:'I\'m flying to Shanghai on flight CA456.', cn:'我乘CA456航班飞上海。'},
+      {en:'May I see your passport and ticket, please?', cn:'请出示您的护照和机票。'},
+      {en:'Here you go. Can I have a window seat?', cn:'给您。我可以选靠窗的座位吗？'},
+      {en:'Sure. Do you have any luggage to check?', cn:'当然。您有需要托运的行李吗？'},
+      {en:'Yes, one suitcase. It\'s about 20 kilograms.', cn:'有，一个行李箱。大约20公斤。'},
+      {en:'Please place it on the scale. That\'s fine.', cn:'请放在秤上。没问题。'},
+      {en:'Here\'s your boarding pass. Gate 12. Boarding at 9:30.', cn:'这是您的登机牌。12号登机口。9:30登机。'},
+      {en:'Thank you. How long is the flight?', cn:'谢谢。飞行时间多久？'},
+      {en:'About 2 hours and 15 minutes. Have a pleasant trip!', cn:'大约2小时15分钟。祝您旅途愉快！'}
+    ]
+  },
+  {
+    title: 'Hotel Check-in & Check-out',
+    icon: '🏨',
+    desc: '酒店入住与退房',
+    segs: [
+      {en:'Good evening. I have a reservation under the name Li.', cn:'晚上好。我用李的名字预订了房间。'},
+      {en:'Welcome! Let me check. Yes, a standard room for two nights.', cn:'欢迎！让我查一下。是的，标准间住两晚。'},
+      {en:'That\'s right. Is breakfast included?', cn:'对的。包含早餐吗？'},
+      {en:'Yes, breakfast is from 7 to 10 in the restaurant.', cn:'是的，早餐7点到10点在餐厅。'},
+      {en:'Great. Can I get a room on a higher floor?', cn:'太好了。可以安排高楼层吗？'},
+      {en:'Sure. Here\'s your key card. Room 805, on the 8th floor.', cn:'当然。这是您的房卡。805房，8楼。'},
+      {en:'Is there WiFi in the room?', cn:'房间里有WiFi吗？'},
+      {en:'Yes, the password is on the desk in your room.', cn:'有的，密码在您房间的桌上。'},
+      {en:'Perfect. What time is check-out?', cn:'完美。退房时间是几点？'},
+      {en:'Check-out is at noon. Enjoy your stay!', cn:'中午12点退房。祝您入住愉快！'}
+    ]
+  },
+  {
+    title: 'Doctor\'s Visit - Seeing a Doctor',
+    icon: '🏥',
+    desc: '看病就医场景',
+    segs: [
+      {en:'Good morning. What seems to be the problem?', cn:'早上好。哪里不舒服？'},
+      {en:'I\'ve had a headache and a sore throat for two days.', cn:'我头痛喉咙痛已经两天了。'},
+      {en:'Do you have a fever?', cn:'有发烧吗？'},
+      {en:'I think so. I feel hot and cold.', cn:'我觉得有。感觉忽冷忽热。'},
+      {en:'Let me take your temperature. Yes, it\'s 38.5.', cn:'让我量一下体温。是的，38.5度。'},
+      {en:'Is it serious, doctor?', cn:'严重吗，医生？'},
+      {en:'It looks like a common cold. Nothing to worry about.', cn:'看起来是普通感冒。不用担心。'},
+      {en:'I\'ll prescribe some medicine. Take it three times a day.', cn:'我开些药。每天吃三次。'},
+      {en:'Should I get plenty of rest?', cn:'我需要多休息吗？'},
+      {en:'Yes, drink lots of water and rest for a few days.', cn:'是的，多喝水，休息几天。'}
+    ]
+  },
+  {
+    title: 'Shopping for Clothes',
+    icon: '🛍️',
+    desc: '买衣服场景',
+    segs: [
+      {en:'Hi, can I help you find something?', cn:'你好，需要帮忙找什么吗？'},
+      {en:'I\'m looking for a jacket, something casual.', cn:'我想找一件外套，休闲一点的。'},
+      {en:'What size do you wear?', cn:'您穿什么尺码？'},
+      {en:'Medium, I think. Do you have this in blue?', cn:'中号吧。这件有蓝色的吗？'},
+      {en:'Let me check. Yes, here\'s a medium in blue.', cn:'让我查一下。有的，这是蓝色中号。'},
+      {en:'Can I try it on?', cn:'可以试穿吗？'},
+      {en:'Sure, the fitting room is right over there.', cn:'当然，试衣间就在那边。'},
+      {en:'How does it fit?', cn:'合身吗？'},
+      {en:'It fits perfectly. How much is it?', cn:'非常合身。多少钱？'},
+      {en:'It\'s on sale today, 30% off. That\'s 350 yuan.', cn:'今天打折，七折。350元。'}
+    ]
+  },
+  {
+    title: 'Job Interview',
+    icon: '💼',
+    desc: '工作面试场景',
+    segs: [
+      {en:'Please have a seat. Let\'s start with your background.', cn:'请坐。先介绍一下你的背景。'},
+      {en:'I have five years of experience in digital marketing.', cn:'我有五年数字营销经验。'},
+      {en:'What attracted you to our company?', cn:'是什么吸引你来我们公司？'},
+      {en:'I admire your innovative approach to product design.', cn:'我欣赏你们在产品设计上的创新。'},
+      {en:'What are your greatest strengths?', cn:'你最大的优势是什么？'},
+      {en:'I\'m creative and good at solving problems.', cn:'我有创造力，善于解决问题。'},
+      {en:'Can you describe a challenge you overcame?', cn:'能描述一个你克服的挑战吗？'},
+      {en:'Last year I led a campaign that increased sales by 40%.', cn:'去年我领导了一个活动，销售额增长了40%。'},
+      {en:'Where do you see yourself in five years?', cn:'你对五年后的自己有什么规划？'},
+      {en:'I hope to grow into a leadership role in marketing.', cn:'我希望成长为营销领域的领导角色。'}
+    ]
+  },
+  {
+    title: 'At the Restaurant',
+    icon: '🍽️',
+    desc: '餐厅就餐场景',
+    segs: [
+      {en:'Good evening. A table for how many?', cn:'晚上好。几位用餐？'},
+      {en:'A table for two, please. By the window if possible.', cn:'两位。如果可以靠窗。'},
+      {en:'Of course. Here are your menus. Can I get you drinks?', cn:'当然。这是菜单。要点饮品吗？'},
+      {en:'I\'ll have a glass of red wine, and water for my friend.', cn:'我要一杯红酒，我朋友要水。'},
+      {en:'Are you ready to order?', cn:'准备好点餐了吗？'},
+      {en:'Yes, I\'ll have the steak, medium rare, please.', cn:'是的，我要牛排，五分熟。'},
+      {en:'And for you, madam?', cn:'女士，您呢？'},
+      {en:'I\'ll have the pasta with tomato sauce.', cn:'我要番茄酱意面。'},
+      {en:'Excellent choices. Anything for dessert?', cn:'很好的选择。要甜点吗？'},
+      {en:'Not right now, maybe later. Thank you!', cn:'先不用，待会儿再说。谢谢！'}
+    ]
+  },
+  {
+    title: 'Renting an Apartment',
+    icon: '🏠',
+    desc: '租房场景',
+    segs: [
+      {en:'Hi, I\'m calling about the apartment for rent.', cn:'你好，我打电话想问租房的事。'},
+      {en:'Yes, it\'s a two-bedroom apartment near the subway.', cn:'是的，是地铁附近的两居室。'},
+      {en:'What\'s the monthly rent?', cn:'月租多少？'},
+      {en:'It\'s 4,000 yuan per month, utilities not included.', cn:'每月4000元，不含水电。'},
+      {en:'Is there a security deposit?', cn:'需要押金吗？'},
+      {en:'Yes, one month\'s rent as deposit.', cn:'是的，一个月房租作为押金。'},
+      {en:'Can I come see it tomorrow?', cn:'我明天能来看房吗？'},
+      {en:'Sure. How about 3 PM?', cn:'当然。下午3点怎么样？'},
+      {en:'That works. Is it furnished?', cn:'可以。有家具吗？'},
+      {en:'Yes, it comes with a bed, sofa, and basic appliances.', cn:'有，配有床、沙发和基本电器。'}
+    ]
+  }
+];
+
+// 口语模式：ted 或 scene
+let speakMode = 'ted';
+let currentSceneIdx = 0;
+
+function getDailyScene() {
+  const dayNum = Math.floor(new Date(today()).getTime() / 86400000);
+  return DAILY_SCENES[dayNum % DAILY_SCENES.length];
+}
+
 function renderSpeaking() {
   const contentEl = document.getElementById('speakingContent');
   if(!contentEl) return;
   while(contentEl.firstChild) el_remove(contentEl);
 
-  const article = getDailyArticle();
+  // 模式切换标签
+  const tabs = document.createElement('div');
+  tabs.style.cssText = 'display:flex;gap:6px;margin-bottom:10px;';
+  const tedTab = document.createElement('span');
+  tedTab.style.cssText = 'padding:6px 12px;border-radius:16px;font-size:12px;cursor:pointer;' + (speakMode==='ted' ? 'background:var(--primary);color:#fff;font-weight:600;' : 'background:#f0f0f0;color:var(--gray);');
+  tedTab.textContent = '🎤 每日TED';
+  tedTab.onclick = () => { speakMode='ted'; renderSpeaking(); };
+  tabs.appendChild(tedTab);
+  const sceneTab = document.createElement('span');
+  sceneTab.style.cssText = 'padding:6px 12px;border-radius:16px;font-size:12px;cursor:pointer;' + (speakMode==='scene' ? 'background:var(--primary);color:#fff;font-weight:600;' : 'background:#f0f0f0;color:var(--gray);');
+  sceneTab.textContent = '💬 日常情景';
+  sceneTab.onclick = () => { speakMode='scene'; renderSpeaking(); };
+  tabs.appendChild(sceneTab);
+  contentEl.appendChild(tabs);
 
+  // 根据模式选择内容
+  let article;
+  if(speakMode === 'ted') {
+    article = getDailyArticle();
+  } else {
+    article = getDailyScene();
+    // 情景模式：加上切换按钮
+    const sceneNav = document.createElement('div');
+    sceneNav.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;';
+    DAILY_SCENES.forEach((s, i) => {
+      const tag = document.createElement('span');
+      const isCurrent = s.title === article.title;
+      tag.style.cssText = 'padding:4px 8px;border-radius:12px;font-size:10px;cursor:pointer;' + (isCurrent ? 'background:var(--primary);color:#fff;' : 'background:#f0f0f0;color:var(--gray);');
+      tag.textContent = s.icon + ' ' + s.desc;
+      tag.onclick = () => { currentSceneIdx = i; speakMode='scene'; renderSpeakingFromScene(s); };
+      sceneNav.appendChild(tag);
+    });
+    contentEl.appendChild(sceneNav);
+  }
+
+  renderSpeakingArticle(contentEl, article);
+}
+
+function renderSpeakingFromScene(scene) {
+  const contentEl = document.getElementById('speakingContent');
+  if(!contentEl) return;
+  while(contentEl.firstChild) el_remove(contentEl);
+
+  // 模式切换标签
+  const tabs = document.createElement('div');
+  tabs.style.cssText = 'display:flex;gap:6px;margin-bottom:10px;';
+  const tedTab = document.createElement('span');
+  tedTab.style.cssText = 'padding:6px 12px;border-radius:16px;font-size:12px;cursor:pointer;background:#f0f0f0;color:var(--gray);';
+  tedTab.textContent = '🎤 每日TED';
+  tedTab.onclick = () => { speakMode='ted'; renderSpeaking(); };
+  tabs.appendChild(tedTab);
+  const sceneTab = document.createElement('span');
+  sceneTab.style.cssText = 'padding:6px 12px;border-radius:16px;font-size:12px;cursor:pointer;background:var(--primary);color:#fff;font-weight:600;';
+  sceneTab.textContent = '💬 日常情景';
+  sceneTab.onclick = () => { speakMode='scene'; renderSpeaking(); };
+  tabs.appendChild(sceneTab);
+  contentEl.appendChild(tabs);
+
+  // 情景切换列表
+  const sceneNav = document.createElement('div');
+  sceneNav.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;';
+  DAILY_SCENES.forEach((s, i) => {
+    const tag = document.createElement('span');
+    const isCurrent = s.title === scene.title;
+    tag.style.cssText = 'padding:4px 8px;border-radius:12px;font-size:10px;cursor:pointer;' + (isCurrent ? 'background:var(--primary);color:#fff;' : 'background:#f0f0f0;color:var(--gray);');
+    tag.textContent = s.icon + ' ' + s.desc;
+    tag.onclick = () => { currentSceneIdx = i; renderSpeakingFromScene(s); };
+    sceneNav.appendChild(tag);
+  });
+  contentEl.appendChild(sceneNav);
+
+  renderSpeakingArticle(contentEl, scene);
+}
+
+function renderSpeakingArticle(contentEl, article) {
   // 文章标题和信息
   const header = document.createElement('div');
   header.style.cssText = 'margin-bottom:12px;';
   const titleEl = document.createElement('div');
-  titleEl.style.cssText = 'font-size:16px;font-weight:700;color:var(--primary);margin-bottom:4px;';
+  titleEl.style.cssText = 'font-size:15px;font-weight:700;color:var(--primary);margin-bottom:4px;';
   titleEl.textContent = article.icon + ' ' + article.title;
   header.appendChild(titleEl);
 
-  const speakerEl = document.createElement('div');
-  speakerEl.style.cssText = 'font-size:12px;color:var(--gray);margin-bottom:4px;';
-  speakerEl.textContent = '演讲者：' + article.speaker;
-  header.appendChild(speakerEl);
+  if(article.speaker) {
+    const speakerEl = document.createElement('div');
+    speakerEl.style.cssText = 'font-size:12px;color:var(--gray);margin-bottom:4px;';
+    speakerEl.textContent = '演讲者：' + article.speaker;
+    header.appendChild(speakerEl);
+  }
 
   const descEl = document.createElement('div');
   descEl.style.cssText = 'font-size:12px;color:#888;';

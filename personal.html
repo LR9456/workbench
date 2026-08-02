@@ -185,6 +185,33 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Mi
 .td-item .td-del { margin-left:6px; color:var(--light); font-size:14px; cursor:pointer; flex-shrink:0; }
 .td-empty { text-align:center; color:var(--light); font-size:13px; padding:30px 10px; }
 .td-empty .emoji { font-size:36px; display:block; margin-bottom:6px; }
+
+/* 四象限网格 */
+.quad-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.quad { border-radius:10px; padding:10px; min-height:120px; position:relative; }
+.quad.q1 { background:linear-gradient(135deg,#fff1f0,#ffccc7); border:1px solid #ffccc7; }
+.quad.q2 { background:linear-gradient(135deg,#fffbe6,#ffe58f); border:1px solid #ffe58f; }
+.quad.q3 { background:linear-gradient(135deg,#f6ffed,#b7eb8f); border:1px solid #b7eb8f; }
+.quad.q4 { background:linear-gradient(135deg,#f9f0ff,#d3adf7); border:1px solid #d3adf7; }
+.quad-head { display:flex; align-items:center; gap:4px; font-size:12px; font-weight:600; color:#333; margin-bottom:6px; }
+.quad-head span:first-child { flex:1; }
+.quad-hint { font-size:10px; color:#666; font-weight:400; background:rgba(255,255,255,0.6); padding:1px 6px; border-radius:8px; }
+.quad-add { width:22px; height:22px; border-radius:50%; background:rgba(255,255,255,0.8); display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; color:#555; cursor:pointer; }
+.quad-add:active { background:#fff; transform:scale(0.92); }
+.quad-list { display:flex; flex-direction:column; gap:4px; }
+.q-item { background:rgba(255,255,255,0.85); border-radius:6px; padding:6px 8px; display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; transition:all 0.15s; }
+.q-item:active { background:#fff; transform:scale(0.98); }
+.q-item.done { background:rgba(255,255,255,0.5); color:#999; }
+.q-item.done .q-text { text-decoration:line-through; }
+.q-check { width:16px; height:16px; border-radius:4px; border:1.5px solid #999; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:10px; color:#fff; }
+.q-item.done .q-check { background:var(--green); border-color:var(--green); }
+.q-text { flex:1; word-break:break-all; line-height:1.3; }
+.q-carry { font-size:10px; color:#999; background:rgba(255,255,255,0.9); padding:0 4px; border-radius:4px; margin-left:2px; }
+.q-del { font-size:12px; color:#bbb; flex-shrink:0; padding:0 2px; }
+.q-del:active { color:var(--red); }
+.q-empty { font-size:11px; color:#999; text-align:center; padding:8px 4px; opacity:0.6; }
+.q-rollover-tip { font-size:11px; color:#888; background:#f0f5ff; padding:6px 10px; border-radius:6px; margin-bottom:8px; line-height:1.5; }
+.q-rollover-tip .num { color:var(--primary); font-weight:700; }
 .td-stats { font-size:11px; color:var(--gray); text-align:center; margin-top:8px; }
 
 /* ===== 左侧固定菜单栏 ===== */
@@ -565,18 +592,46 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Mi
 </div>
 
 
-<!-- ===== 今日待办页 ===== -->
+<!-- ===== 今日待办页（艾森豪威尔四象限）===== -->
 <div class="page" id="page-todo">
   <div class="card">
-    <div class="card-title">📋 今日待办 <span class="badge" id="todoPageStats">0/0</span></div>
-    <div style="display:flex;gap:6px;margin-bottom:10px;">
-      <input type="text" id="todoPageInput" class="input" placeholder="添加今日待办..." onkeypress="if(event.key==='Enter')addPageTodo()">
-      <select id="todoPagePriority" class="select" style="width:72px;"><option value="low">低</option><option value="mid" selected>中</option><option value="high">高</option></select>
+    <div class="card-title">📋 今日待办 · 四象限法则 <span class="badge" id="todoPageStats">0/0</span></div>
+    <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
+      <input type="text" id="todoPageInput" class="input" style="flex:1;min-width:140px;" placeholder="添加今日待办..." onkeypress="if(event.key==='Enter')addPageTodo()">
+      <select id="todoQuadrant" class="select" style="width:auto;font-size:12px;">
+        <option value="q1">🔴 重要·紧急</option>
+        <option value="q2">🟡 重要·不紧急</option>
+        <option value="q3">🟢 紧急·不重要</option>
+        <option value="q4">🟣 不重要·不紧急</option>
+      </select>
       <button class="btn" onclick="addPageTodo()">+</button>
     </div>
-    <div id="todoPageList"></div>
-    <div id="todoFeedback" style="font-size:14px;color:var(--green);min-height:20px;margin-top:4px;"></div>
-    <div style="margin-top:10px;"><button class="btn btn-sm btn-outline btn-block" onclick="clearDoneTodos()">🗑️ 清除已完成</button></div>
+
+    <!-- 四象限 2x2 网格 -->
+    <div class="quad-grid">
+      <div class="quad q1">
+        <div class="quad-head"><span>🔴 重要·紧急</span><span class="quad-hint">马上做</span><span class="quad-add" onclick="quickAddTodo('q1')">+</span></div>
+        <div class="quad-list" id="quadList-q1"></div>
+      </div>
+      <div class="quad q2">
+        <div class="quad-head"><span>🟡 重要·不紧急</span><span class="quad-hint">安排做</span><span class="quad-add" onclick="quickAddTodo('q2')">+</span></div>
+        <div class="quad-list" id="quadList-q2"></div>
+      </div>
+      <div class="quad q3">
+        <div class="quad-head"><span>🟢 紧急·不重要</span><span class="quad-hint">简化/委托</span><span class="quad-add" onclick="quickAddTodo('q3')">+</span></div>
+        <div class="quad-list" id="quadList-q3"></div>
+      </div>
+      <div class="quad q4">
+        <div class="quad-head"><span>🟣 不重要·不紧急</span><span class="quad-hint">少做/不做</span><span class="quad-add" onclick="quickAddTodo('q4')">+</span></div>
+        <div class="quad-list" id="quadList-q4"></div>
+      </div>
+    </div>
+
+    <div id="todoFeedback" style="font-size:14px;color:var(--green);min-height:20px;margin-top:8px;"></div>
+    <div style="margin-top:10px;display:flex;gap:8px;">
+      <button class="btn btn-sm btn-outline" style="flex:1;" onclick="clearDoneTodos()">🗑️ 清除已完成</button>
+      <button class="btn btn-sm btn-outline" style="flex:1;" onclick="rolloverTodos()">↪️ 手动递延</button>
+    </div>
   </div>
 
   <div class="card">
@@ -831,7 +886,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Mi
 <script>
 // ============ 数据层 ============
 const STORE_KEY = 'daily_workbench_data';
-const APP_VERSION = 'v6.0 · 离线缓存版';
+const APP_VERSION = 'v6.1 · 四象限+自动递延';
 let state = {
   records: [],      // {id,type,amount,category,note,date}
   tasks: {},        // {date: {english:bool, fitness:bool, manage:bool, knowledge:bool}}
@@ -1940,66 +1995,154 @@ function addPageTodo() {
   const input = document.getElementById('todoPageInput');
   const text = input.value.trim();
   if(!text) { toast('请输入待办内容'); return; }
-  const priority = document.getElementById('todoPagePriority').value;
+  const q = document.getElementById('todoQuadrant').value;
   if(!state.todos) state.todos = {};
   const key = 'todo_' + today();
   if(!state.todos[key]) state.todos[key] = [];
-  state.todos[key].push({id:uid(), text:text, done:false, priority:priority, created:new Date().toISOString()});
+  state.todos[key].push({id:uid(), text:text, done:false, quad:q, created:new Date().toISOString()});
   input.value = '';
-  // 即时反馈
   const fbEl = document.getElementById('todoFeedback');
   if(fbEl) fbEl.textContent = '✅ 已添加：' + text;
   save();
   renderNow(() => { renderTodo(); renderTodoPage(); });
   toast('已添加 ✓');
 }
+
+// 象限内快速添加（点象限右上 +）
+function quickAddTodo(quad) {
+  document.getElementById('todoQuadrant').value = quad;
+  document.getElementById('todoPageInput').focus();
+  toast('请输入任务，按 + 添加到【' + ({q1:'🔴重要·紧急',q2:'🟡重要·不紧急',q3:'🟢紧急·不重要',q4:'🟣不重要·不紧急'})[quad] + '】');
+}
+
 function renderTodoPage() {
-  const el = document.getElementById('todoPageList');
-  if(!el) return;
-  const todos = getTodos();
-  const done = todos.filter(t=>t.done).length;
+  const todoAll = getTodos();
+  const done = todoAll.filter(t=>t.done).length;
   const stat = document.getElementById('todoPageStats');
-  if(stat) stat.textContent = done + '/' + todos.length;
-  const pOrder = {high:0, mid:1, low:2};
-  const pName = {high:'高', mid:'中', low:'低'};
-  const sorted = [...todos].sort((a,b)=>{
-    if(a.done!==b.done) return a.done?1:-1;
-    return pOrder[a.priority]-pOrder[b.priority];
+  if(stat) stat.textContent = done + '/' + todoAll.length;
+
+  // 按象限分组（默认 q2：重要·不紧急）
+  const quads = {q1:[], q2:[], q3:[], q4:[]};
+  todoAll.forEach(t => {
+    const q = t.quad || 'q2';
+    if(!quads[q]) quads[q] = [];
+    quads[q].push(t);
   });
-  // 用 DOM API 而非 innerHTML（iOS data URI 下更可靠）
-  while(el.firstChild) el.removeChild(el.firstChild);
-  if(!sorted.length) {
-    const empty = document.createElement('div');
-    empty.className = 'td-empty';
-    empty.innerHTML = '<span class="emoji">🐱</span>今天还没有待办<br>在上方输入框添加一个吧';
-    el.appendChild(empty);
-    renderReward();
-    return;
-  }
-  sorted.forEach(t => {
-    const row = document.createElement('div');
-    row.className = 'td-item';
-    const check = document.createElement('div');
-    check.className = 'td-check' + (t.done?' done':'');
-    if(t.done) check.textContent = '✓';
-    check.onclick = () => toggleTodo(t.id);
-    const text = document.createElement('div');
-    text.className = 'td-text' + (t.done?' done':'');
-    text.textContent = t.text;
-    const pri = document.createElement('span');
-    pri.className = 'td-pri ' + t.priority;
-    pri.textContent = pName[t.priority];
-    text.appendChild(pri);
-    const del = document.createElement('span');
-    del.className = 'td-del';
-    del.textContent = '🗑️';
-    del.onclick = () => deleteTodo(t.id);
-    row.appendChild(check);
-    row.appendChild(text);
-    row.appendChild(del);
-    el.appendChild(row);
+
+  // 每个象限内：未完成在前，已完成在后
+  Object.keys(quads).forEach(q => {
+    quads[q].sort((a,b) => {
+      if(a.done !== b.done) return a.done ? 1 : -1;
+      return 0;
+    });
   });
+
+  // 渲染四个象限
+  ['q1','q2','q3','q4'].forEach(q => {
+    const el = document.getElementById('quadList-' + q);
+    if(!el) return;
+    while(el.firstChild) el.removeChild(el.firstChild);
+
+    const items = quads[q];
+    if(!items.length) {
+      const empty = document.createElement('div');
+      empty.className = 'q-empty';
+      empty.textContent = '暂无任务';
+      el.appendChild(empty);
+      return;
+    }
+
+    items.forEach(t => {
+      const row = document.createElement('div');
+      row.className = 'q-item' + (t.done ? ' done' : '');
+
+      const check = document.createElement('div');
+      check.className = 'q-check';
+      if(t.done) check.textContent = '✓';
+      check.onclick = (e) => { e.stopPropagation(); toggleTodo(t.id); };
+      row.appendChild(check);
+
+      const text = document.createElement('span');
+      text.className = 'q-text';
+      text.textContent = t.text;
+      row.appendChild(text);
+
+      // 递延标记
+      if(t.carried) {
+        const carry = document.createElement('span');
+        carry.className = 'q-carry';
+        carry.textContent = '↪' + t.carried;
+        row.appendChild(carry);
+      }
+
+      const del = document.createElement('span');
+      del.className = 'q-del';
+      del.textContent = '×';
+      del.onclick = (e) => { e.stopPropagation(); deleteTodo(t.id); };
+      row.appendChild(del);
+
+      row.onclick = () => toggleTodo(t.id);
+      el.appendChild(row);
+    });
+  });
+
   renderReward();
+}
+
+// ===== 自动递延：每日首次打开时把昨天未完成移至今天 =====
+let _lastRolloverDate = null;
+function rolloverTodos() {
+  if(!state.todos) state.todos = {};
+  const yKey = 'todo_' + yesterday();
+  const tKey = 'todo_' + today();
+  const yesterdayList = state.todos[yKey] || [];
+  const pending = yesterdayList.filter(t => !t.done);
+  if(!pending.length) {
+    toast('昨天没有未完成的任务，无需递延 ✨');
+    return 0;
+  }
+  if(!state.todos[tKey]) state.todos[tKey] = [];
+  let added = 0;
+  pending.forEach(t => {
+    // 检查今天是否已经有同名任务
+    const dup = state.todos[tKey].find(x => !x.done && x.text === t.text && x.quad === t.quad);
+    if(dup) return;
+    state.todos[tKey].push({
+      id: uid(),
+      text: t.text,
+      done: false,
+      quad: t.quad || 'q2',
+      created: new Date().toISOString(),
+      carried: yesterday().slice(5)  // 记录递延来源
+    });
+    added++;
+  });
+  save();
+  renderNow(() => { renderTodo(); renderTodoPage(); });
+  if(added > 0) toast('↪️ 已递延 ' + added + ' 项到今天');
+  return added;
+}
+
+function yesterday() {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return d.toISOString().slice(0, 10);
+}
+
+// 自动检查：每天首次进入应用时自动递延
+function autoRolloverOnLoad() {
+  const todayStr = today();
+  if(_lastRolloverDate === todayStr) return;
+  _lastRolloverDate = todayStr;
+  // 延迟一点执行，确保数据已 load
+  setTimeout(() => {
+    const added = rolloverTodos();
+    if(added > 0) {
+      setTimeout(() => {
+        toast('↪️ 有 ' + added + ' 项昨天的任务已自动递延到今天');
+      }, 800);
+    }
+  }, 500);
 }
 
 // ===== 穿搭达人：方圆脸157女生 =====
@@ -2544,6 +2687,8 @@ renderTodo(); // 初始化待办抽屉
 renderReward(); // 初始化奖励卡片
 renderGarden(); // 初始化花海
 renderPetPage(); // 初始化宠物
+// 自动递延：每天首次进入应用时把昨天未完成任务移到今天
+autoRolloverOnLoad();
 // 版本徽标（用于确认安装的是哪一版）
 const _av = document.getElementById('appVersion');
 if(_av) _av.textContent = '版本 ' + APP_VERSION + '（数据持久保存，首次后离线可用）';

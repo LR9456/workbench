@@ -52,6 +52,25 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Mi
 .label { font-size:12px; color:var(--gray); margin-bottom:4px; display:block; }
 .form-row { margin-bottom:10px; }
 
+/* 打卡日历 */
+.cal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.cal-month { font-size:14px; font-weight:600; color:var(--primary); }
+.cal-nav { display:flex; gap:6px; }
+.cal-nav button { width:28px; height:28px; border-radius:6px; border:1px solid var(--border); background:#fff; font-size:14px; cursor:pointer; }
+.cal-nav button:active { background:var(--primary); color:#fff; }
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
+.cal-dow { text-align:center; font-size:10px; color:var(--light); padding:2px 0; }
+.cal-day { aspect-ratio:1; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:12px; cursor:pointer; background:#f5f7fa; color:#666; position:relative; }
+.cal-day.done { background:var(--green); color:#fff; font-weight:600; }
+.cal-day.today { border:2px solid var(--primary); }
+.cal-day.today.done { border:2px solid var(--primary); }
+.cal-day.empty { background:transparent; }
+.cal-day:active { transform:scale(0.9); }
+.cal-stats { display:flex; gap:8px; margin-top:8px; }
+.cal-stats .cs { flex:1; text-align:center; background:#f5f7fa; border-radius:6px; padding:6px; }
+.cal-stats .cs .v { font-size:16px; font-weight:700; color:var(--primary); }
+.cal-stats .cs .l { font-size:10px; color:var(--gray); }
+
 /* 统计卡 */
 .stat-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:12px; }
 .stat { background:#fff; border-radius:10px; padding:12px 8px; text-align:center; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
@@ -327,7 +346,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Mi
 <!-- 左侧固定菜单栏 -->
 <div class="app-row">
 <div class="sidebar" id="sidebar">
-  <div class="sb-logo">🌟</div>
+  <div class="sb-logo"></div>
   <div class="sb-item active" data-page="home"><span class="sb-icon">🏠</span><span class="sb-label">首页</span></div>
   <div class="sb-item" data-page="finance"><span class="sb-icon">📈</span><span class="sb-label">理财规划</span></div>
   <div class="sb-item" data-page="todo"><span class="sb-icon">📋</span><span class="sb-label">今日待办</span></div>
@@ -336,6 +355,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Mi
   <div class="sb-item" data-page="dress"><span class="sb-icon">👗</span><span class="sb-label">穿搭达人</span></div>
   <div class="sb-item" data-page="newmedia"><span class="sb-icon">📱</span><span class="sb-label">新媒体</span></div>
   <div class="sb-item" data-page="garden"><span class="sb-icon">🐾</span><span class="sb-label">宠物</span></div>
+  <div class="sb-item" data-page="news"><span class="sb-icon">📰</span><span class="sb-label">新闻播客</span></div>
   <div class="sb-item" data-page="stats"><span class="sb-icon">📊</span><span class="sb-label">统计</span></div>
 </div>
 
@@ -518,12 +538,11 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Mi
       </div>
     </div>
 
-    <!-- ===== 口语跟读模块 ===== -->
+    <!-- ===== 口语跟读模块（每日一篇TED文章）===== -->
     <div class="eng-sub" id="eng-speaking">
       <div class="card">
-        <div class="card-title">🗣️ 影子跟读训练</div>
-        <div style="font-size:12px;color:var(--gray);margin-bottom:10px;line-height:1.6;">影子跟读法（Shadowing）：播放音频后延迟1-2秒跟读模仿，训练语感和发音。建议每段跟读5遍以上。</div>
-        <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;" id="speakingTags"></div>
+        <div class="card-title">🗣️ 每日TED · 影子跟读</div>
+        <div style="font-size:12px;color:var(--gray);margin-bottom:10px;line-height:1.6;">每天一篇TED经典演讲，带中文翻译。点击「播放全文」进入影子跟读模式：逐句播放，每句间隔1.5秒给你跟读时间。也可单句控制。</div>
         <div id="speakingContent"></div>
       </div>
       <div class="card">
@@ -719,17 +738,6 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Mi
       <button class="btn btn-sm btn-outline" style="flex:1;" onclick="rolloverTodos()">↪️ 手动递延</button>
     </div>
   </div>
-
-  <div class="card">
-    <div class="card-title">🎁 完成任务赚积分 <span class="badge" id="rewardPoints">0</span></div>
-    <div style="display:flex;gap:8px;margin-bottom:10px;">
-      <div style="flex:1;text-align:center;background:#f6ffed;border-radius:8px;padding:8px;"><div style="font-size:11px;color:var(--gray);">今日获得</div><div style="font-size:18px;font-weight:700;color:var(--green);" id="rewardToday">0</div></div>
-      <div style="flex:1;text-align:center;background:#fff7e6;border-radius:8px;padding:8px;"><div style="font-size:11px;color:var(--gray);">连续全完成</div><div style="font-size:18px;font-weight:700;color:var(--orange);" id="rewardStreak">🔥0天</div></div>
-    </div>
-    <div style="font-size:12px;color:var(--gray);margin-bottom:6px;">用积分兑换你的小确幸：</div>
-    <div id="rewardList"></div>
-    <button class="btn btn-sm btn-outline btn-block" style="margin-top:8px;" onclick="openRewardModal()">+ 添加心愿奖励</button>
-  </div>
 </div>
 
 <!-- ===== 健身运动页 ===== -->
@@ -739,6 +747,11 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Mi
     <div style="font-size:13px;color:var(--gray);margin-bottom:8px;">每日30分钟 · 欧阳春晓 / 帕梅拉 · 全身/肩背/腰腹/瘦腿</div>
     <div class="task-progress"><div class="bar" id="fitBar" style="width:0%"></div></div>
     <button class="btn btn-block btn-green" id="fitDoneBtn" onclick="completeTask('fitness')">完成今日运动打卡</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📅 打卡日历 <span class="badge" id="calStreakBadge">🔥0天</span></div>
+    <div id="fitnessCalendar"></div>
   </div>
 
   <div class="card">
@@ -800,6 +813,21 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Mi
   <div class="card">
     <div class="card-title">🍽️ 今日喂养</div>
     <div id="petTodayList" style="max-height:200px;overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- ===== 新闻播客页 ===== -->
+<div class="page" id="page-news">
+  <div class="card">
+    <div class="card-title">📰 每日新闻精选</div>
+    <div style="font-size:12px;color:var(--gray);margin-bottom:10px;line-height:1.6;">精选高质量新闻源，涵盖科技、财经、时事、英语学习。点击卡片直接跳转阅读。</div>
+    <div id="newsList"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🎙️ 播客精选</div>
+    <div style="font-size:12px;color:var(--gray);margin-bottom:10px;line-height:1.6;">优质播客推荐，通勤路上听一听，碎片时间也能成长。</div>
+    <div id="podcastList"></div>
   </div>
 </div>
 
@@ -972,7 +1000,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Mi
 <script>
 // ============ 数据层 ============
 const STORE_KEY = 'daily_workbench_data';
-const APP_VERSION = 'v6.2 · 英语学习模块';
+const APP_VERSION = 'v6.3 · 新闻播客+日历+TED';
 let state = {
   records: [],      // {id,type,amount,category,note,date}
   tasks: {},        // {date: {english:bool, fitness:bool, manage:bool, knowledge:bool}}
@@ -1083,6 +1111,7 @@ function switchPage(p) {
   if(p==='dress') renderDress();
   if(p==='stats') renderNow(renderStats);
   if(p==='garden') renderNow(renderPetPage);
+  if(p==='news') renderNow(renderNews);
 }
 document.querySelectorAll('.sidebar .sb-item').forEach(item => {
   item.addEventListener('click', () => switchPage(item.dataset.page));
@@ -1903,125 +1932,227 @@ function renderListening() {
 }
 
 // ============ 口语影子跟读 ============
-const SHADOW_SEGS = [
+// 每日TED文章库（按日期轮换，每天一篇完整文章带中文翻译）
+const TED_ARTICLES = [
   {
-    cat: 'TED经典',
+    title: 'How to speak so that people want to listen',
+    speaker: 'Julian Treasure',
     icon: '🎤',
-    title: '如何成为更好的演讲者',
+    desc: '演讲专家分享如何说话才能让人愿意倾听',
     segs: [
-      {en:'The single most important thing you can do is to look at the people you\'re speaking to.', cn:'你能做的最重要的一件事就是看着你在说话的人。'},
-      {en:'Great speakers don\'t just deliver information. They create an experience.', cn:'伟大的演讲者不只是传递信息，他们创造体验。'},
-      {en:'Your body language speaks louder than your words ever could.', cn:'你的肢体语言比你的话语更有说服力。'},
-      {en:'Stories are the most powerful way to connect with an audience.', cn:'故事是与听众建立联系的最有力方式。'},
-      {en:'Practice doesn\'t make perfect. Perfect practice makes perfect.', cn:'练习不一定完美。完美的练习才完美。'}
+      {en:'The human voice is the most powerful sound in the world.', cn:'人类的声音是世界上最有力的声音。'},
+      {en:'It\'s the only one that can start a war or say "I love you."', cn:'它是唯一能引发战争或说"我爱你"的声音。'},
+      {en:'Hailing is very common in conversations, but it\'s hard to listen to.', cn:'在对话中"打招呼"很常见，但很难听进去。'},
+      {en:'Gossip is something we\'ve all done, but we don\'t want to be gossiped about.', cn:'说闲话我们都做过，但我们不希望别人说我们的闲话。'},
+      {en:'Negativity is hard to listen to.', cn:'消极的情绪让人难以倾听。'},
+      {en:'Complaining is viral misery.', cn:'抱怨就像病毒式的痛苦。'},
+      {en:'Excuses don\'t help anybody.', cn:'借口对任何人都没有帮助。'},
+      {en:'Lying can be the most destructive habit.', cn:'撒谎可能是最具破坏性的习惯。'},
+      {en:'Dogmatism is confusing facts with opinions.', cn:'教条主义是把事实和观点混淆。'},
+      {en:'Register your voice in the chest, not the nose or throat.', cn:'用胸腔发声，而不是鼻腔或喉咙。'},
+      {en:'Timbre is the way your voice feels.', cn:'音色是你声音的感觉。'},
+      {en:'Prosody is the melody of speech.', cn:'韵律是语言的旋律。'},
+      {en:'Pace is how fast or slow you speak.', cn:'语速是你说话的快慢。'},
+      {en:'Pitch conveys meaning and emotion.', cn:'音调传达意义和情感。'},
+      {en:'Volume is the loudness or softness of your voice.', cn:'音量是你声音的大小。'},
+      {en:'Silence is powerful too.', cn:'沉默也有力量。'},
+      {en:'Speak powerfully to make change in the world.', cn:'有力地说话，去改变世界。'}
     ]
   },
   {
-    cat: 'TED经典',
-    icon: '🌟',
-    title: '成功的8个秘密',
+    title: 'The power of vulnerability',
+    speaker: 'Brené Brown',
+    icon: '❤️',
+    desc: '脆弱的力量——拥抱不完美才能建立真正的连接',
     segs: [
-      {en:'Why do some people succeed while others don\'t?', cn:'为什么有些人成功而另一些不？'},
-      {en:'Passion is the fuel that drives success.', cn:'热情是驱动成功的燃料。'},
-      {en:'Work hard and be focused on one thing, not many.', cn:'努力工作，专注于一件事，而非很多。'},
-      {en:'Push yourself through doubt and fear.', cn:'推动自己穿越怀疑和恐惧。'},
-      {en:'Serve others something of value.', cn:'为他人提供有价值的东西。'}
+      {en:'Connection is why we\'re here.', cn:'连接是我们存在的意义。'},
+      {en:'It\'s what gives purpose and meaning to our lives.', cn:'它赋予我们生命目的和意义。'},
+      {en:'Shame is the fear of disconnection.', cn:'羞耻是对断开连接的恐惧。'},
+      {en:'Is there something about me that if other people know it, I won\'t be worthy of connection?', cn:'是否有关于我的某些事，如果别人知道了，我就不值得被连接了？'},
+      {en:'Vulnerability is the core of shame and fear.', cn:'脆弱是羞耻和恐惧的核心。'},
+      {en:'But it\'s also the birthplace of joy, creativity, and love.', cn:'但它也是欢乐、创造力和爱的诞生地。'},
+      {en:'People who have a strong sense of love and belonging believe they\'re worthy of it.', cn:'有强烈爱与归属感的人相信自己值得拥有。'},
+      {en:'They let themselves be deeply seen.', cn:'他们让自己被深深地看见。'},
+      {en:'They loved with their whole hearts even though there\'s no guarantee.', cn:'他们全心全意地去爱，即使没有保证。'},
+      {en:'They practiced gratitude and joy.', cn:'他们练习感恩和喜悦。'},
+      {en:'They believed they were enough.', cn:'他们相信自己足够好了。'},
+      {en:'Being vulnerable is not weakness.', cn:'脆弱不是软弱。'},
+      {en:'It\'s our greatest measure of courage.', cn:'它是我们勇气最大的衡量标准。'},
+      {en:'Let yourself be seen.', cn:'让自己被看见。'},
+      {en:'Love with your whole heart.', cn:'全心全意地去爱。'},
+      {en:'Practice gratitude and joy.', cn:'练习感恩和喜悦。'},
+      {en:'Believe that you are enough.', cn:'相信你已经足够好了。'}
     ]
   },
   {
-    cat: '日常情景',
-    icon: '☕',
-    title: '咖啡店点单',
+    title: 'Your body language may shape who you are',
+    speaker: 'Amy Cuddy',
+    icon: '💪',
+    desc: '肢体语言不仅影响别人对你的看法，也塑造你自己',
     segs: [
-      {en:'Hi, could I get a latte, please?', cn:'你好，请给我一杯拿铁。'},
-      {en:'What size would you like?', cn:'您要什么杯型？'},
-      {en:'A medium, please. And can I have it with oat milk?', cn:'中杯，麻烦用燕麦奶。'},
-      {en:'Sure. That\'ll be 5 dollars.', cn:'好的，一共5美元。'},
-      {en:'Here you go. Thanks!', cn:'给你，谢谢！'}
+      {en:'Body language affects how others see us.', cn:'肢体语言影响别人如何看待我们。'},
+      {en:'But it may also change how we see ourselves.', cn:'但它也可能改变我们如何看待自己。'},
+      {en:'Power posing is standing like a superhero.', cn:'力量姿势是像超级英雄一样站立。'},
+      {en:'It makes you feel more confident.', cn:'它让你感觉更自信。'},
+      {en:'Our bodies change our minds.', cn:'我们的身体改变我们的思维。'},
+      {en:'And our minds change our behavior.', cn:'我们的思维改变我们的行为。'},
+      {en:'And our behavior changes our outcomes.', cn:'我们的行为改变我们的结果。'},
+      {en:'Don\'t fake it till you make it.', cn:'不要假装直到成功。'},
+      {en:'Fake it till you become it.', cn:'假装直到你真正成为它。'},
+      {en:'Tiny tweaks can lead to big changes.', cn:'微小的调整能带来巨大的变化。'},
+      {en:'High power poses increase testosterone.', cn:'高力量姿势增加睾酮。'},
+      {en:'They decrease cortisol, the stress hormone.', cn:'它们降低皮质醇，即压力荷尔蒙。'},
+      {en:'Before a stressful situation, take two minutes.', cn:'在压力情境前，花两分钟。'},
+      {en:'Find a private space and power pose.', cn:'找一个私密空间做力量姿势。'},
+      {en:'Configure your brain to cope with the situation.', cn:'配置你的大脑来应对情境。'},
+      {en:'Don\'t leave a situation without trying.', cn:'不要不尝试就离开。'},
+      {en:'You can become who you want to be.', cn:'你可以成为你想成为的人。'}
     ]
   },
   {
-    cat: '日常情景',
-    icon: '💼',
-    title: '工作面试',
+    title: 'How great leaders inspire action',
+    speaker: 'Simon Sinek',
+    icon: '🎯',
+    desc: '伟大的领导者从"为什么"开始——黄金圈法则',
     segs: [
-      {en:'Tell me about yourself and your background.', cn:'介绍一下你自己和你的背景。'},
-      {en:'I have five years of experience in marketing.', cn:'我有五年的营销经验。'},
-      {en:'What are your greatest strengths?', cn:'你最大的优势是什么？'},
-      {en:'I\'m a quick learner and a team player.', cn:'我学习快，有团队精神。'},
-      {en:'Why do you want to work for our company?', cn:'你为什么想在我们公司工作？'}
+      {en:'Why are some leaders more inspiring than others?', cn:'为什么有些领导者比其他人更有感召力？'},
+      {en:'They all think, act, and communicate the same way.', cn:'他们的思考、行动和沟通方式相同。'},
+      {en:'It\'s the world\'s simplest idea: start with why.', cn:'这是世界上最简单的想法：从"为什么"开始。'},
+      {en:'Most people know what they do.', cn:'大多数人知道他们做什么。'},
+      {en:'Some know how they do it.', cn:'一些人知道他们怎么做。'},
+      {en:'But very few know why they do it.', cn:'但很少有人知道他们为什么做。'},
+      {en:'The Golden Circle has three layers.', cn:'黄金圈有三个层次。'},
+      {en:'The outermost layer is what.', cn:'最外层是"做什么"。'},
+      {en:'The middle layer is how.', cn:'中间层是"怎么做"。'},
+      {en:'The innermost layer is why.', cn:'最内层是"为什么"。'},
+      {en:'Inspiring leaders start from the inside out.', cn:'有感召力的领导者从内到外开始。'},
+      {en:'People don\'t buy what you do.', cn:'人们不买你做什么。'},
+      {en:'They buy why you do it.', cn:'他们买你为什么做。'},
+      {en:'The goal is to do business with people who believe what you believe.', cn:'目标是与相信你所信的人做生意。'},
+      {en:'Martin Luther King said "I have a dream", not "I have a plan".', cn:'马丁·路德·金说"我有一个梦想"，不是"我有一个计划"。'},
+      {en:'The Wright brothers were driven by a cause.', cn:'莱特兄弟被一个使命驱动。'},
+      {en:'They proved that passion beats resources.', cn:'他们证明了激情胜过资源。'}
     ]
   },
   {
-    cat: '日常情景',
-    icon: '🍽️',
-    title: '餐厅点餐',
-    segs: [
-      {en:'Are you ready to order?', cn:'您准备好点餐了吗？'},
-      {en:'Yes, I\'ll have the grilled salmon, please.', cn:'是的，我要一份烤三文鱼。'},
-      {en:'Would you like anything to drink?', cn:'要喝点什么吗？'},
-      {en:'A glass of water and an orange juice, please.', cn:'一杯水和一杯橙汁。'},
-      {en:'Excellent choice. I\'ll get that right away.', cn:'很好的选择，马上为您准备。'}
-    ]
-  },
-  {
-    cat: '日常情景',
-    icon: '📞',
-    title: '电话沟通',
-    segs: [
-      {en:'Hi, this is Li. May I speak to Mr. Smith?', cn:'你好，我是李。请找史密斯先生。'},
-      {en:'Hold on, please. I\'ll put you through.', cn:'请稍等，我帮您转接。'},
-      {en:'Hello, Li. How can I help you?', cn:'你好，李。有什么事吗？'},
-      {en:'I\'m calling about the project. Do you have a minute?', cn:'我打来是想聊项目，您有时间吗？'},
-      {en:'Sure, go ahead. I\'m all ears.', cn:'当然，你说吧，我听着。'}
-    ]
-  },
-  {
-    cat: 'TED经典',
+    title: 'Inside the mind of a master procrastinator',
+    speaker: 'Tim Urban',
     icon: '🧠',
-    title: '拖延症患者的大脑',
+    desc: '拖延症患者的大脑里到底在想什么',
     segs: [
-      {en:'There\'s a difference between procrastinating and being lazy.', cn:'拖延和懒惰是不同的。'},
-      {en:'The procrastinator\'s brain has an Instant Gratification Monkey.', cn:'拖延者的大脑里有一只即时满足猴子。'},
-      {en:'The Panic Monster is the only thing that scares the monkey.', cn:'恐慌怪兽是唯一能吓到猴子的东西。'},
-      {en:'We all have a Life Calendar with limited squares.', cn:'我们都有一个格子有限的人生日历。'},
-      {en:'We need to stop spending time on unimportant things.', cn:'我们需要停止在不重要的事情上浪费时间。'}
+      {en:'In college, I was a chronic procrastinator.', cn:'大学时，我是一个长期拖延者。'},
+      {en:'Every paper was written at the last minute.', cn:'每篇论文都是最后一刻写的。'},
+      {en:'The procrastinator\'s brain has two key players.', cn:'拖延者的大脑有两个关键角色。'},
+      {en:'The rational decision-maker is one.', cn:'理性决策者是其中之一。'},
+      {en:'The instant gratification monkey is the other.', cn:'即时满足猴子是另一个。'},
+      {en:'The monkey only cares about easy and fun.', cn:'猴子只关心简单和有趣。'},
+      {en:'This is why procrastination happens.', cn:'这就是拖延发生的原因。'},
+      {en:'But there\'s a third character: the panic monster.', cn:'但还有第三个角色：恐慌怪兽。'},
+      {en:'The panic monster only wakes up near deadlines.', cn:'恐慌怪兽只在截止日期临近时醒来。'},
+      {en:'It\'s the only thing the monkey is afraid of.', cn:'它是猴子唯一害怕的东西。'},
+      {en:'The life calendar has about 4,000 weeks.', cn:'人生日历大约有4000周。'},
+      {en:'Each week is a square on this calendar.', cn:'每周是日历上的一个格子。'},
+      {en:'We need to stop wasting those squares.', cn:'我们需要停止浪费那些格子。'},
+      {en:'The present is all we have.', cn:'现在是我们拥有的一切。'},
+      {en:'Don\'t wait for the panic monster.', cn:'不要等待恐慌怪兽。'},
+      {en:'Start working on what matters today.', cn:'今天就开始做重要的事。'},
+      {en:'Time is our most precious resource.', cn:'时间是我们最宝贵的资源。'}
+    ]
+  },
+  {
+    title: 'Grit: The power of passion and perseverance',
+    speaker: 'Angela Duckworth',
+    icon: '🔥',
+    desc: '成功的关键不是天赋，而是毅力',
+    segs: [
+      {en:'Grit is passion and perseverance for long-term goals.', cn:'毅力是对长期目标的热情和坚持。'},
+      {en:'It\'s living life like a marathon, not a sprint.', cn:'把生活当作马拉松，而不是短跑。'},
+      {en:'Talent doesn\'t guarantee success.', cn:'天赋不能保证成功。'},
+      {en:'In fact, grit is often unrelated to talent.', cn:'事实上，毅力常常与天赋无关。'},
+      {en:'The most successful people are often not the most talented.', cn:'最成功的人往往不是最有天赋的。'},
+      {en:'They are the ones who never give up.', cn:'他们是永不放弃的人。'},
+      {en:'Grit is about stamina.', cn:'毅力关乎耐力。'},
+      {en:'It\'s working hard to make your future a reality.', cn:'是努力让未来成为现实。'},
+      {en:'Day after day, year after year.', cn:'日复一日，年复一年。'},
+      {en:'Growth mindset is the belief that abilities can grow.', cn:'成长心态是相信能力可以增长。'},
+      {en:'With effort, you can improve.', cn:'通过努力，你可以进步。'},
+      {en:'Failure is not a permanent condition.', cn:'失败不是永久的。'},
+      {en:'It\'s a chance to learn and grow.', cn:'它是学习和成长的机会。'},
+      {en:'Build grit from the inside out.', cn:'从内到外培养毅力。'},
+      {en:'Find something that interests you.', cn:'找到你感兴趣的事。'},
+      {en:'Practice it every day.', cn:'每天练习。'},
+      {en:'Connect your work to a higher purpose.', cn:'将你的工作与更高的目标联系起来。'}
+    ]
+  },
+  {
+    title: 'The happiness advantage',
+    speaker: 'Shawn Achor',
+    icon: '😊',
+    desc: '快乐不是成功的结果，而是成功的原因',
+    segs: [
+      {en:'We think success leads to happiness.', cn:'我们认为成功带来快乐。'},
+      {en:'But actually, happiness leads to success.', cn:'但实际上，快乐带来成功。'},
+      {en:'When your brain is positive, it performs better.', cn:'当你的大脑积极时，它表现更好。'},
+      {en:'You\'re more productive, creative, and engaged.', cn:'你更高效、更有创造力、更投入。'},
+      {en:'Dopamine makes you happier and turns on learning.', cn:'多巴胺让你更快乐并开启学习。'},
+      {en:'We can train our brains to be more positive.', cn:'我们可以训练大脑更积极。'},
+      {en:'Write down three things you\'re grateful for.', cn:'写下三件你感恩的事。'},
+      {en:'Do this for 21 days in a row.', cn:'连续做21天。'},
+      {en:'Journaling about positive experiences helps.', cn:'记录积极体验有帮助。'},
+      {en:'Exercise teaches your brain that behavior matters.', cn:'运动教会大脑行为很重要。'},
+      {en:'Meditation helps you focus on the present.', cn:'冥想帮助你专注于当下。'},
+      {en:'Random acts of kindness boost happiness.', cn:'随机善举提升快乐。'},
+      {en:'The happiness advantage gives you an edge.', cn:'快乐优势给你一种优势。'},
+      {en:'In work and in life.', cn:'在工作中和生活中。'},
+      {en:'Choose positivity every day.', cn:'每天选择积极。'},
+      {en:'Your brain will follow your lead.', cn:'你的大脑会跟随你的引导。'},
+      {en:'Happiness is a choice you can make.', cn:'快乐是你可以选择的。'}
     ]
   }
 ];
 
-let currentShadowGroup = 0;
+function getDailyArticle() {
+  const dayNum = Math.floor(new Date(today()).getTime() / 86400000);
+  return TED_ARTICLES[dayNum % TED_ARTICLES.length];
+}
 
 function renderSpeaking() {
-  // 渲染标签
-  const tagsEl = document.getElementById('speakingTags');
-  if(!tagsEl) return;
-  while(tagsEl.firstChild) tagsEl.removeChild(tagsEl.firstChild);
-  SHADOW_SEGS.forEach((g, i) => {
-    const tag = document.createElement('span');
-    tag.className = 'tag';
-    const bg = i === currentShadowGroup ? 'var(--primary)' : '#f0f0f0';
-    const color = i === currentShadowGroup ? '#fff' : 'var(--gray)';
-    tag.style.cssText = 'padding:6px 12px;background:' + bg + ';color:' + color + ';cursor:pointer;border-radius:16px;font-size:13px;';
-    tag.textContent = g.icon + ' ' + g.title;
-    tag.onclick = () => { currentShadowGroup = i; renderSpeaking(); };
-    tagsEl.appendChild(tag);
-  });
-
-  // 渲染跟读段落
   const contentEl = document.getElementById('speakingContent');
   if(!contentEl) return;
-  while(contentEl.firstChild) contentEl.removeChild(contentEl.firstChild);
-  const group = SHADOW_SEGS[currentShadowGroup];
+  while(contentEl.firstChild) el_remove(contentEl);
 
-  // 标题
+  const article = getDailyArticle();
+
+  // 文章标题和信息
+  const header = document.createElement('div');
+  header.style.cssText = 'margin-bottom:12px;';
   const titleEl = document.createElement('div');
-  titleEl.style.cssText = 'font-size:15px;font-weight:600;margin-bottom:8px;color:var(--primary);';
-  titleEl.textContent = group.icon + ' ' + group.title;
-  contentEl.appendChild(titleEl);
+  titleEl.style.cssText = 'font-size:16px;font-weight:700;color:var(--primary);margin-bottom:4px;';
+  titleEl.textContent = article.icon + ' ' + article.title;
+  header.appendChild(titleEl);
+
+  const speakerEl = document.createElement('div');
+  speakerEl.style.cssText = 'font-size:12px;color:var(--gray);margin-bottom:4px;';
+  speakerEl.textContent = '演讲者：' + article.speaker;
+  header.appendChild(speakerEl);
+
+  const descEl = document.createElement('div');
+  descEl.style.cssText = 'font-size:12px;color:#888;';
+  descEl.textContent = article.desc;
+  header.appendChild(descEl);
+
+  // 整篇播放按钮
+  const playAllBtn = document.createElement('button');
+  playAllBtn.className = 'btn btn-green btn-block';
+  playAllBtn.style.cssText = 'margin-top:10px;font-size:13px;';
+  playAllBtn.textContent = '▶ 播放全文（影子跟读模式）';
+  playAllBtn.onclick = () => playFullArticle(article);
+  header.appendChild(playAllBtn);
+
+  contentEl.appendChild(header);
 
   // 每个段落
-  group.segs.forEach((seg, i) => {
+  article.segs.forEach((seg, i) => {
     const div = document.createElement('div');
     div.className = 'shadow-seg';
 
@@ -2061,9 +2192,60 @@ function renderSpeaking() {
   });
 }
 
+// 播放整篇文章（影子跟读模式：逐句播放，每句间隔给跟读时间）
+let _fullArticlePlaying = false;
+function playFullArticle(article) {
+  if(_fullArticlePlaying) {
+    speechSynthesis.cancel();
+    _fullArticlePlaying = false;
+    toast('⏹ 已停止播放');
+    return;
+  }
+  if(!('speechSynthesis' in window)) { toast('不支持语音播放'); return; }
+
+  _fullArticlePlaying = true;
+  toast('▶ 影子跟读模式开始：先听原句，然后跟读');
+
+  let idx = 0;
+  const playNext = () => {
+    if(!_fullArticlePlaying || idx >= article.segs.length) {
+      _fullArticlePlaying = false;
+      toast('✅ 全文跟读完成！');
+      return;
+    }
+    const seg = article.segs[idx];
+    const u = new SpeechSynthesisUtterance(seg.en);
+    u.lang = 'en-US';
+    u.rate = 0.9;
+    const voices = speechSynthesis.getVoices();
+    const enVoice = voices.find(v => v.lang.startsWith('en'));
+    if(enVoice) u.voice = enVoice;
+
+    // 高亮当前段落
+    const segs = document.querySelectorAll('#speakingContent .shadow-seg');
+    segs.forEach(s => s.style.background = '');
+    if(segs[idx]) {
+      segs[idx].style.background = '#e8f4ff';
+      segs[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    u.onend = () => {
+      if(!_fullArticlePlaying) return;
+      idx++;
+      // 间隔1.5秒给跟读时间
+      setTimeout(playNext, 1500);
+    };
+    speechSynthesis.speak(u);
+  };
+  playNext();
+}
+
+function el_remove(el) { while(el.firstChild) el.removeChild(el.firstChild); }
+
 function speakShadow(text, rate) {
   if('speechSynthesis' in window) {
     speechSynthesis.cancel();
+    _fullArticlePlaying = false;
     const u = new SpeechSynthesisUtterance(text);
     u.lang = 'en-US';
     u.rate = rate;
@@ -2071,19 +2253,14 @@ function speakShadow(text, rate) {
     const enVoice = voices.find(v => v.lang.startsWith('en'));
     if(enVoice) u.voice = enVoice;
     speechSynthesis.speak(u);
-    toast('🔊 播放中，1秒后开始跟读');
-    // 延迟提示跟读
-    setTimeout(() => {
-      if(!speechSynthesis.speaking) {
-        toast('🎤 请跟读...');
-      }
-    }, Math.max(1000, text.length * 100 * rate));
+    toast('🔊 播放中，请跟读');
   }
 }
 
 function speakShadowRepeat(text, times) {
   if('speechSynthesis' in window) {
     speechSynthesis.cancel();
+    _fullArticlePlaying = false;
     let count = 0;
     const playOnce = () => {
       if(count >= times) { toast('✅ 跟读完成'); return; }
@@ -2193,6 +2370,198 @@ function renderFitness() {
     </div>`).join('');
   renderWeightHistory();
   renderWeightStats();
+  renderFitnessCalendar();
+}
+
+// ===== 健身打卡日历 =====
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+
+function getFitnessCheckins() {
+  // 从 state.tasks 读取 fitness 打卡记录
+  try {
+    let s = localStorage.getItem(STORE_KEY);
+    if(!s) return {};
+    const d = JSON.parse(s);
+    const tasks = d.tasks || {};
+    const checkins = {};
+    Object.keys(tasks).forEach(k => {
+      if(k.startsWith('task_') && tasks[k] && tasks[k].fitness) {
+        checkins[k.replace('task_', '')] = true;
+      }
+    });
+    return checkins;
+  } catch(e) { return {}; }
+}
+
+function renderFitnessCalendar() {
+  const el = document.getElementById('fitnessCalendar');
+  if(!el) return;
+  const checkins = getFitnessCheckins();
+  const todayStr = today();
+  const firstDay = new Date(calYear, calMonth, 1);
+  const lastDay = new Date(calYear, calMonth + 1, 0);
+  const startDow = firstDay.getDay();
+  const daysInMonth = lastDay.getDate();
+
+  // 计算连续打卡天数
+  let streak = 0;
+  let checkDate = new Date();
+  while(true) {
+    const ds = checkDate.toISOString().slice(0,10);
+    if(checkins[ds]) {
+      streak++;
+      checkDate.setDate(checkDate.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+  const streakBadge = document.getElementById('calStreakBadge');
+  if(streakBadge) streakBadge.textContent = '🔥' + streak + '天';
+
+  // 计算本月打卡天数
+  let monthCount = 0;
+  for(let d = 1; d <= daysInMonth; d++) {
+    const ds = calYear + '-' + String(calMonth + 1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    if(checkins[ds]) monthCount++;
+  }
+
+  while(el.firstChild) el.removeChild(el.firstChild);
+
+  // 头部：月份 + 前后切换
+  const header = document.createElement('div');
+  header.className = 'cal-header';
+  const monthLabel = document.createElement('div');
+  monthLabel.className = 'cal-month';
+  monthLabel.textContent = calYear + '年' + (calMonth + 1) + '月';
+  header.appendChild(monthLabel);
+
+  const nav = document.createElement('div');
+  nav.className = 'cal-nav';
+  const prevBtn = document.createElement('button');
+  prevBtn.textContent = '◀';
+  prevBtn.onclick = () => { calMonth--; if(calMonth < 0) { calMonth = 11; calYear--; } renderFitnessCalendar(); };
+  nav.appendChild(prevBtn);
+  const todayBtn = document.createElement('button');
+  todayBtn.textContent = '●';
+  todayBtn.style.fontSize = '10px';
+  todayBtn.onclick = () => { calYear = new Date().getFullYear(); calMonth = new Date().getMonth(); renderFitnessCalendar(); };
+  nav.appendChild(todayBtn);
+  const nextBtn = document.createElement('button');
+  nextBtn.textContent = '▶';
+  nextBtn.onclick = () => { calMonth++; if(calMonth > 11) { calMonth = 0; calYear++; } renderFitnessCalendar(); };
+  nav.appendChild(nextBtn);
+  header.appendChild(nav);
+  el.appendChild(header);
+
+  // 星期标题
+  const dows = ['日','一','二','三','四','五','六'];
+  const grid = document.createElement('div');
+  grid.className = 'cal-grid';
+  dows.forEach(d => {
+    const dow = document.createElement('div');
+    dow.className = 'cal-dow';
+    dow.textContent = d;
+    grid.appendChild(dow);
+  });
+
+  // 空格填充
+  for(let i = 0; i < startDow; i++) {
+    const empty = document.createElement('div');
+    empty.className = 'cal-day empty';
+    grid.appendChild(empty);
+  }
+
+  // 日期格子
+  for(let d = 1; d <= daysInMonth; d++) {
+    const ds = calYear + '-' + String(calMonth + 1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    const day = document.createElement('div');
+    day.className = 'cal-day';
+    if(checkins[ds]) day.classList.add('done');
+    if(ds === todayStr) day.classList.add('today');
+    day.textContent = d;
+    grid.appendChild(day);
+  }
+  el.appendChild(grid);
+
+  // 统计
+  const stats = document.createElement('div');
+  stats.className = 'cal-stats';
+  stats.innerHTML = '<div class="cs"><div class="v">' + monthCount + '</div><div class="l">本月打卡</div></div>' +
+    '<div class="cs"><div class="v">' + streak + '</div><div class="l">连续天数</div></div>' +
+    '<div class="cs"><div class="v">' + Object.keys(checkins).length + '</div><div class="l">累计打卡</div></div>';
+  el.appendChild(stats);
+}
+
+// ===== 新闻模块 =====
+const NEWS_SOURCES = [
+  {cat:'科技', icon:'🔬', title:'36氪 - 创业与科技资讯', desc:'前沿科技、创业项目、行业趋势', url:'https://36kr.com/'},
+  {cat:'科技', icon:'⚡', title:'少数派 - 高品质数字消费指南', desc:'App推荐、效率工具、数字生活', url:'https://sspai.com/'},
+  {cat:'科技', icon:'🤖', title:'机器之心 - AI前沿', desc:'人工智能、机器学习最新研究', url:'https://www.jiqizhixin.com/'},
+  {cat:'财经', icon:'📈', title:'第一财经 - 财经资讯', desc:'实时财经新闻、市场分析', url:'https://www.yicai.com/'},
+  {cat:'财经', icon:'💰', title:'华尔街见闻', desc:'全球金融市场资讯', url:'https://wallstreetcn.com/'},
+  {cat:'时事', icon:'🌐', title:'澎湃新闻 - 时事思想', desc:'原创新闻、深度报道', url:'https://www.thepaper.cn/'},
+  {cat:'时事', icon:'📰', title:'界面新闻', desc:'只服务于独立思考的人群', url:'https://www.jiemian.com/'},
+  {cat:'英语', icon:'🇬🇧', title:'China Daily 英语新闻', desc:'中国视角英语新闻，适合精读', url:'https://www.chinadaily.com.cn/'},
+  {cat:'英语', icon:'📻', title:'VOA 慢速英语', desc:'美国之音慢速英语，适合听力', url:'https://www.chinavoa.com/'},
+  {cat:'英语', icon:'📖', title:'BBC Learning English', desc:'BBC官方英语学习', url:'https://www.bbc.com/learningenglish/'},
+  {cat:'综合', icon:'🔮', title:'知乎热榜', desc:'热门话题讨论', url:'https://www.zhihu.com/hot'},
+  {cat:'综合', icon:'💡', title:'虎嗅网', desc:'聚焦科技与商业的深度思考', url:'https://www.huxiu.com/'}
+];
+
+const PODCAST_SOURCES = [
+  {cat:'知识', icon:'🧠', title:'得到 - 每天听本书', desc:'每天20分钟听一本书精华', url:'https://www.dedao.cn/', host:'得到App'},
+  {cat:'知识', icon:'📚', title:'硬地骇客 - 独立开发者播客', desc:'独立开发、副业、技术分享', url:'https://www.xiaoyuzhoufm.com/podcast/648e9efb63e85ab69b8e7590', host:'小宇宙'},
+  {cat:'商业', icon:'💼', title:'商业就是这样', desc:'商业故事背后的一线逻辑', url:'https://www.xiaoyuzhoufm.com/podcast/60e27fba84c2de9f3c2b4e95', host:'小宇宙'},
+  {cat:'商业', icon:'🌍', title:'疯投圈 - 投资人视角', desc:'消费品牌、投资逻辑分析', url:'https://www.xiaoyuzhoufm.com/podcast/614ac9b2da9b1fecd6c50156', host:'小宇宙'},
+  {cat:'英语', icon:'🎧', title:'Luke\'s English Podcast', desc:'英国英语老师播客，练听力', url:'https://teacherluke.co.uk/', host:'Luke Thompson'},
+  {cat:'英语', icon:'🎙️', title:'All Ears English', desc:'美式英语日常对话播客', url:'https://www.allearsenglish.com/', host:'Lindsay & Michelle'},
+  {cat:'成长', icon:'🌟', title:'自我进化论 - 个人成长', desc:'自我认知、情绪管理、成长', url:'https://www.xiaoyuzhoufm.com/podcast/62d7c6ac3c3f7c0e8c8e7590', host:'小宇宙'},
+  {cat:'科技', icon:'⚙️', title:'科技乱炖 - 科技杂谈', desc:'科技行业热点讨论', url:'https://www.xiaoyuzhoufm.com/podcast/5e7c8e9b3c3f7c0e8c8e7591', host:'小宇宙'},
+  {cat:'文化', icon:'🎭', title:'忽左忽右 - 文化访谈', desc:'国际政治、文化历史深度对谈', url:'https://www.xiaoyuzhoufm.com/podcast/5e8c8e9b3c3f7c0e8c8e7592', host:'小宇宙'},
+  {cat:'生活', icon:'☕', title:'贤者时间 - 情感生活', desc:'都市年轻人的情感观察', url:'https://www.xiaoyuzhoufm.com/podcast/5f8c8e9b3c3f7c0e8c8e7593', host:'小宇宙'}
+];
+
+function renderNews() {
+  // 新闻
+  const newsEl = document.getElementById('newsList');
+  if(newsEl) {
+    while(newsEl.firstChild) newsEl.removeChild(newsEl.firstChild);
+    NEWS_SOURCES.forEach(n => {
+      const card = document.createElement('div');
+      card.className = 'res-card';
+      card.onclick = () => window.open(n.url, '_blank');
+      const title = document.createElement('div');
+      title.className = 'res-title';
+      title.innerHTML = '<span class="res-tag cd">' + n.cat + '</span>' + n.icon + ' ' + n.title;
+      card.appendChild(title);
+      const meta = document.createElement('div');
+      meta.className = 'res-meta';
+      meta.textContent = n.desc;
+      card.appendChild(meta);
+      newsEl.appendChild(card);
+    });
+  }
+
+  // 播客
+  const podEl = document.getElementById('podcastList');
+  if(podEl) {
+    while(podEl.firstChild) podEl.removeChild(podEl.firstChild);
+    PODCAST_SOURCES.forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'res-card';
+      card.onclick = () => window.open(p.url, '_blank');
+      const title = document.createElement('div');
+      title.className = 'res-title';
+      title.innerHTML = '<span class="res-tag ted">' + p.cat + '</span>' + p.icon + ' ' + p.title;
+      card.appendChild(title);
+      const meta = document.createElement('div');
+      meta.className = 'res-meta';
+      meta.textContent = p.host + ' · ' + p.desc;
+      card.appendChild(meta);
+      podEl.appendChild(card);
+    });
+  }
 }
 
 function addWeight() {

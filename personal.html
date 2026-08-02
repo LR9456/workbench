@@ -1000,7 +1000,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Mi
 <script>
 // ============ 数据层 ============
 const STORE_KEY = 'daily_workbench_data';
-const APP_VERSION = 'v6.4 · 日历适配+情景对话';
+const APP_VERSION = 'v6.5 · 31篇TED+月度轮换';
 let state = {
   records: [],      // {id,type,amount,category,note,date}
   tasks: {},        // {date: {english:bool, fitness:bool, manage:bool, knowledge:bool}}
@@ -2108,12 +2108,447 @@ const TED_ARTICLES = [
       {en:'Your brain will follow your lead.', cn:'你的大脑会跟随你的引导。'},
       {en:'Happiness is a choice you can make.', cn:'快乐是你可以选择的。'}
     ]
+  },
+  // ===== 以下为扩充文章（8-31）=====
+  {
+    title: 'The skill of self-confidence',
+    speaker: 'Dr. Ivan Joseph',
+    icon: '🎯',
+    desc: '自信是一种可以训练的技能，不是天赋',
+    segs: [
+      {en:'Self-confidence is the belief in your ability to accomplish tasks.', cn:'自信是相信自己有能力完成任务。'},
+      {en:'It\'s a skill that can be trained, not something you\'re born with.', cn:'它是一种可以训练的技能，不是天生的。'},
+      {en:' repetition is the key to building confidence.', cn:'重复是建立自信的关键。'},
+      {en:'Practice until you can\'t get it wrong.', cn:'练习到你不会出错为止。'},
+      {en:'Self-talk matters. Stop the negative voice in your head.', cn:'自我对话很重要。停止脑中的负面声音。'},
+      {en:'Write a self-confidence letter to yourself.', cn:'给自己写一封自信信。'},
+      {en:'Catch yourself when you\'re being negative.', cn:'当你消极时要察觉到自己。'},
+      {en:'Replace negative thoughts with positive ones.', cn:'用积极想法替代消极想法。'},
+      {en:'Confidence comes from knowing you\'ve prepared.', cn:'自信来源于知道你已准备好。'},
+      {en:'Believe in yourself, even when no one else does.', cn:'相信自己，即使没人相信你。'}
+    ]
+  },
+  {
+    title: 'How to stop screwing yourself over',
+    speaker: 'Mel Robbins',
+    icon: '⚡',
+    desc: '别再自我设限——5秒法则改变人生',
+    segs: [
+      {en:'You can have the life you want, but you keep screwing yourself over.', cn:'你可以拥有想要的生活，但你总在自我设限。'},
+      {en:'Getting what you want is simple, but not easy.', cn:'得到你想要的很简单，但不容易。'},
+      {en:'You have to force yourself out of your comfort zone.', cn:'你必须强迫自己走出舒适区。'},
+      {en:'The 5-second rule: count 5-4-3-2-1 and act.', cn:'5秒法则：倒数5-4-3-2-1然后行动。'},
+      {en:'Your brain is wired to stop you from doing things that are uncertain.', cn:'你的大脑天生要阻止你做不确定的事。'},
+      {en:'You\'re never going to feel like doing it.', cn:'你永远不会觉得想做。'},
+      {en:'You have to force yourself to start.', cn:'你必须强迫自己开始。'},
+      {en:'Change requires pushing through discomfort.', cn:'改变需要穿越不适。'},
+      {en:'Activation energy is the initial push needed to start.', cn:'活化能是开始时所需的初始推力。'},
+      {en:'Stop waiting for the right moment. Start now.', cn:'别等合适的时机。现在就开始。'}
+    ]
+  },
+  {
+    title: 'The puzzle of motivation',
+    speaker: 'Dan Pink',
+    icon: '🧩',
+    desc: '传统奖励不总是有效——自主性才是动力',
+    segs: [
+      {en:'There\'s a mismatch between what science knows and what business does.', cn:'科学所知的和商业所做的不匹配。'},
+      {en:'Rewards narrow our focus and restrict our thinking.', cn:'奖励窄了我们的注意力，限制了思维。'},
+      {en:'Carrots and sticks are great for simple, mechanical tasks.', cn:'胡萝卜和大棒适合简单的机械任务。'},
+      {en:'But they don\'t work for creative, conceptual tasks.', cn:'但对创造性概念性任务无效。'},
+      {en:'Autonomy is the urge to direct our own lives.', cn:'自主性是主导自己生活的冲动。'},
+      {en:'Mastery is the desire to get better at something.', cn:'精通是想在某方面变得更好的欲望。'},
+      {en:'Purpose is the reason we do what we do.', cn:'目的是我们做我们所做之事的原因。'},
+      {en:'The best motivation is intrinsic, not extrinsic.', cn:'最好的动力是内在的，不是外在的。'},
+      {en:'Give people autonomy over their work.', cn:'给人们工作的自主权。'},
+      {en:'Results-Only Work Environment focuses on outcomes, not hours.', cn:'只看结果的工作环境关注成果而非时间。'}
+    ]
+  },
+  {
+    title: 'What makes a good life? Lessons from the longest study',
+    speaker: 'Robert Waldinger',
+    icon: '🌟',
+    desc: '哈佛75年研究揭示：好的人际关系让人幸福',
+    segs: [
+      {en:'What keeps us healthy and happy?', cn:'什么让我们健康快乐？'},
+      {en:'The Harvard study tracked people for 75 years.', cn:'哈佛研究追踪了人们75年。'},
+      {en:'Good relationships keep us happier and healthier. Period.', cn:'良好的人际关系让我们更快乐更健康。就这么简单。'},
+      {en:'Social connections are really good for us.', cn:'社交联系对我们真的有好处。'},
+      {en:'Loneliness kills. It\'s as toxic as smoking 15 cigarettes a day.', cn:'孤独致命。它和每天抽15支烟一样有害。'},
+      {en:'It\'s not about the number of friends, but the quality.', cn:'不是朋友的数量，而是质量。'},
+      {en:'Living in conflict is bad for our health.', cn:'生活在冲突中对健康有害。'},
+      {en:'Warm relationships protect our bodies and brains.', cn:'温暖的关系保护我们的身体和大脑。'},
+      {en:'People who are more socially connected are happier.', cn:'社交联系更多的人更快乐。'},
+      {en:'Replace screen time with people time.', cn:'用与人相处的时间替代看屏幕的时间。'}
+    ]
+  },
+  {
+    title: 'The power of believing you can improve',
+    speaker: 'Carol Dweck',
+    icon: '🌱',
+    desc: '成长型思维——相信能力可以提升',
+    segs: [
+      {en:'The power of "yet" versus "not yet".', cn:'还没 vs 不行的力量。'},
+      {en:'A growth mindset means believing you can improve.', cn:'成长型思维意味着相信你能进步。'},
+      {en:'A fixed mindset means thinking ability is static.', cn:'固定型思维认为能力是静止的。'},
+      {en:'In one school, failing means "not yet".', cn:'在一所学校，不及格意味着"还没"。'},
+      {en:'This simple word changes your whole trajectory.', cn:'这个简单的词改变了你整个轨迹。'},
+      {en:'Students with growth mindset succeed more.', cn:'有成长型思维的学生更成功。'},
+      {en:'They see effort as the path to mastery.', cn:'他们把努力视为精通的路径。'},
+      {en:'They learn from criticism instead of ignoring it.', cn:'他们从批评中学习而非忽视。'},
+      {en:'They find lessons in others\' success.', cn:'他们从别人的成功中找到经验。'},
+      {en:'We can grow our abilities through effort and strategy.', cn:'我们可以通过努力和策略提升能力。'}
+    ]
+  },
+  {
+    title: 'How to make stress your friend',
+    speaker: 'Kelly McGonigal',
+    icon: '💪',
+    desc: '压力不是敌人——改变对压力的看法就能改变身体反应',
+    segs: [
+      {en:'For years I\'ve been telling people stress makes you sick.', cn:'多年来我告诉人们压力让你生病。'},
+      {en:'But I\'ve changed my mind about stress.', cn:'但我改变了对压力的看法。'},
+      {en:'How you think about stress matters.', cn:'你怎么看待压力很重要。'},
+      {en:'When you change your mind about stress, you change your body\'s response.', cn:'当你改变对压力的看法，你改变了身体的反应。'},
+      {en:'People who view stress as helpful have healthier hearts.', cn:'把压力视为有帮助的人心脏更健康。'},
+      {en:'Stress makes you social. It releases oxytocin.', cn:'压力让你社交。它释放催产素。'},
+      {en:'Oxytocin is a stress hormone that protects your heart.', cn:'催产素是一种保护心脏的压力荷尔蒙。'},
+      {en:'Helping others makes you more resilient to stress.', cn:'帮助他人让你对压力更有韧性。'},
+      {en:'Chasing meaning is better for your health than avoiding discomfort.', cn:'追求意义比逃避不适对健康更好。'},
+      {en:'Stress gives us access to our hearts.', cn:'压力让我们触及内心。'}
+    ]
+  },
+  {
+    title: 'The single skill every woman should master',
+    speaker: 'Reshma Saujani',
+    icon: '👩',
+    desc: '女孩要勇敢而非完美',
+    segs: [
+      {en:'Most girls are taught to avoid failure and risk.', cn:'大多数女孩被教导避免失败和风险。'},
+      {en:'Boys are taught to be brave.', cn:'男孩被教导要勇敢。'},
+      {en:'We have to teach girls to be brave, not perfect.', cn:'我们必须教女孩勇敢而非完美。'},
+      {en:'Perfectionism holds women back.', cn:'完美主义阻碍了女性。'},
+      {en:'Women apply for jobs only if they meet 100% of qualifications.', cn:'女性只有100%符合条件才申请工作。'},
+      {en:'Men apply if they meet 60%.', cn:'男性符合60%就申请。'},
+      {en:'Coding is a process of trial and error.', cn:'编程是试错的过程。'},
+      {en:'Girls are afraid to write imperfect code.', cn:'女孩害怕写不完美的代码。'},
+      {en:'We need to socialize girls to be comfortable with imperfection.', cn:'我们需要让女孩适应不完美。'},
+      {en:'When you\'re brave, you inspire others around you.', cn:'当你勇敢时，你激励了周围的人。'}
+    ]
+  },
+  {
+    title: 'How to build (and rebuild) trust',
+    speaker: ' Frances Frei',
+    icon: '🤝',
+    desc: '信任的三角：真实、逻辑、同理心',
+    segs: [
+      {en:'Trust is the foundation of everything we do.', cn:'信任是我们所做一切的基础。'},
+      {en:'The trust triangle has three sides: authenticity, logic, empathy.', cn:'信任三角有三边：真实、逻辑、同理心。'},
+      {en:'Authenticity is being who you truly are.', cn:'真实是做真正的自己。'},
+      {en:'Logic is the rigor in your thinking.', cn:'逻辑是你思考的严谨。'},
+      {en:'Empathy is showing you care about others.', cn:'同理心是表明你关心他人。'},
+      {en:'When trust breaks, identify which side is wobbly.', cn:'当信任破裂时，找出哪一边出了问题。'},
+      {en:'If you lack empathy, put away your phone and listen.', cn:'如果缺乏同理心，放下手机去倾听。'},
+      {en:'If your logic is weak, be clear and concise.', cn:'如果逻辑薄弱，要清晰简洁。'},
+      {en:'If authenticity is missing, be yourself.', cn:'如果缺少真实，做你自己。'},
+      {en:'Trust can be rebuilt if you work on the weak side.', cn:'信任可以重建如果你修补薄弱的一面。'}
+    ]
+  },
+  {
+    title: 'The beauty of being a misfit',
+    speaker: 'Lydia Yuknavitch',
+    icon: '🦋',
+    desc: '不合群的人拥有独特的力量',
+    segs: [
+      {en:'I\'m a misfit. I always have been.', cn:'我是个不合群的人。我一直都是。'},
+      {en:'Misfits don\'t fit into the expected mold.', cn:'不合群的人不符合期望的模子。'},
+      {en:'But misfits have a special kind of beauty.', cn:'但不合群的人有一种特殊的美。'},
+      {en:'They see the world differently.', cn:'他们用不同的眼光看世界。'},
+      {en:'They\'re not afraid to be wrong.', cn:'他们不怕犯错。'},
+      {en:'Society tries to make us all the same.', cn:'社会试图让我们都一样。'},
+      {en:'But your differences are your strength.', cn:'但你的不同是你的力量。'},
+      {en:'Don\'t let the world shrink you.', cn:'别让世界缩小你。'},
+      {en:'Find your tribe of fellow misfits.', cn:'找到你同类不合群的人。'},
+      {en:'Your story matters, even if it\'s not perfect.', cn:'你的故事很重要，即使不完美。'}
+    ]
+  },
+  {
+    title: 'Why we all need to practice emotional first aid',
+    speaker: 'Guy Winch',
+    icon: '❤️‍🩹',
+    desc: '我们关注身体健康却忽视心理伤害',
+    segs: [
+      {en:'We brush our teeth but don\'t care for our minds.', cn:'我们刷牙却不关心心理。'},
+      {en:'Loneliness creates a deep emotional wound.', cn:'孤独造成深层情感创伤。'},
+      {en:'Failure can distort our perception of reality.', cn:'失败会扭曲我们对现实的感知。'},
+      {en:'Rejection is painful, more than we admit.', cn:'被拒绝很痛苦，比我们承认的更痛。'},
+      {en:'Ruminating on negative thoughts is harmful.', cn:'反复想消极想法是有害的。'},
+      {en:'Even a two-minute distraction can break the rumination cycle.', cn:'即使两分钟的分心也能打破反刍循环。'},
+      {en:'We need to change our response to failure.', cn:'我们需要改变对失败的反应。'},
+      {en:'Protect your self-esteem as you would your body.', cn:'像保护身体一样保护自尊。'},
+      {en:'Don\'t let loneliness become chronic.', cn:'别让孤独变成慢性的。'},
+      {en:'Practice emotional hygiene regularly.', cn:'定期练习情绪卫生。'}
+    ]
+  },
+  {
+    title: 'The power of introverts',
+    speaker: 'Susan Cain',
+    icon: '🤫',
+    desc: '内向者的力量——安静的人也能改变世界',
+    segs: [
+      {en:'I grew up thinking introversion was a weakness.', cn:'我长大时以为内向是弱点。'},
+      {en:'But introverts have extraordinary talents.', cn:'但内向者有非凡的才能。'},
+      {en:'They think deeply and care intensely.', cn:'他们思考深刻，关心深切。'},
+      {en:'Solitude is a crucial ingredient for creativity.', cn:'独处是创造力的关键要素。'},
+      {en:'Groups often follow the loudest person, not the best idea.', cn:'群体常跟随最大声的人，而非最好的主意。'},
+      {en:'Introverts make better leaders in some situations.', cn:'内向者在某些情况下是更好的领导者。'},
+      {en:'They let employees run with their ideas.', cn:'他们让员工发挥自己的想法。'},
+      {en:'There\'s zero correlation between being the best talker and having the best ideas.', cn:'最会说话和最好的主意之间零相关。'},
+      {en:'Stop the constant demand for group work.', cn:'停止对团队合作的无尽要求。'},
+      {en:'Give introverts the freedom to be themselves.', cn:'给内向者做自己的自由。'}
+    ]
+  },
+  {
+    title: 'Remember to say thank you',
+    speaker: 'Laura Trice',
+    icon: '🙏',
+    desc: '感恩的力量——说谢谢能改变关系',
+    segs: [
+      {en:'Saying thank you seems so simple.', cn:'说谢谢看起来很简单。'},
+      {en:'But many of us forget to do it.', cn:'但我们很多人忘了说。'},
+      {en:'Praise and appreciation are basic human needs.', cn:'赞扬和感谢是人类基本需求。'},
+      {en:'We crave recognition but are afraid to ask.', cn:'我们渴望认可但不敢要求。'},
+      {en:'Tell people specifically what you\'re thanking them for.', cn:'具体告诉别人你感谢他们什么。'},
+      {en:'Don\'t wait. Express gratitude now.', cn:'别等。现在就表达感恩。'},
+      {en:'Thank you can heal relationships.', cn:'谢谢能治愈关系。'},
+      {en:'Gratitude makes both giver and receiver happy.', cn:'感恩让给予者和接受者都快乐。'},
+      {en:'Be sincere when you say it.', cn:'说的时候要真诚。'},
+      {en:'Make thank you a daily habit.', cn:'让谢谢成为日常习惯。'}
+    ]
+  },
+  {
+    title: 'The art of asking questions',
+    speaker: 'Dan Moulthrop',
+    icon: '❓',
+    desc: '好问题比好答案更有力量',
+    segs: [
+      {en:'Questions are more powerful than answers.', cn:'问题比答案更有力量。'},
+      {en:'A good question opens up new possibilities.', cn:'好问题开启新可能。'},
+      {en:'Most people ask questions to confirm what they know.', cn:'大多数人提问是为了确认已知。'},
+      {en:'The best questions come from genuine curiosity.', cn:'最好的问题来自真诚的好奇。'},
+      {en:'Ask "what" before "why".', cn:'先问"什么"再问"为什么"。'},
+      {en:'Open-ended questions lead to richer answers.', cn:'开放式问题带来更丰富的答案。'},
+      {en:'Listen to understand, not to respond.', cn:'倾听是为了理解，不是回应。'},
+      {en:'Silence after a question is golden.', cn:'问后的沉默是金。'},
+      {en:'Questions build relationships.', cn:'问题建立关系。'},
+      {en:'The right question can change everything.', cn:'对的问题能改变一切。'}
+    ]
+  },
+  {
+    title: 'Success, failure and the courage to keep going',
+    speaker: 'Elizabeth Gilbert',
+    icon: '✍️',
+    desc: '成功和失败之后如何继续前行',
+    segs: [
+      {en:'After a big success, I was afraid I\'d never do better.', cn:'在一次大成功后，我怕再也做不好了。'},
+      {en:'After a big failure, I was afraid I\'d never recover.', cn:'在一次大失败后，我怕再也恢复不了。'},
+      {en:'You have to find your way home.', cn:'你必须找到回家的路。'},
+      {en:'Home is whatever you love doing.', cn:'家就是你热爱做的事。'},
+      {en:'Do what you love, regardless of outcome.', cn:'做你爱的，不管结果。'},
+      {en:'I learned to keep working no matter what.', cn:'我学会了无论如何继续工作。'},
+      {en:'I learned to keep going despite success.', cn:'我学会在成功后继续前行。'},
+      {en:'I learned to keep going despite failure.', cn:'我学会在失败后继续前行。'},
+      {en:'Your work is to show up and do your job.', cn:'你的工作是出现并做好你的事。'},
+      {en:'Have the courage to keep going.', cn:'有勇气继续前行。'}
+    ]
+  },
+  {
+    title: 'How to use a paper towel',
+    speaker: 'Joe Smith',
+    icon: '🧻',
+    desc: '小事也能改变世界——减少纸张浪费',
+    segs: [
+      {en:'13 billion pounds of paper towels are used in the US each year.', cn:'美国每年使用130亿磅纸巾。'},
+      {en:'We can reduce this significantly with one simple step.', cn:'我们可以用一个简单步骤大幅减少。'},
+      {en:'Shake your hands after washing.', cn:'洗完手后甩一甩。'},
+      {en:'Fold the paper towel in half.', cn:'把纸巾对折。'},
+      {en:'The folded towel is more absorbent.', cn:'对折的毛巾更吸水。'},
+      {en:'One towel is enough if you fold it.', cn:'如果对折一张就够。'},
+      {en:'This could save 571 million pounds of paper per year.', cn:'这每年可节省5.71亿磅纸。'},
+      {en:'Small actions multiplied make a huge difference.', cn:'小行动乘以人数能产生巨大影响。'},
+      {en:'Shake and fold. That\'s all it takes.', cn:'甩和对折。就这么简单。'},
+      {en:'You can change the world with small habits.', cn:'你可以用小习惯改变世界。'}
+    ]
+  },
+  {
+    title: 'The habits of original thinkers',
+    speaker: 'Adam Grant',
+    icon: '💡',
+    desc: '原创思考者的三个习惯',
+    segs: [
+      {en:'Originals are people who think differently.', cn:'原创者是想法不同的人。'},
+      {en:'They doubt their ideas, not themselves.', cn:'他们怀疑想法，不怀疑自己。'},
+      {en:'Procrastination can be a virtue for creativity.', cn:'拖延可能是创造力的美德。'},
+      {en:'The biggest regret is playing it too safe.', cn:'最大的遗憾是过于保守。'},
+      {en:'First movers aren\'t always the winners.', cn:'先行者不总是赢家。'},
+      {en:'Improvers often win over pioneers.', cn:'改进者常胜过开拓者。'},
+      {en:'Originals generate many ideas, not just one.', cn:'原创者产生很多想法，不只是一个。'},
+      {en:'Quantity leads to quality.', cn:'数量带来质量。'},
+      {en:'They fear failing to try more than failing.', cn:'他们更怕没尝试而非失败。'},
+      {en:'Being original is about taking action on your ideas.', cn:'原创是就你的想法采取行动。'}
+    ]
+  },
+  {
+    title: 'Why 30 is not the new 20',
+    speaker: 'Meg Jay',
+    icon: '⏰',
+    desc: '20多岁是人生最关键的十年',
+    segs: [
+      {en:'Thirty is not the new twenty.', cn:'30不是新的20。'},
+      {en:'Your 20s are the most defining decade.', cn:'你的20多岁是最决定性的十年。'},
+      {en:'80% of life\'s defining moments happen by age 35.', cn:'80%的人生决定性时刻在35岁前发生。'},
+      {en:'The first 10 years of a career matter most.', cn:'职业生涯前10年最重要。'},
+      {en:'Don\'t wait for life to happen to you.', cn:'别等生活降临到你头上。'},
+      {en:'Get some identity capital.', cn:'积累一些身份资本。'},
+      {en:'Do things that add value to who you are.', cn:'做能增加你价值的事。'},
+      {en:'Use your weak ties to find opportunities.', cn:'利用弱关系寻找机会。'},
+      {en:'Pick your family, don\'t just wait.', cn:'选择你的家庭，不只是等待。'},
+      {en:'Claim your adulthood now.', cn:'现在就宣告你的成年。'}
+    ]
+  },
+  {
+    title: 'A simpler way to break bad habits',
+    speaker: 'Judson Brewer',
+    icon: '🧘',
+    desc: '用正念打破坏习惯',
+    segs: [
+      {en:'Why is it so hard to break bad habits?', cn:'为什么改掉坏习惯那么难？'},
+      {en:'Our brains are wired for reward-based learning.', cn:'我们的大脑天生偏好基于奖励的学习。'},
+      {en:'Trigger, behavior, reward — this is the habit loop.', cn:'触发、行为、奖励——这是习惯回路。'},
+      {en:'We eat when stressed, feel better, and repeat.', cn:'压力大时吃东西，感觉好了，就重复。'},
+      {en:'Mindfulness can help break this loop.', cn:'正念可以帮助打破这个回路。'},
+      {en:'Pay attention to the results of your habits.', cn:'关注你习惯的结果。'},
+      {en:'When you truly notice, the habit loses its power.', cn:'当你真正注意到，习惯就失去了力量。'},
+      {en:'Curiosity feels better than craving.', cn:'好奇比渴望感觉更好。'},
+      {en:'Be interested in your experience.', cn:'对你的体验感兴趣。'},
+      {en:'Awareness is the first step to change.', cn:'觉察是改变的第一步。'}
+    ]
+  },
+  {
+    title: 'The danger of a single story',
+    speaker: 'Chimamanda Ngozi Adichie',
+    icon: '📖',
+    desc: '单一故事的危险——用多元视角看世界',
+    segs: [
+      {en:'I\'m a storyteller, so I\'ll tell a story.', cn:'我是讲故事的人，所以我讲个故事。'},
+      {en:'The single story creates stereotypes.', cn:'单一故事制造刻板印象。'},
+      {en:'The problem with stereotypes is not that they are untrue.', cn:'刻板印象的问题不是它们不真实。'},
+      {en:'But that they are incomplete.', cn:'而是它们不完整。'},
+      {en:'They make one story become the only story.', cn:'它们让一个故事成为唯一的故事。'},
+      {en:'Power is the ability to tell the story of another person.', cn:'权力是讲述他人故事的能力。'},
+      {en:'How they are told, who tells them, when they\'re told.', cn:'怎么讲、谁讲、何时讲。'},
+      {en:'How many stories are told depends on power.', cn:'讲多少故事取决于权力。'},
+      {en:'Reject the single story.', cn:'拒绝单一故事。'},
+      {en:'When we realize there is never a single story, we regain a kind of paradise.', cn:'当我们意识到永远没有单一故事，我们重获一种天堂。'}
+    ]
+  },
+  {
+    title: 'What you can do to prevent Alzheimer\'s',
+    speaker: 'Lisa Genova',
+    icon: '🧠',
+    desc: '预防阿尔茨海默症——从现在开始',
+    segs: [
+      {en:'Alzheimer\'s doesn\'t start when symptoms appear.', cn:'阿尔茨海默症不是症状出现时才开始的。'},
+      {en:'It begins in the brain decades before.', cn:'它在几十年前就开始了。'},
+      {en:'Amyloid plaques build up silently.', cn:'淀粉样蛋白斑悄悄积累。'},
+      {en:'Sleep helps clear these plaques.', cn:'睡眠有助于清除这些斑块。'},
+      {en:'Exercise increases blood flow to the brain.', cn:'运动增加大脑血流。'},
+      {en:'What\'s good for the heart is good for the brain.', cn:'对心脏好的对大脑也好。'},
+      {en:'Learning new things builds cognitive reserve.', cn:'学习新事物建立认知储备。'},
+      {en:'Social connection protects against decline.', cn:'社交联系防止衰退。'},
+      {en:'You can change your brain\'s trajectory.', cn:'你可以改变大脑的轨迹。'},
+      {en:'Start prevention habits now, not later.', cn:'现在就开始预防习惯，不要等。'}
+    ]
+  },
+  {
+    title: 'The boost you need to stop negative thoughts',
+    speaker: 'Oprah Winfrey',
+    icon: '✨',
+    desc: '如何停止消极想法',
+    segs: [
+      {en:'Negative thoughts can consume you.', cn:'消极想法可以吞噬你。'},
+      {en:'But you have the power to shift them.', cn:'但你有力量转变它们。'},
+      {en:'Awareness is the first step.', cn:'觉察是第一步。'},
+      {en:'Notice when you\'re spiraling.', cn:'注意你何时在螺旋下降。'},
+      {en:'Replace "I can\'t" with "I can\'t yet".', cn:'把"我不能"换成"我还没能"。'},
+      {en:'Gratitude shifts your perspective instantly.', cn:'感恩瞬间改变你的视角。'},
+      {en:'Write down three good things each day.', cn:'每天写下三件好事。'},
+      {en:'Your thoughts become your reality.', cn:'你的想法成为你的现实。'},
+      {en:'Choose thoughts that serve you.', cn:'选择对你有益的想法。'},
+      {en:'You are the author of your mind.', cn:'你是你心灵的作者。'}
+    ]
+  },
+  {
+    title: 'How to motivate yourself to change your life',
+    speaker: 'Tony Robbins',
+    icon: '🔥',
+    desc: '激励自己改变的两个核心要素',
+    segs: [
+      {en:'Change happens in an instant.', cn:'改变在瞬间发生。'},
+      {en:'It\'s not about lack of ability, it\'s about lack of motivation.', cn:'不是能力不够，是动力不够。'},
+      {en:'Two things drive all behavior: state and blueprint.', cn:'两件事驱动所有行为：状态和蓝图。'},
+      {en:'Your state is your physical and mental condition.', cn:'状态是你的身心条件。'},
+      {en:'Your blueprint is your map of the world.', cn:'蓝图是你的世界地图。'},
+      {en:'Pain is the ultimate motivator.', cn:'痛苦是终极激励者。'},
+      {en:'Get angry enough to change.', cn:'愤怒到要改变。'},
+      {en:'Raise your standards, not your goals.', cn:'提高标准，不是目标。'},
+      {en:'Should vs must: must creates action.', cn:'应该 vs 必须：必须创造行动。'},
+      {en:'Decide today, not someday.', cn:'今天就决定，不是某天。'}
+    ]
+  },
+  {
+    title: 'The frugal secrets of the world\'s richest people',
+    speaker: 'Alex Hormozi',
+    icon: '💰',
+    desc: '富人的节俭秘密',
+    segs: [
+      {en:'Many wealthy people live surprisingly frugal lives.', cn:'许多富人过着惊人的节俭生活。'},
+      {en:'Wealth is what you don\'t see.', cn:'财富是你看不到的东西。'},
+      {en:'It\'s the cars not bought, the clothes not purchased.', cn:'是没买的车，没买的衣服。'},
+      {en:'Frugality is a habit, not a sacrifice.', cn:'节俭是习惯，不是牺牲。'},
+      {en:'Spend less than you earn, always.', cn:'永远花的比赚的少。'},
+      {en:'Invest the difference.', cn:'投资差额。'},
+      {en:'Time is more valuable than money.', cn:'时间比金钱更有价值。'},
+      {en:'Buy experiences, not things.', cn:'买体验，不是物品。'},
+      {en:'The goal is freedom, not display.', cn:'目标是自由，不是展示。'},
+      {en:'True wealth is having options.', cn:'真正的财富是拥有选择。'}
+    ]
+  },
+  {
+    title: 'Sleep is your superpower',
+    speaker: 'Matt Walker',
+    icon: '😴',
+    desc: '睡眠是你的超能力',
+    segs: [
+      {en:'Sleep is the most important thing you can do.', cn:'睡眠是你能做的最重要的事。'},
+      {en:'Men who sleep 5-6 hours have testosterone of someone 10 years older.', cn:'睡5-6小时的男性睾酮水平像老了10岁。'},
+      {en:'Lack of sleep affects your immune system.', cn:'缺乏睡眠影响免疫系统。'},
+      {en:'Sleep before midnight is not more valuable.', cn:'午夜前的睡眠并不更有价值。'},
+      {en:'Regularity is king. Go to bed at the same time.', cn:'规律是王道。同一时间睡觉。'},
+      {en:'Keep your bedroom cool.', cn:'保持卧室凉爽。'},
+      {en:'Darkness helps melatonin production.', cn:'黑暗帮助褪黑素分泌。'},
+      {en:'Avoid caffeine after 2 PM.', cn:'下午2点后避免咖啡因。'},
+      {en:'Don\'t lie awake in bed. Get up if you can\'t sleep.', cn:'别在床上躺着。睡不着就起来。'},
+      {en:'Sleep is a non-negotiable biological necessity.', cn:'睡眠是不可协商的生理必需。'}
+    ]
   }
 ];
 
 function getDailyArticle() {
   const dayNum = Math.floor(new Date(today()).getTime() / 86400000);
-  return TED_ARTICLES[dayNum % TED_ARTICLES.length];
+  // 每月轮换：同一个日期每月看到不同的文章
+  const monthOffset = new Date(today()).getMonth() * 31;
+  return TED_ARTICLES[(dayNum + monthOffset) % TED_ARTICLES.length];
 }
 
 // 日常情景对话库

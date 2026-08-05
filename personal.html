@@ -603,8 +603,18 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Mi
 
         <div class="card">
           <div class="card-title">📅 艾宾浩斯复习哨兵 <span class="badge" id="reviewCount">0</span></div>
-          <div style="font-size:12px;color:var(--gray);margin-bottom:8px;">今日需复习的词汇组（间隔1/3/7/15天）</div>
+          <div style="font-size:12px;color:var(--gray);margin-bottom:8px;">今日需复习的词汇组（间隔1/3/7/15天）+ 生词提醒</div>
           <div id="reviewList"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📔 生词本 <span class="badge" id="kaoyanWordbookCount">0</span></div>
+          <div style="font-size:12px;color:var(--gray);margin-bottom:8px;">学习时点「❌ 不熟」的词自动加入，定期复习</div>
+          <div id="kaoyanWordbookList" style="max-height:300px;overflow-y:auto;"></div>
+          <div style="display:flex;gap:6px;margin-top:8px;">
+            <button class="btn btn-sm btn-green" style="flex:1;" onclick="startWordReview()">📖 生词复习</button>
+            <button class="btn btn-sm btn-outline" style="flex:1;" onclick="clearAllWords()">🗑️ 清空</button>
+          </div>
         </div>
 
         <div class="card">
@@ -1215,7 +1225,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Mi
 <script>
 // ============ 数据层 ============
 const STORE_KEY = 'daily_workbench_data';
-const APP_VERSION = 'v7.1 · TED整篇跟读';
+const APP_VERSION = 'v7.2 · 考研生词本';
 let state = {
   records: [],      // {id,type,amount,category,note,date}
   tasks: {},        // {date: {english:bool, fitness:bool, manage:bool, knowledge:bool}}
@@ -1828,6 +1838,8 @@ function renderKaoyanDay() {
 
   // 记录学习日期（用于复习哨兵）
   recordStudyDay(currentKaoyanDay);
+  // 渲染生词本
+  renderKaoyanWordbook();
 
   dayData.groups.forEach((grp, gi) => {
     const groupDiv = document.createElement('div');
@@ -1946,6 +1958,23 @@ function renderKaoyanDay() {
       rel.textContent = '📚 同根词：' + w.rel;
       wDiv.appendChild(rel);
 
+      // 不熟/已掌握按钮
+      const wActionRow = document.createElement('div');
+      wActionRow.style.cssText = 'display:flex;gap:6px;margin-top:6px;';
+      const knownBtn = document.createElement('button');
+      knownBtn.className = 'btn btn-sm btn-green';
+      knownBtn.style.cssText = 'flex:1;font-size:11px;padding:4px 8px;';
+      knownBtn.textContent = '✅ 掌握';
+      knownBtn.onclick = () => { removeKaoyanWord(w.w); toast('✅ 已标记掌握'); };
+      wActionRow.appendChild(knownBtn);
+      const unknownBtn = document.createElement('button');
+      unknownBtn.className = 'btn btn-sm btn-red';
+      unknownBtn.style.cssText = 'flex:1;font-size:11px;padding:4px 8px;';
+      unknownBtn.textContent = '❌ 不熟';
+      unknownBtn.onclick = () => { addKaoyanWord(w); toast('📔 已加入生词本'); };
+      wActionRow.appendChild(unknownBtn);
+      wDiv.appendChild(wActionRow);
+
       groupDiv.appendChild(wDiv);
     });
 
@@ -1989,10 +2018,31 @@ function renderReviewList() {
   if(!el) return;
   while(el.firstChild) el.removeChild(el.firstChild);
   const reviews = getReviewSchedule();
+  const wordbook = getKaoyanWordbook();
+  const totalCount = reviews.length + (wordbook.length > 0 ? 1 : 0);
   const countEl = document.getElementById('reviewCount');
-  if(countEl) countEl.textContent = reviews.length;
+  if(countEl) countEl.textContent = totalCount;
 
-  if(!reviews.length) {
+  // 生词提醒（优先显示）
+  if(wordbook.length > 0) {
+    const wordItem = document.createElement('div');
+    wordItem.className = 'rv-item';
+    wordItem.style.cssText = 'background:#fff1f0;border:1px solid #ffccc7;';
+    const left = document.createElement('span');
+    left.className = 'rv-day';
+    left.style.color = '#ff4d4f';
+    left.textContent = '📔 ' + wordbook.length + '个生词待复习';
+    left.style.cursor = 'pointer';
+    left.onclick = () => startWordReview();
+    wordItem.appendChild(left);
+    const interval = document.createElement('span');
+    interval.className = 'rv-interval d15';
+    interval.textContent = '立即复习';
+    wordItem.appendChild(interval);
+    el.appendChild(wordItem);
+  }
+
+  if(!reviews.length && wordbook.length === 0) {
     const empty = document.createElement('div');
     empty.style.cssText = 'text-align:center;color:var(--light);font-size:12px;padding:16px;';
     empty.textContent = '今天没有需要复习的内容 ✨';
@@ -2015,6 +2065,166 @@ function renderReviewList() {
     item.appendChild(interval);
     el.appendChild(item);
   });
+}
+
+// ============ 考研生词本 ============
+function getKaoyanWordbook() {
+  try { return JSON.parse(localStorage.getItem('kaoyan_wordbook') || '[]'); } catch(e) { return []; }
+}
+
+function saveKaoyanWordbook(wb) {
+  try { localStorage.setItem('kaoyan_wordbook', JSON.stringify(wb)); } catch(e) {}
+}
+
+function addKaoyanWord(w) {
+  let wb = getKaoyanWordbook();
+  if(!wb.find(x => x.w === w.w)) {
+    wb.push({...w, addedDate: today(), reviewCount: 0, lastReview: null});
+    saveKaoyanWordbook(wb);
+    renderKaoyanWordbook();
+    renderReviewList();
+  }
+}
+
+function removeKaoyanWord(word) {
+  let wb = getKaoyanWordbook();
+  wb = wb.filter(x => x.w !== word);
+  saveKaoyanWordbook(wb);
+  renderKaoyanWordbook();
+  renderReviewList();
+}
+
+function clearAllWords() {
+  if(!confirm('确定清空生词本吗？')) return;
+  saveKaoyanWordbook([]);
+  renderKaoyanWordbook();
+  renderReviewList();
+  toast('已清空');
+}
+
+function renderKaoyanWordbook() {
+  const el = document.getElementById('kaoyanWordbookList');
+  if(!el) return;
+  const wb = getKaoyanWordbook();
+  const countEl = document.getElementById('kaoyanWordbookCount');
+  if(countEl) countEl.textContent = wb.length;
+  while(el.firstChild) el.removeChild(el.firstChild);
+
+  if(!wb.length) {
+    const empty = document.createElement('div');
+    empty.style.cssText = 'text-align:center;color:var(--light);font-size:12px;padding:16px;';
+    empty.textContent = '生词本为空，学习时点「❌ 不熟」自动加入';
+    el.appendChild(empty);
+    return;
+  }
+
+  wb.forEach((w, i) => {
+    const row = document.createElement('div');
+    row.className = 'wb-item';
+    const word = document.createElement('span');
+    word.className = 'wb-word';
+    word.textContent = w.w;
+    word.onclick = () => speakWord(w.w);
+    word.style.cursor = 'pointer';
+    const meaning = document.createElement('span');
+    meaning.className = 'wb-meaning';
+    meaning.textContent = w.m;
+    const del = document.createElement('span');
+    del.className = 'wb-del';
+    del.textContent = '×';
+    del.onclick = () => removeKaoyanWord(w.w);
+    row.appendChild(word);
+    row.appendChild(meaning);
+    row.appendChild(del);
+    el.appendChild(row);
+  });
+}
+
+// 生词复习模式
+let wordReviewMode = false;
+let wordReviewIdx = 0;
+
+function startWordReview() {
+  const wb = getKaoyanWordbook();
+  if(!wb.length) { toast('生词本为空'); return; }
+  wordReviewMode = true;
+  wordReviewIdx = 0;
+  renderWordReviewCard();
+  toast('📖 生词复习模式，共 ' + wb.length + ' 个');
+}
+
+function renderWordReviewCard() {
+  const wb = getKaoyanWordbook();
+  if(!wb.length || wordReviewIdx >= wb.length) {
+    wordReviewMode = false;
+    toast('✅ 生词复习完成！');
+    renderKaoyanWordbook();
+    return;
+  }
+  const w = wb[wordReviewIdx];
+  const el = document.getElementById('kaoyanGroupList');
+  if(!el) return;
+  while(el.firstChild) el.removeChild(el.firstChild);
+
+  // 生词复习卡片
+  const card = document.createElement('div');
+  card.className = 'kg-word';
+  card.style.cssText = 'text-align:center;padding:20px;';
+
+  const progress = document.createElement('div');
+  progress.style.cssText = 'font-size:11px;color:var(--gray);margin-bottom:10px;';
+  progress.textContent = '📖 生词复习 ' + (wordReviewIdx + 1) + '/' + wb.length;
+  card.appendChild(progress);
+
+  const spell = document.createElement('div');
+  spell.style.cssText = 'font-size:24px;font-weight:700;color:var(--primary);margin-bottom:4px;cursor:pointer;';
+  spell.textContent = w.w;
+  spell.onclick = () => speakWord(w.w);
+  card.appendChild(spell);
+
+  const ph = document.createElement('div');
+  ph.style.cssText = 'font-size:12px;color:var(--gray);margin-bottom:8px;';
+  ph.textContent = w.p;
+  card.appendChild(ph);
+
+  // 隐藏释义，点击显示
+  const hidden = document.createElement('div');
+  hidden.style.cssText = 'color:var(--light);font-style:italic;cursor:pointer;padding:8px;';
+  hidden.textContent = '点击显示释义 ▼';
+  hidden.onclick = () => {
+    hidden.innerHTML = '<div style="font-size:14px;color:#333;font-weight:600;">' + w.m + '</div>' +
+      '<div style="font-size:12px;color:#555;margin-top:6px;text-align:left;">📝 ' + (w.ex || '') + '</div>' +
+      '<div style="font-size:11px;color:var(--gray);margin-top:2px;text-align:left;">' + (w.exCn || '') + '</div>';
+    hidden.style.cursor = 'default';
+    hidden.style.fontStyle = 'normal';
+  };
+  card.appendChild(hidden);
+
+  // 按钮
+  const btnRow = document.createElement('div');
+  btnRow.style.cssText = 'display:flex;gap:8px;margin-top:12px;';
+  const knownBtn = document.createElement('button');
+  knownBtn.className = 'btn btn-sm btn-green';
+  knownBtn.style.flex = '1';
+  knownBtn.textContent = '✅ 掌握了';
+  knownBtn.onclick = () => {
+    removeKaoyanWord(w.w);
+    wordReviewIdx++;
+    renderWordReviewCard();
+  };
+  btnRow.appendChild(knownBtn);
+  const stillBtn = document.createElement('button');
+  stillBtn.className = 'btn btn-sm btn-red';
+  stillBtn.style.flex = '1';
+  stillBtn.textContent = '❌ 还不熟';
+  stillBtn.onclick = () => {
+    wordReviewIdx++;
+    renderWordReviewCard();
+  };
+  btnRow.appendChild(stillBtn);
+  card.appendChild(btnRow);
+
+  el.appendChild(card);
 }
 
 // ============ 熟词僻义抽查测验 ============

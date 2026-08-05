@@ -240,6 +240,38 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Mi
 .quiz-input { width:100%; padding:6px 8px; border:1px solid var(--border); border-radius:6px; font-size:13px; margin-top:4px; }
 .quiz-answer { font-size:12px; color:var(--green); margin-top:3px; display:none; }
 .quiz-answer.show { display:block; }
+/* 树洞 */
+.th-tabs { display:flex; gap:4px; margin-bottom:10px; overflow-x:auto; }
+.th-tab { padding:8px 10px; font-size:12px; color:var(--gray); white-space:nowrap; cursor:pointer; border-bottom:2px solid transparent; }
+.th-tab.active { color:var(--primary); border-bottom-color:var(--primary); font-weight:600; }
+.th-panel { display:none; }
+.th-panel.active { display:block; }
+.th-mood-row { display:flex; flex-wrap:wrap; gap:6px; }
+.th-mood { padding:6px 12px; border-radius:16px; font-size:13px; background:#f0f0f0; color:var(--gray); cursor:pointer; }
+.th-mood.selected { background:var(--primary); color:#fff; font-weight:600; }
+.th-q { margin-bottom:10px; }
+.th-q-title { font-size:13px; font-weight:600; color:var(--primary); margin-bottom:6px; }
+.th-q-input { font-size:15px; }
+.th-reply { background:#f5f7fa; border-radius:10px; padding:12px; font-size:13px; line-height:1.7; color:#333; }
+.th-reply .th-empathy { color:#666; font-style:italic; margin-bottom:8px; }
+.th-reply .th-core { color:#d4380d; font-weight:600; margin-bottom:8px; }
+.th-reply .th-observer { color:var(--primary); font-weight:600; padding:8px; background:#fff; border-radius:8px; border-left:3px solid var(--primary); }
+.th-mindmap { background:#fff; border-radius:8px; padding:10px; font-size:12px; line-height:1.8; }
+.th-mindmap .mm-root { font-weight:700; color:var(--primary); }
+.th-mindmap .mm-branch { padding-left:16px; color:#333; }
+.th-mindmap .mm-leaf { padding-left:32px; color:#666; }
+.th-mindmap .mm-fact { color:var(--green); }
+.th-mindmap .mm-assume { color:#ff4d4f; }
+.th-declaration { background:#e6f7ff; border-radius:8px; padding:10px; font-size:14px; font-weight:600; color:var(--primary); text-align:center; margin-top:8px; }
+.th-diary-item { background:#f5f7fa; border-radius:8px; padding:10px; margin-bottom:6px; font-size:12px; }
+.th-diary-item .diary-type { font-size:10px; padding:2px 6px; border-radius:6px; margin-right:4px; }
+.th-diary-item .diary-type.vent { background:#fff1f0; color:#ff4d4f; }
+.th-diary-item .diary-type.review { background:#e6f7ff; color:#1890ff; }
+.th-diary-item .diary-type.hatch { background:#f6ffed; color:#52c41a; }
+.th-diary-item .diary-date { font-size:10px; color:var(--light); margin-top:4px; }
+.th-mh-item { display:flex; align-items:center; gap:6px; font-size:12px; padding:4px 0; }
+.th-mh-check { width:18px; height:18px; border-radius:4px; border:1.5px solid #ccc; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:10px; }
+.th-mh-check.done { background:var(--green); border-color:var(--green); color:#fff; }
 
 /* 新媒体 */
 .nm-topic { background:#fff; border-radius:8px; padding:12px; margin-bottom:10px; border-left:3px solid var(--primary-l); box-shadow:0 1px 3px rgba(0,0,0,0.04); }
@@ -398,6 +430,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Mi
   <div class="sb-item" data-page="newmedia"><span class="sb-icon">📱</span><span class="sb-label">新媒体</span></div>
   <div class="sb-item" data-page="garden"><span class="sb-icon">🐾</span><span class="sb-label">宠物</span></div>
   <div class="sb-item" data-page="news"><span class="sb-icon">📰</span><span class="sb-label">新闻播客</span></div>
+  <div class="sb-item" data-page="treehole"><span class="sb-icon">🌳</span><span class="sb-label">树洞</span></div>
   <div class="sb-item" data-page="stats"><span class="sb-icon">📊</span><span class="sb-label">统计</span></div>
 </div>
 
@@ -907,6 +940,108 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Mi
   </div>
 </div>
 
+<!-- ===== 树洞页 ===== -->
+<div class="page" id="page-treehole">
+  <div class="card">
+    <div class="card-title">🌳 心灵树洞 <span class="badge" id="treeholeDate"></span></div>
+    <div style="font-size:12px;color:var(--gray);margin-bottom:10px;line-height:1.6;">你的专属心灵树洞，倾诉、复盘、孵化想法、对抗拖延。所有内容仅保存在本地，绝无外传。</div>
+
+    <div class="th-tabs">
+      <div class="th-tab active" data-th="vent">😤 倾诉</div>
+      <div class="th-tab" data-th="review">📋 复盘</div>
+      <div class="th-tab" data-th="hatch">💡 孵化</div>
+      <div class="th-tab" data-th="anti">⏰ 反拖延</div>
+    </div>
+
+    <!-- 倾诉模块 -->
+    <div class="th-panel active" id="th-vent">
+      <div style="font-size:13px;color:#333;margin-bottom:8px;">选择你现在的情绪：</div>
+      <div class="th-mood-row" id="thMoodRow">
+        <span class="th-mood" data-mood="烦躁">😤 烦躁</span>
+        <span class="th-mood" data-mood="焦虑">😰 焦虑</span>
+        <span class="th-mood" data-mood="迷茫">😶‍🌫️ 迷茫</span>
+        <span class="th-mood" data-mood="平静">😌 平静</span>
+        <span class="th-mood" data-mood="难过">😢 难过</span>
+        <span class="th-mood" data-mood="生气">😡 生气</span>
+      </div>
+      <div style="font-size:13px;color:#333;margin-top:10px;margin-bottom:6px;">想吐槽什么事？尽管说，我听着：</div>
+      <textarea id="thVentInput" class="textarea" rows="5" placeholder="今天发生了什么？把心里的烦心事都倒出来..." style="font-size:15px;"></textarea>
+      <button class="btn btn-block btn-green" style="margin-top:8px;" onclick="thVent()">🌳 树洞倾听</button>
+      <div id="thVentResult" style="margin-top:10px;"></div>
+    </div>
+
+    <!-- 复盘模块 -->
+    <div class="th-panel" id="th-review">
+      <div style="font-size:13px;color:#333;margin-bottom:8px;">📋 KISS深度复盘——逐一回答四个问题，帮你理清今天。</div>
+      <div id="thReviewSteps">
+        <div class="th-q" id="rq1">
+          <div class="th-q-title">1️⃣ Keep（保留）：今天做得不错、值得保留的事是什么？</div>
+          <textarea class="textarea th-q-input" rows="3" placeholder="写出今天做得好的一件事..."></textarea>
+        </div>
+        <div class="th-q" id="rq2" style="display:none;">
+          <div class="th-q-title">2️⃣ Improve（改进）：今天哪里做得不够好，下次怎么优化？</div>
+          <textarea class="textarea th-q-input" rows="3" placeholder="写出可以改进的地方..."></textarea>
+        </div>
+        <div class="th-q" id="rq3" style="display:none;">
+          <div class="th-q-title">3️⃣ Start（开始）：今天有什么新启发，明天必须开始做的一件事？</div>
+          <textarea class="textarea th-q-input" rows="3" placeholder="写出明天要开始做的事..."></textarea>
+        </div>
+        <div class="th-q" id="rq4" style="display:none;">
+          <div class="th-q-title">4️⃣ Stop（停止）：今天浪费了时间，明天必须立刻停止或拒绝的事？</div>
+          <textarea class="textarea th-q-input" rows="3" placeholder="写出明天要停止做的事..."></textarea>
+        </div>
+      </div>
+      <div id="thReviewNav" style="margin-top:8px;">
+        <button class="btn btn-block btn-green" onclick="thReviewNext()">下一步 ▶</button>
+      </div>
+      <div id="thReviewResult" style="margin-top:10px;"></div>
+    </div>
+
+    <!-- 想法孵化模块 -->
+    <div class="th-panel" id="th-hatch">
+      <div style="font-size:13px;color:#333;margin-bottom:8px;">💡 把脑子里模糊的想法倒出来，帮你孵成可执行的计划。</div>
+      <textarea id="thHatchInput" class="textarea" rows="5" placeholder="把脑子里乱七八糟的想法都写出来，不用整理..." style="font-size:15px;"></textarea>
+      <button class="btn btn-block btn-green" style="margin-top:8px;" onclick="thHatch()">💡 帮我孵化</button>
+      <div id="thHatchResult" style="margin-top:10px;"></div>
+    </div>
+
+    <!-- 反拖延模块 -->
+    <div class="th-panel" id="th-anti">
+      <div style="font-size:13px;color:#333;margin-bottom:8px;">⏰ 反拖延训练营——5分钟启动法 + 微习惯追踪。</div>
+      <div class="card" style="background:#f6ffed;border:1px solid #b7eb8f;margin-bottom:10px;">
+        <div style="font-size:14px;font-weight:600;color:var(--green);margin-bottom:6px;">🎯 5分钟启动法</div>
+        <div style="font-size:12px;color:#555;line-height:1.6;margin-bottom:8px;">你现在最不想做但应该做的那件事是什么？写下来，承诺只做5分钟。5分钟后想停就停——但你大概率会继续。</div>
+        <input type="text" id="thAntiTask" class="input" placeholder="写下那件你正在拖延的事..." style="font-size:15px;margin-bottom:8px;">
+        <button class="btn btn-block btn-green" onclick="thAntiStart()">⏱️ 承诺5分钟，开始</button>
+        <div id="thAntiTimer" style="text-align:center;font-size:32px;font-weight:700;color:var(--green);margin:10px 0;display:none;">05:00</div>
+      </div>
+      <div class="card" style="background:#fff7e6;border:1px solid #ffe58f;margin-bottom:10px;">
+        <div style="font-size:14px;font-weight:600;color:var(--orange);margin-bottom:6px;">📊 拖延指数追踪</div>
+        <div style="font-size:12px;color:#555;margin-bottom:6px;">每天记录：今天拖延了几次？</div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <button class="btn btn-sm btn-outline" onclick="thLogProcrastinate(-1)">−</button>
+          <span style="font-size:20px;font-weight:700;color:var(--orange);min-width:30px;text-align:center;" id="thProcrastinateCount">0</span>
+          <button class="btn btn-sm btn-outline" onclick="thLogProcrastinate(1)">+</button>
+          <span style="font-size:12px;color:var(--gray);margin-left:6px;">次/今天</span>
+        </div>
+        <div style="font-size:11px;color:var(--gray);margin-top:6px;" id="thProcrastinateTrend"></div>
+      </div>
+      <div class="card" style="background:#e6f7ff;border:1px solid #91d5ff;">
+        <div style="font-size:14px;font-weight:600;color:#1890ff;margin-bottom:6px;">💪 微习惯打卡</div>
+        <div style="font-size:12px;color:#555;margin-bottom:8px;">每天完成一个小到不可能失败的动作：</div>
+        <div id="thMicroHabits"></div>
+        <button class="btn btn-sm btn-outline btn-block" style="margin-top:6px;" onclick="thAddMicroHabit()">+ 添加微习惯</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📖 树洞日记 <span class="badge" id="thDiaryCount">0</span></div>
+    <div style="font-size:12px;color:var(--gray);margin-bottom:8px;">所有倾诉和复盘记录都在这里</div>
+    <div id="thDiaryList"></div>
+  </div>
+</div>
+
 <!-- ===== 统计页 ===== -->
 <div class="page" id="page-stats">
   <div class="card">
@@ -1076,7 +1211,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Mi
 <script>
 // ============ 数据层 ============
 const STORE_KEY = 'daily_workbench_data';
-const APP_VERSION = 'v6.6 · 考研词汇+口语短语';
+const APP_VERSION = 'v6.7 · 心灵树洞';
 let state = {
   records: [],      // {id,type,amount,category,note,date}
   tasks: {},        // {date: {english:bool, fitness:bool, manage:bool, knowledge:bool}}
@@ -1188,6 +1323,7 @@ function switchPage(p) {
   if(p==='stats') renderNow(renderStats);
   if(p==='garden') renderNow(renderPetPage);
   if(p==='news') renderNow(renderNews);
+  if(p==='treehole') renderNow(renderTreehole);
 }
 document.querySelectorAll('.sidebar .sb-item').forEach(item => {
   item.addEventListener('click', () => switchPage(item.dataset.page));
@@ -3412,6 +3548,398 @@ function renderNews() {
       podEl.appendChild(card);
     });
   }
+}
+
+// ===== 树洞模块 =====
+let thSelectedMood = '';
+let thReviewStep = 1;
+
+function renderTreehole() {
+  const dateEl = document.getElementById('treeholeDate');
+  if(dateEl) dateEl.textContent = today();
+  thRenderDiary();
+  thRenderMicroHabits();
+  thRenderProcrastinate();
+}
+
+// tab切换
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.th-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.th-tab').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      document.querySelectorAll('.th-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('th-' + this.dataset.th).classList.add('active');
+    });
+  });
+  // 情绪选择
+  document.querySelectorAll('.th-mood').forEach(m => {
+    m.addEventListener('click', function() {
+      document.querySelectorAll('.th-mood').forEach(x => x.classList.remove('selected'));
+      this.classList.add('selected');
+      thSelectedMood = this.dataset.mood;
+    });
+  });
+});
+
+// 保存树洞日记
+function thSaveDiary(type, content) {
+  try {
+    let diary = JSON.parse(localStorage.getItem('th_diary') || '[]');
+    diary.unshift({type:type, content:content, date:new Date().toISOString()});
+    localStorage.setItem('th_diary', JSON.stringify(diary));
+    thRenderDiary();
+  } catch(e) {}
+}
+
+function thRenderDiary() {
+  const el = document.getElementById('thDiaryList');
+  if(!el) return;
+  let diary = [];
+  try { diary = JSON.parse(localStorage.getItem('th_diary') || '[]'); } catch(e) {}
+  const countEl = document.getElementById('thDiaryCount');
+  if(countEl) countEl.textContent = diary.length;
+  while(el.firstChild) el.removeChild(el.firstChild);
+  if(!diary.length) {
+    const empty = document.createElement('div');
+    empty.style.cssText = 'text-align:center;color:var(--light);font-size:12px;padding:16px;';
+    empty.textContent = '还没有记录，从上方开始倾诉吧';
+    el.appendChild(empty);
+    return;
+  }
+  const typeNames = {vent:'倾诉', review:'复盘', hatch:'孵化'};
+  diary.slice(0, 20).forEach(d => {
+    const item = document.createElement('div');
+    item.className = 'th-diary-item';
+    const typeTag = document.createElement('span');
+    typeTag.className = 'diary-type ' + d.type;
+    typeTag.textContent = typeNames[d.type] || d.type;
+    item.appendChild(typeTag);
+    const text = document.createElement('span');
+    text.textContent = d.content.slice(0, 80) + (d.content.length > 80 ? '...' : '');
+    item.appendChild(text);
+    const dateDiv = document.createElement('div');
+    dateDiv.className = 'diary-date';
+    dateDiv.textContent = new Date(d.date).toLocaleString('zh-CN');
+    item.appendChild(dateDiv);
+    el.appendChild(item);
+  });
+}
+
+// 倾诉
+function thVent() {
+  const input = document.getElementById('thVentInput');
+  const text = input.value.trim();
+  if(!text) { toast('写点什么吧，我在听'); return; }
+  if(!thSelectedMood) { toast('先选择你现在的情绪'); return; }
+
+  // 智能回复
+  const mood = thSelectedMood;
+  let empathy = '', core = '', observer = '';
+
+  // 共情
+  const empathyMap = {
+    '烦躁': '我能感受到你的烦躁。那种事情堆在一起、理不清头绪的感觉，真的很让人抓狂。你不是一个人在这样感觉。',
+    '焦虑': '焦虑的时候好像什么都抓不住，对未来不确定的恐惧我理解。你现在能说出来，已经很勇敢了。',
+    '迷茫': '迷茫说明你在思考，在寻找方向。不知道往哪走的时候，停下来也是一种选择。这种感觉不丢人。',
+    '平静': '能保持平静挺好的。但平静之下也许还有一些没处理的情绪，没关系，慢慢来。',
+    '难过': '难过的时候就允许自己难过一会。情绪没有对错，你感受到了就说明它值得被看见。',
+    '生气': '你的生气是有道理的。被这样对待，谁都会愤怒。不用急着原谅或放下。'
+  };
+  empathy = empathyMap[mood] || '我听到了你说的话，你的感受是真实的。';
+
+  // 核心点分析
+  const textLower = text.toLowerCase();
+  if(/别人|他|她|领导|老板|同事|说了|评价|批评|否定/.test(text)) {
+    core = '核心点：可能是「被否定的感觉」——你在意的不只是事情本身，而是对方的态度让你觉得自己的价值被质疑了。';
+  } else if(/来不及|做不完|太多|堆|赶|deadline|截止/.test(text)) {
+    core = '核心点：可能是「失控感」——事情多到超出你能掌控的范围，你怕自己做不好但又无法拒绝或放慢。';
+  } else if(/累|疲惫|不想动|没力气|撑/.test(text)) {
+    core = '核心点：可能是「太累了」——你的身体和心都在告诉你需要休息，但你的大脑还在逼自己运转。';
+  } else if(/选择|决定|不知道|迷茫|方向/.test(text)) {
+    core = '核心点：可能是「不确定性带来的恐惧」——你害怕选错，所以停在原地，但停着也不舒服。';
+  } else if(/吵架|冲突|矛盾|关系|分手/.test(text)) {
+    core = '核心点：可能是「关系中的不安」——你在意这段关系，但又感到受伤或不被理解。';
+  } else {
+    core = '核心点：可能这件事触动了你某个深层的情绪按钮——也许是关于「掌控感」「被认可」或「安全感」。';
+  }
+
+  // 旁观者视角
+  const observerMap = [
+    '如果这件事发生在你最好的朋友身上，你会怎么跟ta说？大概率你会说："这没什么大不了的，你已经做得很好了。"——现在，把这句话送给自己。',
+    '想象五年后的你回头看今天这件事，大概率会觉得："那件事当时觉得天要塌了，其实根本不重要。"——你现在经历的就是那个"当时"。',
+    '你现在的感受是真实的，但感受≠事实。事情可能没有你想的那么糟，你只是在这个瞬间被情绪淹没了。等潮水退去，你会看清沙滩上的脚印。',
+    '你不是这件事本身，你是经历这件事的人。事情会过去，但你对自己的态度会留下来。对自己温柔一点。'
+  ];
+  observer = observerMap[Math.floor(Math.random() * observerMap.length)];
+
+  // 渲染
+  const el = document.getElementById('thVentResult');
+  while(el.firstChild) el.removeChild(el.firstChild);
+  const reply = document.createElement('div');
+  reply.className = 'th-reply';
+  reply.innerHTML = '<div class="th-empathy">🌿 ' + empathy + '</div>' +
+    '<div class="th-core">🔍 ' + core + '</div>' +
+    '<div class="th-observer">👁️ 旁观者视角：<br>' + observer + '</div>';
+  el.appendChild(reply);
+
+  // 保存日记
+  thSaveDiary('vent', '【' + mood + '】' + text);
+  input.value = '';
+  toast('🌳 树洞已记录，你不再独自承受');
+}
+
+// 复盘
+function thReviewNext() {
+  const currentStep = thReviewStep;
+  const currentQ = document.getElementById('rq' + currentStep);
+  const input = currentQ.querySelector('.th-q-input');
+  if(!input.value.trim()) { toast('写一点再继续吧'); return; }
+
+  if(currentStep < 4) {
+    currentQ.style.display = 'none';
+    document.getElementById('rq' + (currentStep + 1)).style.display = 'block';
+    thReviewStep++;
+    if(thReviewStep === 4) {
+      document.querySelector('#thReviewNav button').textContent = '📋 生成复盘汇总';
+    }
+  } else {
+    // 生成汇总
+    thReviewSummary();
+  }
+}
+
+function thReviewSummary() {
+  const answers = [];
+  for(let i = 1; i <= 4; i++) {
+    const input = document.querySelector('#rq' + i + ' .th-q-input');
+    answers.push(input.value.trim());
+  }
+
+  // 精华
+  const essence = '今天' + (answers[0] ? '在「' + answers[0].slice(0,15) + '」上做得好' : '') +
+    (answers[1] ? '，但「' + answers[1].slice(0,15) + '」需要改进' : '') +
+    (answers[2] ? '，明天开始做「' + answers[2].slice(0,15) + '」' : '') +
+    (answers[3] ? '，停止「' + answers[3].slice(0,15) + '」' : '') + '。';
+
+  // 优先级
+  const priority = answers[2] ? answers[2].split(/[，。,.]/)[0] : (answers[0] ? '继续保持今天的节奏' : '先照顾好自己');
+
+  const el = document.getElementById('thReviewResult');
+  while(el.firstChild) el.removeChild(el.firstChild);
+  const result = document.createElement('div');
+  result.className = 'th-reply';
+  result.innerHTML = '<div style="font-weight:600;color:var(--primary);margin-bottom:8px;">📋 今日复盘汇总</div>' +
+    '<div style="margin-bottom:6px;">✅ <b>Keep:</b> ' + answers[0] + '</div>' +
+    '<div style="margin-bottom:6px;">🔧 <b>Improve:</b> ' + answers[1] + '</div>' +
+    '<div style="margin-bottom:6px;">🚀 <b>Start:</b> ' + answers[2] + '</div>' +
+    '<div style="margin-bottom:8px;">🛑 <b>Stop:</b> ' + answers[3] + '</div>' +
+    '<div class="th-observer" style="margin-top:10px;">⭐ 今日一句话精华：<br>' + essence + '</div>' +
+    '<div class="th-declaration">🎯 明天唯一的优先级：<br>' + priority + '</div>';
+  el.appendChild(result);
+
+  // 保存
+  thSaveDiary('review', 'K: ' + answers[0] + ' | I: ' + answers[1] + ' | S: ' + answers[2] + ' | St: ' + answers[3]);
+  toast('📋 复盘已生成');
+
+  // 重置
+  thReviewStep = 1;
+  for(let i = 1; i <= 4; i++) {
+    document.getElementById('rq' + i).style.display = i === 1 ? 'block' : 'none';
+    document.querySelector('#rq' + i + ' .th-q-input').value = '';
+  }
+  document.querySelector('#thReviewNav button').textContent = '下一步 ▶';
+}
+
+// 想法孵化
+function thHatch() {
+  const input = document.getElementById('thHatchInput');
+  const text = input.value.trim();
+  if(!text) { toast('把你的想法写出来'); return; }
+
+  // 分析：提取关键词，构建思维导图
+  const sentences = text.split(/[。.！!？?\n]/).filter(s => s.trim());
+  const facts = [];
+  const assumptions = [];
+
+  sentences.forEach(s => {
+    const trimmed = s.trim();
+    if(!trimmed) return;
+    // 判断事实vs假设
+    if(/应该|可能|也许|大概|觉得|感觉|担心|怕|万一|如果/.test(trimmed)) {
+      assumptions.push(trimmed);
+    } else {
+      facts.push(trimmed);
+    }
+  });
+
+  // 构建思维导图
+  const mainIdea = sentences[0] ? sentences[0].slice(0, 20) : '我的想法';
+  let mm = '<div class="th-mindmap">';
+  mm += '<div class="mm-root">💡 ' + mainIdea + '</div>';
+  if(facts.length) {
+    mm += '<div class="mm-branch">├─ 📌 事实</div>';
+    facts.slice(0, 5).forEach(f => { mm += '<div class="mm-leaf mm-fact">├─ ✅ ' + f + '</div>'; });
+  }
+  if(assumptions.length) {
+    mm += '<div class="mm-branch">├─ ⚠️ 假设/担忧</div>';
+    assumptions.slice(0, 5).forEach(a => { mm += '<div class="mm-leaf mm-assume">├─ ❓ ' + a + '</div>'; });
+  }
+  mm += '<div class="mm-branch">└─ 🎯 可执行方向</div>';
+  mm += '<div class="mm-leaf">└─ 先验证假设，再基于事实行动</div>';
+  mm += '</div>';
+
+  // 一句话宣言
+  const declaration = '我要用' + (facts.length || '现有') + '个事实，验证' + (assumptions.length || '不确定') + '个担忧，第一步是：' + (facts[0] ? facts[0].slice(0, 15) : '从最小的行动开始') + '。';
+
+  const el = document.getElementById('thHatchResult');
+  while(el.firstChild) el.removeChild(el.firstChild);
+  const result = document.createElement('div');
+  result.className = 'th-reply';
+  result.innerHTML = '<div style="font-weight:600;color:var(--primary);margin-bottom:8px;">💡 想法孵化结果</div>' +
+    mm +
+    '<div style="margin-top:8px;font-size:12px;color:#666;">📊 事实 ' + facts.length + ' 个 / 假设 ' + assumptions.length + ' 个</div>' +
+    '<div style="font-size:11px;color:#888;margin-top:4px;">💡 绿色=事实，红色=假设/担忧。先基于绿色行动，红色需要验证。</div>' +
+    '<div class="th-declaration">📣 一句话宣言：<br>' + declaration + '</div>';
+  el.appendChild(result);
+
+  thSaveDiary('hatch', text.slice(0, 100));
+  input.value = '';
+  toast('💡 想法已孵化');
+}
+
+// 反拖延：5分钟计时器
+let thAntiInterval = null;
+let thAntiSeconds = 300;
+
+function thAntiStart() {
+  const task = document.getElementById('thAntiTask').value.trim();
+  if(!task) { toast('先写下你在拖延的事'); return; }
+
+  if(thAntiInterval) {
+    clearInterval(thAntiInterval);
+    thAntiInterval = null;
+    thAntiSeconds = 300;
+    document.getElementById('thAntiTimer').style.display = 'none';
+    document.querySelector('#th-anti .btn-block').textContent = '⏱️ 承诺5分钟，开始';
+    toast('⏹ 已停止，但至少你开始了——这就是胜利');
+    return;
+  }
+
+  thAntiSeconds = 300;
+  document.getElementById('thAntiTimer').style.display = 'block';
+  document.querySelector('#th-anti .btn-block').textContent = '⏹ 停止（你随时可以停）';
+  toast('⏱️ 5分钟倒计时开始！只做5分钟，想停就停');
+  thSaveDiary('vent', '【反拖延】开始做：' + task);
+
+  thAntiInterval = setInterval(() => {
+    thAntiSeconds--;
+    const m = String(Math.floor(thAntiSeconds / 60)).padStart(2, '0');
+    const s = String(thAntiSeconds % 60).padStart(2, '0');
+    const el = document.getElementById('thAntiTimer');
+    if(el) el.textContent = m + ':' + s;
+    if(thAntiSeconds <= 0) {
+      clearInterval(thAntiInterval);
+      thAntiInterval = null;
+      toast('🎉 5分钟到了！你可以停了——但大多数时候你会选择继续');
+      document.getElementById('thAntiTimer').textContent = '✅ 完成！';
+    }
+  }, 1000);
+}
+
+// 拖延计数
+function thLogProcrastinate(delta) {
+  try {
+    let data = JSON.parse(localStorage.getItem('th_procrastinate') || '{}');
+    const key = today();
+    if(!data[key]) data[key] = 0;
+    data[key] = Math.max(0, data[key] + delta);
+    localStorage.setItem('th_procrastinate', JSON.stringify(data));
+    thRenderProcrastinate();
+    if(delta > 0) toast('记录了，没关系，觉察就是改变的第一步');
+    else toast('减1次！你在进步 💪');
+  } catch(e) {}
+}
+
+function thRenderProcrastinate() {
+  try {
+    let data = JSON.parse(localStorage.getItem('th_procrastinate') || '{}');
+    const key = today();
+    const count = data[key] || 0;
+    const el = document.getElementById('thProcrastinateCount');
+    if(el) el.textContent = count;
+    // 趋势
+    const days = Object.keys(data).sort().slice(-7);
+    if(days.length > 1) {
+      const recent = days.slice(-3).map(d => data[d] || 0);
+      const avg = (recent.reduce((a,b)=>a+b,0) / recent.length).toFixed(1);
+      const trendEl = document.getElementById('thProcrastinateTrend');
+      if(trendEl) trendEl.textContent = '近3天平均：' + avg + '次/天';
+    }
+  } catch(e) {}
+}
+
+// 微习惯
+function thGetMicroHabits() {
+  try { return JSON.parse(localStorage.getItem('th_microhabits') || '[]'); } catch(e) { return []; }
+}
+
+function thAddMicroHabit() {
+  const name = prompt('微习惯名称（小到不可能失败，如"做1个俯卧撑"）：');
+  if(!name || !name.trim()) return;
+  let habits = thGetMicroHabits();
+  habits.push({id: uid(), name: name.trim(), log: {}});
+  localStorage.setItem('th_microhabits', JSON.stringify(habits));
+  thRenderMicroHabits();
+  toast('微习惯已添加 💪');
+}
+
+function thToggleMicroHabit(id) {
+  let habits = thGetMicroHabits();
+  const h = habits.find(x => x.id === id);
+  if(!h) return;
+  if(!h.log) h.log = {};
+  const key = today();
+  h.log[key] = !h.log[key];
+  localStorage.setItem('th_microhabits', JSON.stringify(habits));
+  thRenderMicroHabits();
+}
+
+function thRenderMicroHabits() {
+  const el = document.getElementById('thMicroHabits');
+  if(!el) return;
+  while(el.firstChild) el.removeChild(el.firstChild);
+  const habits = thGetMicroHabits();
+  if(!habits.length) {
+    const empty = document.createElement('div');
+    empty.style.cssText = 'text-align:center;color:var(--light);font-size:11px;padding:8px;';
+    empty.textContent = '还没有微习惯，点下方添加';
+    el.appendChild(empty);
+    return;
+  }
+  const key = today();
+  habits.forEach(h => {
+    const item = document.createElement('div');
+    item.className = 'th-mh-item';
+    const check = document.createElement('div');
+    check.className = 'th-mh-check' + (h.log && h.log[key] ? ' done' : '');
+    check.textContent = h.log && h.log[key] ? '✓' : '';
+    check.onclick = () => thToggleMicroHabit(h.id);
+    item.appendChild(check);
+    const name = document.createElement('span');
+    name.textContent = h.name;
+    name.style.flex = '1';
+    item.appendChild(name);
+    // 连续天数
+    let streak = 0;
+    let d = new Date();
+    while(h.log && h.log[d.toISOString().slice(0,10)]) { streak++; d.setDate(d.getDate()-1); }
+    const stEl = document.createElement('span');
+    stEl.style.cssText = 'font-size:10px;color:var(--orange);';
+    stEl.textContent = '🔥' + streak + '天';
+    item.appendChild(stEl);
+    el.appendChild(item);
+  });
 }
 
 function addWeight() {

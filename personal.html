@@ -199,6 +199,48 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Mi
 .shadow-seg .seg-btn { font-size:11px; padding:4px 10px; border-radius:6px; background:#fff; border:1px solid var(--border); cursor:pointer; }
 .shadow-seg .seg-btn:active { background:var(--primary); color:#fff; }
 
+/* 考研词汇 */
+.vocab-sub { display:none; }
+.vocab-sub.active { display:block; }
+.kg-group { background:#f5f7fa; border-radius:8px; padding:10px; margin-bottom:10px; }
+.kg-head { font-size:13px; font-weight:600; color:var(--primary); margin-bottom:4px; display:flex; align-items:center; justify-content:space-between; }
+.kg-root { font-size:11px; color:var(--gray); background:#fff; padding:2px 8px; border-radius:8px; }
+.kg-mnemonic { font-size:11px; color:#666; background:#fff7e6; padding:4px 8px; border-radius:6px; margin-bottom:6px; line-height:1.4; }
+.kg-word { background:#fff; border-radius:6px; padding:8px 10px; margin-bottom:4px; }
+.kg-w-head { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+.kg-w-spell { font-size:15px; font-weight:700; color:var(--primary); cursor:pointer; }
+.kg-w-phonetic { font-size:11px; color:var(--gray); }
+.kg-w-meaning { font-size:12px; color:#333; margin-top:3px; }
+.kg-w-ex { font-size:11px; color:#555; margin-top:2px; line-height:1.4; }
+.kg-w-ex .cn { color:var(--gray); }
+.kg-w-tag { display:inline-block; font-size:9px; padding:1px 5px; border-radius:4px; margin-left:4px; }
+.kg-w-tag.bi { background:#fff1f0; color:#ff4d4f; }
+.kg-w-tag.col { background:#e6f7ff; color:#1890ff; }
+.kg-w-decomp { font-size:10px; color:#888; margin-top:3px; font-family:monospace; }
+.kg-w-rel { font-size:10px; color:#888; margin-top:2px; }
+.kg-toggle { font-size:11px; color:var(--primary); cursor:pointer; margin-top:3px; }
+/* 口语短语 */
+.ph-card { background:#f5f7fa; border-radius:8px; padding:12px; text-align:center; }
+.ph-en { font-size:16px; font-weight:700; color:var(--primary); margin-bottom:4px; cursor:pointer; }
+.ph-phonetic { font-size:11px; color:var(--gray); margin-bottom:6px; }
+.ph-example { font-size:13px; color:#333; background:#fff; border-radius:6px; padding:8px; margin-top:6px; text-align:left; }
+.ph-cn-trap { font-size:11px; color:#ff4d4f; background:#fff1f0; padding:4px 8px; border-radius:6px; margin-top:4px; text-align:left; }
+.ph-hidden { color:var(--light); font-style:italic; cursor:pointer; }
+/* 复习列表 */
+.rv-item { background:#fff; border-radius:6px; padding:8px 10px; margin-bottom:4px; font-size:12px; display:flex; align-items:center; justify-content:space-between; }
+.rv-item .rv-day { font-weight:600; color:var(--primary); }
+.rv-item .rv-interval { font-size:10px; padding:2px 6px; border-radius:6px; }
+.rv-interval.d1 { background:#e6f7ff; color:#1890ff; }
+.rv-interval.d3 { background:#f6ffed; color:#52c41a; }
+.rv-interval.d7 { background:#fff7e6; color:#fa8c16; }
+.rv-interval.d15 { background:#fff1f0; color:#ff4d4f; }
+/* 测验 */
+.quiz-item { background:#fff; border-radius:6px; padding:8px 10px; margin-bottom:6px; }
+.quiz-q { font-size:14px; font-weight:600; color:var(--primary); }
+.quiz-input { width:100%; padding:6px 8px; border:1px solid var(--border); border-radius:6px; font-size:13px; margin-top:4px; }
+.quiz-answer { font-size:12px; color:var(--green); margin-top:3px; display:none; }
+.quiz-answer.show { display:block; }
+
 /* 新媒体 */
 .nm-topic { background:#fff; border-radius:8px; padding:12px; margin-bottom:10px; border-left:3px solid var(--primary-l); box-shadow:0 1px 3px rgba(0,0,0,0.04); }
 .nm-topic .nm-title { font-size:14px; font-weight:600; line-height:1.5; margin-bottom:6px; }
@@ -503,29 +545,63 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Mi
       <div class="sub-tab" data-engsub="speaking">🗣️ 口语跟读</div>
     </div>
 
-    <!-- ===== 单词模块 ===== -->
+    <!-- ===== 单词模块（考研词汇 + 口语短语）===== -->
     <div class="eng-sub active" id="eng-vocab">
-      <div class="card">
-        <div class="card-title">📝 每日单词 <span class="badge" id="vocabProgress">0/30</span></div>
-        <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
-          <select id="vocabMode" class="select" style="width:auto;font-size:12px;" onchange="renderVocabCard()">
-            <option value="cn2en">🇨🇳→🇬🇧 看中译英</option>
-            <option value="en2cn">🇬🇧→🇨🇳 看英译中</option>
-          </select>
-          <button class="btn btn-sm btn-outline" onclick="prevVocab()">◀ 上一个</button>
-          <button class="btn btn-sm btn-outline" onclick="nextVocab()">下一个 ▶</button>
+      <!-- 词汇子板块切换 -->
+      <div class="sub-tabs" id="vocabSubTabs" style="margin-bottom:10px;">
+        <div class="sub-tab active" data-vocabsub="kaoyan">🎓 考研词汇</div>
+        <div class="sub-tab" data-vocabsub="phrase">💬 口语短语</div>
+      </div>
+
+      <!-- ===== 考研词汇 ===== -->
+      <div class="vocab-sub active" id="vocab-kaoyan">
+        <div class="card">
+          <div class="card-title">🎓 考研核心词汇 <span class="badge" id="kaoyanProgress">第1天</span></div>
+          <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;align-items:center;">
+            <span style="font-size:11px;color:var(--gray);">Day</span>
+            <input type="number" id="kaoyanDayInput" value="1" min="1" max="60" style="width:50px;padding:4px;border:1px solid var(--border);border-radius:6px;font-size:13px;text-align:center;" onchange="loadKaoyanDay(this.value)">
+            <span style="font-size:11px;color:var(--gray);">/ 60</span>
+            <button class="btn btn-sm btn-outline" onclick="prevKaoyanDay()">◀</button>
+            <button class="btn btn-sm btn-outline" onclick="nextKaoyanDay()">▶</button>
+          </div>
+          <div style="font-size:12px;color:var(--gray);margin-bottom:8px;" id="kaoyanGroupInfo"></div>
+          <div id="kaoyanGroupList"></div>
         </div>
-        <div id="vocabCard"></div>
-        <div style="display:flex;gap:8px;margin-top:10px;">
-          <button class="btn btn-sm btn-green" style="flex:1;" onclick="markVocabKnown()">✅ 认识</button>
-          <button class="btn btn-sm btn-red" style="flex:1;" onclick="markVocabUnknown()">❌ 不认识</button>
+
+        <div class="card">
+          <div class="card-title">📅 艾宾浩斯复习哨兵 <span class="badge" id="reviewCount">0</span></div>
+          <div style="font-size:12px;color:var(--gray);margin-bottom:8px;">今日需复习的词汇组（间隔1/3/7/15天）</div>
+          <div id="reviewList"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">🔍 熟词僻义抽查</div>
+          <div style="font-size:12px;color:var(--gray);margin-bottom:8px;">给英文写考研常考释义（8字母以上或抽象长难词）</div>
+          <div id="quizArea"></div>
+          <button class="btn btn-sm btn-outline btn-block" style="margin-top:8px;" onclick="startQuiz()">📝 开始抽查</button>
         </div>
       </div>
-      <div class="card">
-        <div class="card-title">📔 生词本 <span class="badge" id="wordbookCount">0</span></div>
-        <div style="font-size:12px;color:var(--gray);margin-bottom:8px;">不认识的单词自动加入生词本，方便复习</div>
-        <div id="wordbookList"></div>
-        <button class="btn btn-sm btn-outline btn-block" style="margin-top:8px;" onclick="startWordbookReview()">📖 开始复习生词</button>
+
+      <!-- ===== 口语短语 ===== -->
+      <div class="vocab-sub" id="vocab-phrase">
+        <div class="card">
+          <div class="card-title">💬 口语高频短语 <span class="badge" id="phraseProgress">0/500</span></div>
+          <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
+            <select id="phraseCat" class="select" style="width:auto;font-size:12px;" onchange="renderPhraseList()">
+              <option value="emotion">😊 情绪态度</option>
+              <option value="logic">🔗 逻辑衔接</option>
+              <option value="action">🏃 日常动作</option>
+            </select>
+            <button class="btn btn-sm btn-outline" onclick="prevPhrase()">◀</button>
+            <button class="btn btn-sm btn-outline" onclick="nextPhrase()">▶</button>
+          </div>
+          <div id="phraseCard"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">🗓️ 7天滚动口译练习</div>
+          <div style="font-size:12px;color:var(--gray);margin-bottom:8px;">只给中文，自己翻译成英文（点击查看答案）</div>
+          <div id="interpretList"></div>
+        </div>
       </div>
     </div>
 
@@ -1000,7 +1076,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Mi
 <script>
 // ============ 数据层 ============
 const STORE_KEY = 'daily_workbench_data';
-const APP_VERSION = 'v6.5 · 31篇TED+月度轮换';
+const APP_VERSION = 'v6.6 · 考研词汇+口语短语';
 let state = {
   records: [],      // {id,type,amount,category,note,date}
   tasks: {},        // {date: {english:bool, fitness:bool, manage:bool, knowledge:bool}}
@@ -1433,8 +1509,9 @@ const ENG_VIDEOS = [
 
 function renderEnglish() {
   renderTaskStatus('english', 'engBadge', 'engBar', 'engDoneBtn');
-  renderVocabCard();
-  renderWordbook();
+  renderKaoyanDay();
+  renderReviewList();
+  renderPhraseList();
   renderListening();
   renderSpeaking();
 }
@@ -1459,428 +1536,559 @@ function speak(lineIdx, rate) {
 
 // ============ 每日单词 + 生词本 ============
 // 内置词库（精选高频词，含音标、释义、例句、短语）
-const VOCAB_POOL = [
-  {w:'abandon', p:'/əˈbændən/', m:'v. 放弃，抛弃', ex:'He abandoned his plan to travel.', exCn:'他放弃了旅行计划。', ph:'abandon oneself to 沉溺于'},
-  {w:'benefit', p:'/ˈbenɪfɪt/', m:'n. 益处 v. 获益', ex:'Regular exercise benefits your health.', exCn:'规律运动有益健康。', ph:'benefit from 从…中获益'},
-  {w:'challenge', p:'/ˈtʃælɪndʒ/', m:'n. 挑战 v. 向…挑战', ex:'She accepted the challenge bravely.', exCn:'她勇敢地接受了挑战。', ph:'take up a challenge 接受挑战'},
-  {w:'determine', p:'/dɪˈtɜːmɪn/', m:'v. 决定，确定', ex:'Your attitude determines your altitude.', exCn:'你的态度决定你的高度。', ph:'be determined to do 决心做'},
-  {w:'efficient', p:'/ɪˈfɪʃnt/', m:'adj. 高效的', ex:'This is a very efficient method.', exCn:'这是一个非常高效的方法。', ph:'energy-efficient 节能的'},
-  {w:'familiar', p:'/fəˈmɪliə/', m:'adj. 熟悉的', ex:'This song sounds familiar to me.', exCn:'这首歌听起来很熟悉。', ph:'be familiar with 熟悉…'},
-  {w:'genuine', p:'/ˈdʒenjuɪn/', m:'adj. 真正的，真诚的', ex:'She showed genuine concern for others.', exCn:'她对他人的关心是真诚的。', ph:'genuine leather 真皮'},
-  {w:'hesitate', p:'/ˈhezɪteɪt/', m:'v. 犹豫，迟疑', ex:'Don\'t hesitate to ask if you need help.', exCn:'需要帮助时不要犹豫。', ph:'don\'t hesitate to 不要犹豫做'},
-  {w:'implement', p:'/ˈɪmplɪment/', m:'v. 实施，执行', ex:'We need to implement the new policy.', exCn:'我们需要实施新政策。', ph:'implement a plan 执行计划'},
-  {w:'justify', p:'/ˈdʒʌstɪfaɪ/', m:'v. 证明…正当，辩护', ex:'How can you justify your behavior?', exCn:'你怎么为自己的行为辩护？', ph:'justify oneself 为自己辩护'},
-  {w:'keen', p:'/kiːn/', m:'adj. 渴望的，敏锐的', ex:'She is keen on learning languages.', exCn:'她热衷于学语言。', ph:'be keen on 热衷于'},
-  {w:'launch', p:'/lɔːntʃ/', m:'v. 发起，发射', ex:'They launched a new product yesterday.', exCn:'他们昨天发布了新产品。', ph:'launch a campaign 发起活动'},
-  {w:'maintain', p:'/meɪnˈteɪn/', m:'v. 维持，保养', ex:'It\'s hard to maintain a work-life balance.', exCn:'维持工作生活平衡很难。', ph:'maintain contact 保持联系'},
-  {w:'negotiate', p:'/nɪˈɡəʊʃieɪt/', m:'v. 谈判，协商', ex:'We need to negotiate the price.', exCn:'我们需要协商价格。', ph:'negotiate with 与…谈判'},
-  {w:'obstacle', p:'/ˈɒbstəkl/', m:'n. 障碍', ex:'Fear is the biggest obstacle to success.', exCn:'恐惧是成功最大的障碍。', ph:'overcome an obstacle 克服障碍'},
-  {w:'perspective', p:'/pəˈspektɪv/', m:'n. 视角，观点', ex:'Try to see things from my perspective.', exCn:'试着从我的角度看问题。', ph:'from the perspective of 从…角度'},
-  {w:'qualify', p:'/ˈkwɒlɪfaɪ/', m:'v. 取得资格', ex:'She qualified as a doctor last year.', exCn:'她去年取得了医生资格。', ph:'qualify for 有资格…'},
-  {w:'resolve', p:'/rɪˈzɒlv/', m:'v. 解决，决定', ex:'We resolved the issue quickly.', exCn:'我们很快解决了问题。', ph:'resolve to do 决心做'},
-  {w:'sufficient', p:'/səˈfɪʃnt/', m:'adj. 足够的', ex:'We have sufficient food for the trip.', exCn:'我们有足够的食物旅行。', ph:'sufficient for 足够…'},
-  {w:'tolerate', p:'/ˈtɒləreɪt/', m:'v. 容忍', ex:'I can\'t tolerate his rudeness.', exCn:'我无法容忍他的粗鲁。', ph:'tolerate doing 容忍做'},
-  {w:'unique', p:'/juːˈniːk/', m:'adj. 独特的', ex:'Everyone has a unique talent.', exCn:'每个人都有独特的天赋。', ph:'unique to …特有'},
-  {w:'vital', p:'/ˈvaɪtl/', m:'adj. 至关重要的', ex:'Sleep is vital for good health.', exCn:'睡眠对健康至关重要。', ph:'play a vital role 起关键作用'},
-  {w:'withdraw', p:'/wɪðˈdrɔː/', m:'v. 撤退，取款', ex:'She withdrew money from the ATM.', exCn:'她从ATM取了钱。', ph:'withdraw from 退出'},
-  {w:'yield', p:'/jiːld/', m:'v. 产出，屈服', ex:'The tree yields a lot of fruit.', exCn:'这棵树结了很多果子。', ph:'yield to 屈服于'},
-  {w:'absolute', p:'/ˈæbsəluːt/', m:'adj. 绝对的', ex:'I have absolute confidence in you.', exCn:'我对你绝对有信心。', ph:'absolute majority 绝对多数'},
-  {w:'boundary', p:'/ˈbaʊndri/', m:'n. 边界，界限', ex:'Don\'t cross the boundary.', exCn:'不要越过界限。', ph:'push the boundary 突破界限'},
-  {w:'concept', p:'/ˈkɒnsept/', m:'n. 概念', ex:'It\'s a difficult concept to understand.', exCn:'这是个难以理解的概念。', ph:'basic concept 基本概念'},
-  {w:'dedicate', p:'/ˈdedɪkeɪt/', m:'v. 奉献，致力于', ex:'She dedicated her life to teaching.', exCn:'她将一生奉献给教学。', ph:'be dedicated to 致力于'},
-  {w:'emphasize', p:'/ˈemfəsaɪz/', m:'v. 强调', ex:'I want to emphasize the importance.', exCn:'我想强调重要性。', ph:'emphasize on 强调'},
-  {w:'fragment', p:'/ˈfræɡmənt/', m:'n. 碎片', ex:'The vase broke into fragments.', exCn:'花瓶碎成了碎片。', ph:'a fragment of 一小块'},
-  {w:'generate', p:'/ˈdʒenəreɪt/', m:'v. 产生，生成', ex:'Wind turbines generate electricity.', exCn:'风力涡轮机发电。', ph:'generate income 创收'},
-  {w:'horizon', p:'/həˈraɪzn/', m:'n. 地平线，视野', ex:'The sun set below the horizon.', exCn:'太阳沉入地平线。', ph:'broaden one\'s horizon 开阔眼界'},
-  {w:'initiate', p:'/ɪˈnɪʃieɪt/', m:'v. 发起，开始', ex:'He initiated the project last year.', exCn:'他去年发起了这个项目。', ph:'initiate a conversation 开启对话'},
-  {w:'justify', p:'/ˈdʒʌstɪfaɪ/', m:'v. 证明正当', ex:'Nothing can justify his actions.', exCn:'没什么能为他的行为辩护。', ph:'justify doing 证明做…正当'},
-  {w:'leisure', p:'/ˈleʒə/', m:'n. 休闲', ex:'I read books in my leisure time.', exCn:'我在休闲时间看书。', ph:'leisure time 休闲时间'},
-  {w:'manipulate', p:'/məˈnɪpjuleɪt/', m:'v. 操纵', ex:'He tried to manipulate the situation.', exCn:'他试图操纵局势。', ph:'manipulate data 操纵数据'},
-  {w:'novelty', p:'/ˈnɒvlti/', m:'n. 新奇，新颖', ex:'The novelty soon wore off.', exCn:'新鲜感很快消失了。', ph:'novelty value 新奇价值'},
-  {w:'opportunity', p:'/ˌɒpəˈtjuːnəti/', m:'n. 机会', ex:'Don\'t miss this opportunity.', exCn:'别错过这个机会。', ph:'take the opportunity 把握机会'},
-  {w:'persist', p:'/pəˈsɪst/', m:'v. 坚持', ex:'She persisted despite difficulties.', exCn:'尽管有困难她还是坚持了。', ph:'persist in doing 坚持做'},
-  {w:'quantify', p:'/ˈkwɒntɪfaɪ/', m:'v. 量化', ex:'It\'s hard to quantify happiness.', exCn:'幸福很难量化。', ph:'quantify the impact 量化影响'},
-  {w:'relevant', p:'/ˈreləvənt/', m:'adj. 相关的', ex:'This information is not relevant.', exCn:'这条信息不相关。', ph:'relevant to 与…相关'},
-  {w:'strategy', p:'/ˈstrætədʒi/', m:'n. 策略', ex:'We need a new marketing strategy.', exCn:'我们需要新的营销策略。', ph:'strategy for …的策略'},
-  {w:'transform', p:'/trænsˈfɔːm/', m:'v. 转变', ex:'Education can transform lives.', exCn:'教育能改变人生。', ph:'transform into 转变为'},
-  {w:'update', p:'/ˈʌpdeɪt/', m:'v./n. 更新', ex:'Please update your contact info.', exCn:'请更新你的联系信息。', ph:'software update 软件更新'},
-  {w:'vivid', p:'/ˈvɪvɪd/', m:'adj. 生动的', ex:'She gave a vivid description.', exCn:'她做了生动的描述。', ph:'vivid memory 鲜活记忆'},
-  {w:'wander', p:'/ˈwɒndə/', m:'v. 漫游，走神', ex:'My mind began to wander.', exCn:'我开始走神了。', ph:'wander around 闲逛'},
-  {w:'accumulation', p:'/əˌkjuːmjəˈleɪʃn/', m:'n. 积累', ex:'The accumulation of wealth takes time.', exCn:'财富的积累需要时间。', ph:'accumulation of …的积累'},
-  {w:'breakthrough', p:'/ˈbreɪkθruː/', m:'n. 突破', ex:'Scientists made a breakthrough.', exCn:'科学家取得了突破。', ph:'a breakthrough in …的突破'},
-  {w:'consequence', p:'/ˈkɒnsɪkwəns/', m:'n. 后果', ex:'Think about the consequences.', exCn:'想想后果。', ph:'as a consequence 因此'},
-  {w:'deteriorate', p:'/dɪˈtɪəriəreɪt/', m:'v. 恶化', ex:'His health deteriorated rapidly.', exCn:'他的健康迅速恶化。', ph:'deteriorate into 恶化为'},
-  {w:'embrace', p:'/ɪmˈbreɪs/', m:'v. 拥抱，接受', ex:'Embrace change and grow.', exCn:'拥抱变化并成长。', ph:'embrace new ideas 接受新思想'},
-  {w:'fluctuate', p:'/ˈflʌktʃueɪt/', m:'v. 波动', ex:'Prices fluctuate daily.', exCn:'价格每天波动。', ph:'fluctuate between 在…间波动'},
-  {w:'guarantee', p:'/ˌɡærənˈtiː/', m:'n./v. 保证', ex:'I guarantee you\'ll love it.', exCn:'我保证你会喜欢。', ph:'guarantee to do 保证做'},
-  {w:'hypothesis', p:'/haɪˈpɒθəsɪs/', m:'n. 假设', ex:'The hypothesis needs testing.', exCn:'这个假设需要验证。', ph:'test a hypothesis 验证假设'},
-  {w:'imitate', p:'/ˈɪmɪteɪt/', m:'v. 模仿', ex:'Children learn by imitating adults.', exCn:'孩子通过模仿大人学习。', ph:'imitate behavior 模仿行为'},
-  {w:'jeopardize', p:'/ˈdʒepədaɪz/', m:'v. 危及', ex:'Don\'t jeopardize your career.', exCn:'别危及你的事业。', ph:'jeopardize safety 危及安全'},
-  {w:'lucrative', p:'/ˈluːkrətɪv/', m:'adj. 获利丰厚的', ex:'It\'s a lucrative business.', exCn:'这是门赚钱的生意。', ph:'lucrative market 利润丰厚的市场'},
-  {w:'momentum', p:'/məˈmentəm/', m:'n. 势头，动力', ex:'Keep the momentum going.', exCn:'保持这个势头。', ph:'gain momentum 获得动力'},
-  {w:'notion', p:'/ˈnəʊʃn/', m:'n. 概念，想法', ex:'I have no notion of what he means.', exCn:'我不明白他的意思。', ph:'have no notion 不明白'},
-  {w:'overwhelm', p:'/ˌəʊvəˈwelm/', m:'v. 压倒', ex:'Don\'t let work overwhelm you.', exCn:'别让工作压垮你。', ph:'be overwhelmed by 被…压倒'},
-  {w:'preliminary', p:'/prɪˈlɪmɪnəri/', m:'adj. 初步的', ex:'These are preliminary results.', exCn:'这些是初步结果。', ph:'preliminary study 初步研究'},
-  {w:'quote', p:'/kwəʊt/', m:'v. 引用', ex:'Can I quote you on that?', exCn:'我可以引用你的话吗？', ph:'quote from 引用自'},
-  {w:'reinforce', p:'/ˌriːɪnˈfɔːs/', m:'v. 加强', ex:'Praise reinforces good behavior.', exCn:'表扬强化好行为。', ph:'reinforce the idea 强化观念'},
-  {w:'scrutinize', p:'/ˈskruːtənaɪz/', m:'v. 仔细检查', ex:'They scrutinized every detail.', exCn:'他们仔细检查了每个细节。', ph:'scrutinize closely 仔细审查'},
-  {w:'tackle', p:'/ˈtækl/', m:'v. 处理，应对', ex:'Let\'s tackle the problem together.', exCn:'让我们一起解决这个问题。', ph:'tackle a problem 解决问题'},
-  {w:'undermine', p:'/ˌʌndəˈmaɪn/', m:'v. 破坏', ex:'Don\'t undermine her confidence.', exCn:'别破坏她的信心。', ph:'undermine authority 削弱权威'},
-  {w:'versatile', p:'/ˈvɜːsətaɪl/', m:'adj. 多才多艺的', ex:'She\'s a versatile performer.', exCn:'她是多才多艺的表演者。', ph:'versatile tool 多功能工具'},
-  {w:'widespread', p:'/ˈwaɪdspred/', m:'adj. 普遍的', ex:'The disease is widespread.', exCn:'这种病很普遍。', ph:'widespread concern 广泛关注'},
-  {w:'accomplish', p:'/əˈkʌmplɪʃ/', m:'v. 完成，实现', ex:'She accomplished her goal.', exCn:'她实现了目标。', ph:'accomplish a goal 实现目标'},
-  {w:'bias', p:'/ˈbaɪəs/', m:'n. 偏见', ex:'We should avoid bias.', exCn:'我们应避免偏见。', ph:'conscious bias 有意识的偏见'},
-  {w:'comprehensive', p:'/ˌkɒmprɪˈhensɪv/', m:'adj. 全面的', ex:'We need a comprehensive plan.', exCn:'我们需要全面的计划。', ph:'comprehensive analysis 全面分析'},
-  {w:'diminish', p:'/dɪˈmɪnɪʃ/', m:'v. 减少', ex:'His influence diminished over time.', exCn:'他的影响力随时间减弱。', ph:'diminish in importance 重要性降低'},
-  {w:'endorse', p:'/ɪnˈdɔːs/', m:'v. 认可，代言', ex:'She endorsed the new product.', exCn:'她代言了新产品。', ph:'endorse a brand 代言品牌'},
-  {w:'feasible', p:'/ˈfiːzəbl/', m:'adj. 可行的', ex:'Is this plan feasible?', exCn:'这个计划可行吗？', ph:'feasible solution 可行方案'},
-  {w:'genuine', p:'/ˈdʒenjuɪn/', m:'adj. 真诚的', ex:'His smile was genuine.', exCn:'他的微笑是真诚的。', ph:'genuine concern 真诚关心'},
-  {w:'hinder', p:'/ˈhɪndə/', m:'v. 阻碍', ex:'Lack of sleep hinders learning.', exCn:'缺乏睡眠妨碍学习。', ph:'hinder progress 阻碍进步'},
-  {w:'incorporate', p:'/ɪnˈkɔːpəreɪt/', m:'v. 包含，融入', ex:'Incorporate exercise into your routine.', exCn:'把运动融入你的日常。', ph:'incorporate into 融入'},
-  {w:'judgment', p:'/ˈdʒʌdʒmənt/', m:'n. 判断', ex:'Trust your judgment.', exCn:'相信你的判断。', ph:'poor judgment 判断失误'},
-  {w:'leverage', p:'/ˈliːvərɪdʒ/', m:'n./v. 杠杆，利用', ex:'Leverage your strengths.', exCn:'利用你的优势。', ph:'leverage resources 利用资源'},
-  {w:'mitigate', p:'/ˈmɪtɪɡeɪt/', m:'v. 减轻', ex:'We must mitigate the risks.', exCn:'我们必须减轻风险。', ph:'mitigate risk 降低风险'},
-  {w:'nurture', p:'/ˈnɜːtʃə/', m:'v. 培养', ex:'Parents nurture their children.', exCn:'父母培养孩子。', ph:'nurture talent 培养人才'},
-  {w:'optimize', p:'/ˈɒptɪmaɪz/', m:'v. 优化', ex:'We need to optimize the process.', exCn:'我们需要优化流程。', ph:'optimize performance 优化性能'},
-  {w:'perceive', p:'/pəˈsiːv/', m:'v. 察觉，认为', ex:'How do others perceive you?', exCn:'别人怎么看你？', ph:'perceive as 视为'},
-  {w:'quantitative', p:'/ˈkwɒntɪtətɪv/', m:'adj. 定量的', ex:'We need quantitative data.', exCn:'我们需要定量数据。', ph:'quantitative analysis 定量分析'},
-  {w:'reluctant', p:'/rɪˈlʌktənt/', m:'adj. 不情愿的', ex:'He was reluctant to leave.', exCn:'他不情愿离开。', ph:'reluctant to do 不愿做'},
-  {w:'subsequent', p:'/ˈsʌbsɪkwənt/', m:'adj. 随后的', ex:'Subsequent events proved him right.', exCn:'随后的事件证明他是对的。', ph:'subsequent to 在…之后'},
-  {w:'tedious', p:'/ˈtiːdiəs/', m:'adj. 乏味的', ex:'The work was tedious but necessary.', exCn:'工作乏味但必要。', ph:'tedious task 枯燥任务'},
-  {w:'unanimous', p:'/juːˈnænɪməs/', m:'adj. 一致的', ex:'The decision was unanimous.', exCn:'决定是一致通过的。', ph:'unanimous agreement 一致同意'},
-  {w:'viable', p:'/ˈvaɪəbl/', m:'adj. 可行的', ex:'It\'s a viable alternative.', exCn:'这是个可行的替代方案。', ph:'viable option 可行选择'},
-  {w:'withstand', p:'/wɪðˈstænd/', m:'v. 承受', ex:'The building can withstand earthquakes.', exCn:'这栋楼能抗震。', ph:'withstand pressure 承受压力'},
-  {w:'acknowledge', p:'/əkˈnɒlɪdʒ/', m:'v. 承认', ex:'She acknowledged her mistake.', exCn:'她承认了错误。', ph:'acknowledge that 承认'},
-  {w:'benchmark', p:'/ˈbentʃmɑːk/', m:'n. 基准', ex:'Set a benchmark for quality.', exCn:'设定质量基准。', ph:'benchmark against 与…对标'},
-  {w:'compromise', p:'/ˈkɒmprəmaɪz/', m:'n./v. 妥协', ex:'We reached a compromise.', exCn:'我们达成了妥协。', ph:'reach a compromise 达成妥协'},
-  {w:'delegate', p:'/ˈdelɪɡeɪt/', m:'v. 委派', ex:'Learn to delegate tasks.', exCn:'学会委派任务。', ph:'delegate to 委派给'},
-  {w:'endeavor', p:'/ɪnˈdevə/', m:'n./v. 努力', ex:'We endeavor to provide the best service.', exCn:'我们努力提供最好的服务。', ph:'endeavor to do 努力做'},
-  {w:'facilitate', p:'/fəˈsɪlɪteɪt/', m:'v. 促进', ex:'Technology facilitates communication.', exCn:'科技促进沟通。', ph:'facilitate learning 促进学习'},
-  {w:'gradual', p:'/ˈɡrædʒuəl/', m:'adj. 逐渐的', ex:'There was a gradual improvement.', exCn:'有了逐步改善。', ph:'gradual change 渐变'},
-  {w:'harness', p:'/ˈhɑːnɪs/', m:'v. 利用', ex:'We can harness solar energy.', exCn:'我们可以利用太阳能。', ph:'harness potential 发挥潜力'},
-  {w:'incentive', p:'/ɪnˈsentɪv/', m:'n. 激励', ex:'Bonuses are an incentive to work harder.', exCn:'奖金是更努力工作的激励。', ph:'provide incentive 提供激励'},
-  {w:'jurisdiction', p:'/ˌdʒʊərɪsˈdɪkʃn/', m:'n. 管辖权', ex:'This falls under federal jurisdiction.', exCn:'这属于联邦管辖。', ph:'within jurisdiction 在管辖范围内'},
-  {w:'legitimate', p:'/lɪˈdʒɪtɪmət/', m:'adj. 合法的', ex:'He has a legitimate concern.', exCn:'他有合理的顾虑。', ph:'legitimate reason 合理理由'},
-  {w:'mentor', p:'/ˈmentɔː/', m:'n. 导师', ex:'She was my mentor and friend.', exCn:'她是我的导师和朋友。', ph:'mentor program 导师计划'},
-  {w:'navigate', p:'/ˈnævɪɡeɪt/', m:'v. 导航，应对', ex:'She navigated the challenge well.', exCn:'她很好地应对了挑战。', ph:'navigate through 穿梭于'},
-  {w:'objective', p:'/əbˈdʒektɪv/', m:'n. 目标', ex:'What\'s your main objective?', exCn:'你的主要目标是什么？', ph:'achieve objectives 实现目标'},
-  {w:'perception', p:'/pəˈsepʃn/', m:'n. 知觉，看法', ex:'Perception is reality.', exCn:'认知即现实。', ph:'public perception 公众认知'},
-  {w:'quota', p:'/ˈkwəʊtə/', m:'n. 配额', ex:'We met our sales quota.', exCn:'我们完成了销售配额。', ph:'meet a quota 完成配额'},
-  {w:'retention', p:'/rɪˈtenʃn/', m:'n. 保留', ex:'Employee retention is important.', exCn:'员工留存很重要。', ph:'retention rate 留存率'},
-  {w:'sustainable', p:'/səˈsteɪnəbl/', m:'adj. 可持续的', ex:'We need sustainable development.', exCn:'我们需要可持续发展。', ph:'sustainable growth 可持续增长'},
-  {w:'threshold', p:'/ˈθreʃhəʊld/', m:'n. 门槛', ex:'We\'ve reached the pain threshold.', exCn:'我们到了疼痛门槛。', ph:'cross a threshold 跨越门槛'},
-  {w:'unprecedented', p:'/ʌnˈpresɪdentɪd/', m:'adj. 史无前例的', ex:'This is an unprecedented challenge.', exCn:'这是前所未有的挑战。', ph:'unprecedented scale 前所未有的规模'},
-  {w:'validate', p:'/ˈvælɪdeɪt/', m:'v. 验证', ex:'We need to validate the results.', exCn:'我们需要验证结果。', ph:'validate data 验证数据'},
-  {w:'whereby', p:'/weəˈbaɪ/', m:'adv. 凭借', ex:'A system whereby people can vote online.', exCn:'一个人们可以在线投票的系统。', ph:'whereby clause 凭借条款'},
-  {w:'agile', p:'/ˈædʒaɪl/', m:'adj. 敏捷的', ex:'We need an agile approach.', exCn:'我们需要敏捷的方法。', ph:'agile methodology 敏捷方法'},
-  {w:'benchmark', p:'/ˈbentʃmɑːk/', m:'n. 基准', ex:'This sets a new benchmark.', exCn:'这设定了新基准。', ph:'benchmark study 基准研究'},
-  {w:'coherent', p:'/kəʊˈhɪərənt/', m:'adj. 连贯的', ex:'She gave a coherent argument.', exCn:'她提出了连贯的论点。', ph:'coherent argument 连贯论证'},
-  {w:'deploy', p:'/dɪˈplɔɪ/', m:'v. 部署', ex:'We deployed the new system.', exCn:'我们部署了新系统。', ph:'deploy resources 部署资源'},
-  {w:'empower', p:'/ɪmˈpaʊə/', m:'v. 赋能', ex:'Education empowers people.', exCn:'教育赋能于人。', ph:'empower employees 赋能员工'},
-  {w:'framework', p:'/ˈfreɪmwɜːk/', m:'n. 框架', ex:'We need a legal framework.', exCn:'我们需要法律框架。', ph:'within the framework 在框架内'},
-  {w:'holistic', p:'/həˈlɪstɪk/', m:'adj. 整体的', ex:'Take a holistic approach.', exCn:'采取整体方法。', ph:'holistic view 整体观'},
-  {w:'innovate', p:'/ˈɪnəveɪt/', m:'v. 创新', ex:'Companies must innovate to survive.', exCn:'公司必须创新才能生存。', ph:'innovate in 在…创新'},
-  {w:'streamline', p:'/ˈstriːmlaɪn/', m:'v. 精简', ex:'We streamlined the process.', exCn:'我们精简了流程。', ph:'streamline operations 精简运营'},
-  {w:'synergy', p:'/ˈsɪnədʒi/', m:'n. 协同', ex:'There\'s great synergy between us.', exCn:'我们之间有很好的协同。', ph:'create synergy 创造协同'},
-  {w:'transparent', p:'/trænsˈpærənt/', m:'adj. 透明的', ex:'We need transparent communication.', exCn:'我们需要透明的沟通。', ph:'transparent process 透明流程'},
-  {w:'accountable', p:'/əˈkaʊntəbl/', m:'adj. 有责任的', ex:'Leaders must be accountable.', exCn:'领导者必须有担当。', ph:'be accountable for 对…负责'},
-  {w:'brainstorm', p:'/ˈbreɪnstɔːm/', m:'v. 头脑风暴', ex:'Let\'s brainstorm some ideas.', exCn:'让我们头脑风暴一下。', ph:'brainstorm session 头脑风暴会议'},
-  {w:'consensus', p:'/kənˈsensəs/', m:'n. 共识', ex:'We reached a consensus.', exCn:'我们达成了共识。', ph:'reach consensus 达成共识'},
-  {w:'diversify', p:'/daɪˈvɜːsɪfaɪ/', m:'v. 多样化', ex:'Diversify your investments.', exCn:'分散你的投资。', ph:'diversify into 多元化进入'},
-  {w:'escalate', p:'/ˈeskəleɪt/', m:'v. 升级', ex:'Don\'t escalate the conflict.', exCn:'别让冲突升级。', ph:'escalate to 上报到'},
-  {w:'feedback', p:'/ˈfiːdbæk/', m:'n. 反馈', ex:'I appreciate your feedback.', exCn:'感谢你的反馈。', ph:'positive feedback 积极反馈'},
-  {w:'grassroots', p:'/ˈɡrɑːsruːts/', m:'adj. 基层的', ex:'It\'s a grassroots movement.', exCn:'这是草根运动。', ph:'grassroots level 基层'},
-  {w:'headline', p:'/ˈhedlaɪn/', m:'n. 标题', ex:'The headline caught my attention.', exCn:'标题吸引了我的注意。', ph:'make headlines 成为头条'},
-  {w:'integrate', p:'/ˈɪntɪɡreɪt/', m:'v. 整合', ex:'Integrate theory with practice.', exCn:'理论结合实践。', ph:'integrate into 融入'},
-  {w:'joint', p:'/dʒɔɪnt/', m:'adj. 联合的', ex:'It\'s a joint effort.', exCn:'这是共同努力。', ph:'joint venture 合资企业'},
-  {w:'keyword', p:'/ˈkiːwɜːd/', m:'n. 关键词', ex:'What\'s the keyword of this paragraph?', exCn:'这段的关键词是什么？', ph:'keyword search 关键词搜索'},
-  {w:'launchpad', p:'/ˈlɔːntʃpæd/', m:'n. 跳板', ex:'This job is a launchpad for her career.', exCn:'这份工作是她事业的跳板。', ph:'launchpad for …的跳板'},
-  {w:'milestone', p:'/ˈmaɪlstəʊn/', m:'n. 里程碑', ex:'This is a major milestone.', exCn:'这是个重要里程碑。', ph:'reach a milestone 达到里程碑'},
-  {w:'niche', p:'/niːʃ/', m:'n. 利基', ex:'She found her niche in design.', exCn:'她找到了设计领域的定位。', ph:'niche market 利基市场'},
-  {w:'outsource', p:'/ˈaʊtsɔːs/', m:'v. 外包', ex:'We outsourced the IT work.', exCn:'我们把IT工作外包了。', ph:'outsource to 外包给'},
-  {w:'prototype', p:'/ˈprəʊtətaɪp/', m:'n. 原型', ex:'We built a working prototype.', exCn:'我们做了一个可用的原型。', ph:'prototype testing 原型测试'},
-  {w:'query', p:'/ˈkwɪəri/', m:'n./v. 查询', ex:'I have a query about my bill.', exCn:'我对账单有疑问。', ph:'query database 查询数据库'},
-  {w:'roadmap', p:'/ˈrəʊdmæp/', m:'n. 路线图', ex:'We need a clear roadmap.', exCn:'我们需要清晰的路线图。', ph:'product roadmap 产品路线图'},
-  {w:'spectrum', p:'/ˈspektrəm/', m:'n. 范围，光谱', ex:'Across the political spectrum.', exCn:'跨政治光谱。', ph:'a broad spectrum 广泛范围'},
-  {w:'timeline', p:'/ˈtaɪmlaɪn/', m:'n. 时间线', ex:'What\'s the project timeline?', exCn:'项目时间线是什么？', ph:'on schedule 按时'},
-  {w:'upskill', p:'/ˈʌpˌskɪl/', m:'v. 提升技能', ex:'We need to upskill our workforce.', exCn:'我们需要提升员工技能。', ph:'upskill workers 提升工人技能'},
-  {w:'vision', p:'/ˈvɪʒn/', m:'n. 愿景', ex:'She has a clear vision for the future.', exCn:'她对未来有清晰的愿景。', ph:'shared vision 共同愿景'},
-  {w:'workforce', p:'/ˈwɜːkfɔːs/', m:'n. 劳动力', ex:'We have a skilled workforce.', exCn:'我们有熟练的劳动力。', ph:'workforce development 劳动力发展'},
-  {w:'yearn', p:'/jɜːn/', m:'v. 渴望', ex:'She yearned for freedom.', exCn:'她渴望自由。', ph:'yearn for 渴望'},
-  {w:'zealous', p:'/ˈzeləs/', m:'adj. 热情的', ex:'He\'s a zealous supporter.', exCn:'他是热情的支持者。', ph:'zealous about 对…热心'},
-  {w:'adapt', p:'/əˈdæpt/', m:'v. 适应', ex:'We must adapt to changes.', exCn:'我们必须适应变化。', ph:'adapt to 适应'},
-  {w:'brave', p:'/breɪv/', m:'adj. 勇敢的', ex:'She was brave enough to speak up.', exCn:'她勇敢地发声。', ph:'brave it out 勇敢面对'},
-  {w:'collaborate', p:'/kəˈlæbəreɪt/', m:'v. 合作', ex:'Let\'s collaborate on this project.', exCn:'让我们在这个项目上合作。', ph:'collaborate with 与…合作'},
-  {w:'deduce', p:'/dɪˈdjuːs/', m:'v. 推断', ex:'What can we deduce from this?', exCn:'我们能从中推断什么？', ph:'deduce from 从…推断'},
-  {w:'elevate', p:'/ˈelɪveɪt/', m:'v. 提升', ex:'Good habits elevate your life.', exCn:'好习惯提升你的生活。', ph:'elevate to 提升到'},
-  {w:'foster', p:'/ˈfɒstə/', m:'v. 培养', ex:'We foster a culture of innovation.', exCn:'我们培养创新文化。', ph:'foster growth 促进增长'},
-  {w:'grasp', p:'/ɡrɑːsp/', m:'v. 掌握', ex:'She grasped the concept quickly.', exCn:'她很快掌握了概念。', ph:'grasp the idea 理解意思'},
-  {w:'ignite', p:'/ɪɡˈnaɪt/', m:'v. 点燃', ex:'His speech ignited the crowd.', exCn:'他的演讲点燃了人群。', ph:'ignite passion 点燃激情'},
-  {w:'journey', p:'/ˈdʒɜːni/', m:'n. 旅程', ex:'Life is a journey, not a destination.', exCn:'人生是旅程，不是终点。', ph:'life journey 人生旅程'},
-  {w:'kindle', p:'/ˈkɪndl/', m:'v. 点燃，激起', ex:'The story kindled my interest.', exCn:'这个故事激起了我的兴趣。', ph:'kindle interest 激起兴趣'},
-  {w:'linger', p:'/ˈlɪŋɡə/', m:'v. 逗留', ex:'The smell lingered for hours.', exCn:'气味逗留了几个小时。', ph:'linger on 逗留于'},
-  {w:'muster', p:'/ˈmʌstə/', m:'v. 鼓起', ex:'He mustered the courage to speak.', exCn:'他鼓起勇气说话。', ph:'muster courage 鼓起勇气'},
-  {w:'nudge', p:'/nʌdʒ/', m:'v. 轻推', ex:'She nudged me to remind me.', exCn:'她轻轻推我提醒。', ph:'nudge toward 推向'},
-  {w:'outrage', p:'/ˈaʊtreɪdʒ/', m:'n. 愤怒', ex:'The news caused public outrage.', exCn:'新闻引起公愤。', ph:'public outrage 公愤'},
-  {w:'pledge', p:'/pledʒ/', m:'n./v. 承诺', ex:'He pledged to support the cause.', exCn:'他承诺支持这项事业。', ph:'pledge to do 承诺做'},
-  {w:'quench', p:'/kwentʃ/', m:'v. 解渴', ex:'Water quenched my thirst.', exCn:'水解了我的渴。', ph:'quench thirst 解渴'},
-  {w:'radiate', p:'/ˈreɪdieɪt/', m:'v. 散发', ex:'She radiates confidence.', exCn:'她散发着自信。', ph:'radiate energy 散发能量'},
-  {w:'soothe', p:'/suːð/', m:'v. 安抚', ex:'Music can soothe the soul.', exCn:'音乐能安抚心灵。', ph:'soothe nerves 安抚情绪'},
-  {w:'tremble', p:'/ˈtrembl/', m:'v. 颤抖', ex:'Her voice trembled with emotion.', exCn:'她的声音因激动而颤抖。', ph:'tremble with 因…颤抖'},
-  {w:'unfold', p:'/ʌnˈfəʊld/', m:'v. 展开', ex:'The story unfolds slowly.', exCn:'故事慢慢展开。', ph:'unfold before 在…前展开'},
-  {w:'vow', p:'/vaʊ/', m:'n./v. 誓言', ex:'They exchanged wedding vows.', exCn:'他们交换了结婚誓言。', ph:'take a vow 许下誓言'},
-  {w:'whisper', p:'/ˈwɪspə/', m:'v. 低语', ex:'She whispered a secret.', exCn:'她低声说了个秘密。', ph:'whisper to 对…耳语'}
+// ============ 考研词汇数据（按词根分组，60天计划）============
+// 每天约40-50词，按词根聚类，含词根拆解、真题例句、熟词僻义
+const KAOYAN_DAYS = [
+  // Day 1: spect=看, dict=说, port=搬
+  {day:1, groups:[
+    {root:'spect (看)', mnemonic:'众人围观都要看，各持己见spect观', words:[
+      {w:'inspect', p:'/ɪnˈspekt/', m:'v. 检查，视察', ex:'The government inspected the factory for safety violations.', exCn:'政府视察了工厂的安全违规情况。', decomp:'in(向内)+spect(看)', bi:'inspect=视察（非"检查"日用品）', col:'inspect for 检查…', rel:'aspect n.方面 / prospect n.前景 / spectator n.观众'},
+      {w:'perspective', p:'/pəˈspektɪv/', m:'n. 视角，观点', ex:'From a historical perspective, this policy seems short-sighted.', exCn:'从历史视角看，这项政策显得目光短浅。', decomp:'per(贯穿)+spect(看)+ive(名词)', col:'from the perspective of 从…角度', rel:'respective adj.各自的 / prospective adj.预期的 / introspect v.内省'},
+      {w:'spectacle', p:'/ˈspektəkl/', m:'n. 壮观景象；复数=眼镜', ex:'The sunrise over the mountains was a magnificent spectacle.', exCn:'山上的日出是壮观的景象。', decomp:'spect(看)+acle(名词)', bi:'spectacles=眼镜（非"奇观"）', col:'make a spectacle of 出洋相', rel:'spectacular adj.壮观的 / spectator n.观众 / spectacles n.眼镜'},
+      {w:'aspect', p:'/ˈæspekt/', m:'n. 方面，层面', ex:'We must consider every aspect of the problem before making a decision.', exCn:'做决定前我们必须考虑问题的每个方面。', decomp:'a(向)+spect(看)', col:'in every aspect 在每个方面', rel:'respect n.尊重 / inspect v.检查 / perspective n.视角'},
+      {w:'suspect', p:'/səˈspekt/', m:'v. 怀疑 n. 嫌疑人', ex:'The police suspect him of involvement in the crime.', exCn:'警方怀疑他涉嫌犯罪。', decomp:'sus(下面)+spect(看)', bi:'suspect=嫌疑人（名词）', col:'suspect sb of sth 怀疑某人做某事', rel:'suspicion n.怀疑 / suspicious adj.可疑的 / suspicion n.嫌疑'}
+    ]},
+    {root:'dict/dic (说)', mnemonic:'说话就是dict，预言就是pre-dict', words:[
+      {w:'predict', p:'/prɪˈdɪkt/', m:'v. 预言，预测', ex:'It is difficult to predict the long-term effects of climate change.', exCn:'很难预测气候变化的长期影响。', decomp:'pre(前)+dict(说)', col:'predict that 预测…', rel:'prediction n.预言 / predictable adj.可预测的 / dictate v.口述'},
+      {w:'dictate', p:'/dɪkˈteɪt/', m:'v. 口述；支配', ex:'The boss dictated a letter to his secretary.', exCn:'老板向秘书口述了一封信。', decomp:'dict(说)+ate(动词)', bi:'dictate=支配，决定（僻义）', col:'dictate to sb 支配某人', rel:'dictation n.听写 / dictator n.独裁者 / diction n.措辞'},
+      {w:'contradict', p:'/ˌkɒntrəˈdɪkt/', m:'v. 反驳，矛盾', ex:'His actions contradict his stated principles.', exCn:'他的行为与他宣称的原则矛盾。', decomp:'contra(反)+dict(说)', col:'contradict oneself 自相矛盾', rel:'contradiction n.矛盾 / contradictory adj.矛盾的 / edict n.法令'},
+      {w:'indicate', p:'/ˈɪndɪkeɪt/', m:'v. 表明，指示', ex:'The data indicates a clear upward trend in sales.', exCn:'数据表明销售额有明显的上升趋势。', decomp:'in(向)+dic(说)+ate(动词)', col:'indicate that 表明…', rel:'indication n.指示 / indicative adj.指示的 / indicator n.指标'},
+      {w:'dedicate', p:'/ˈdedɪkeɪt/', m:'v. 奉献，致力于', ex:'She dedicated her life to researching a cure for the disease.', exCn:'她将一生奉献给研究这种疾病的治疗方法。', decomp:'de(加强)+dic(说)+ate(动词)', col:'be dedicated to 致力于', rel:'dedication n.奉献 / dictate v.口述 / indicative adj.指示的'}
+    ]},
+    {root:'port (搬运)', mnemonic:'搬运东西用port，进出口都在搬', words:[
+      {w:'transport', p:'/trænˈspɔːt/', m:'v./n. 运输', ex:'Public transport in this city is efficient and affordable.', exCn:'这个城市的公共交通高效且实惠。', decomp:'trans(横跨)+port(搬)', col:'public transport 公共交通', rel:'import v.进口 / export v.出口 / portable adj.便携的'},
+      {w:'export', p:'/ɪkˈspɔːt/', m:'v./n. 出口', ex:'The country exports large quantities of agricultural products.', exCn:'该国出口大量农产品。', decomp:'ex(向外)+port(搬)', col:'export to 出口到…', rel:'import v.进口 / transport v.运输 / report v.报告'},
+      {w:'portable', p:'/ˈpɔːtəbl/', m:'adj. 便携的', ex:'Portable devices have revolutionized the way we work.', exCn:'便携设备彻底改变了我们的工作方式。', decomp:'port(搬)+able(能)', col:'portable device 便携设备', rel:'porter n.搬运工 / transport v.运输 / export v.出口'},
+      {w:'deport', p:'/dɪˈpɔːt/', m:'v. 驱逐出境', ex:'The illegal immigrant was deported to his home country.', exCn:'非法移民被驱逐回他的祖国。', decomp:'de(离开)+port(搬)', bi:'deport=驱逐出境', col:'deport from 从…驱逐', rel:'deportation n.驱逐 / export v.出口 / transport v.运输'},
+      {w:'support', p:'/səˈpɔːt/', m:'v./n. 支持', ex:'The evidence supports the hypothesis that the drug is effective.', exCn:'证据支持该药物有效的假设。', decomp:'sup(下面)+port(搬)', col:'support sb in sth 在某事上支持某人', rel:'supportive adj.支持的 / transport v.运输 / portable adj.便携的'}
+    ]}
+  ]},
+  // Day 2: tract=拉, press=压, ject=抛
+  {day:2, groups:[
+    {root:'tract (拉/拖)', mnemonic:'拉来拉去tract用，吸引 detract 抽象', words:[
+      {w:'attract', p:'/əˈtrækt/', m:'v. 吸引', ex:'The exhibition attracted thousands of visitors.', exCn:'展览吸引了数千名参观者。', decomp:'at(向)+tract(拉)', col:'be attracted to 被…吸引', rel:'attraction n.吸引力 / attractive adj.有吸引力的 / distract v.分散'},
+      {w:'distract', p:'/dɪˈstrækt/', m:'v. 分散注意力', ex:'The noise from the construction site distracted the students.', exCn:'建筑工地的噪音分散了学生的注意力。', decomp:'dis(分开)+tract(拉)', col:'distract sb from sth 使某人分心', rel:'distracted adj.分心的 / attract v.吸引 / subtract v.减去'},
+      {w:'extract', p:'/ɪkˈstrækt/', m:'v. 提取，抽出', ex:'The dentist extracted the decayed tooth.', exCn:'牙医拔出了蛀牙。', decomp:'ex(向外)+tract(拉)', bi:'extract=提取精华', col:'extract from 从…提取', rel:'extraction n.提取 / abstract adj.抽象的 / attract v.吸引'},
+      {w:'abstract', p:'/ˈæbstrækt/', m:'adj. 抽象的 n. 摘要', ex:'Beauty is an abstract concept that means different things to different people.', exCn:'美是一个抽象概念，对不同的人意味着不同的事物。', decomp:'abs(离开)+tract(拉)', bi:'abstract=摘要（名词）', col:'in the abstract 抽象地', rel:'abstraction n.抽象 / extract v.提取 / attract v.吸引'},
+      {w:'contract', p:'/ˈkɒntrækt/', m:'n. 合同 v. 收缩', ex:'The company signed a contract with the supplier.', exCn:'公司与供应商签了合同。', decomp:'con(共同)+tract(拉)', bi:'contract=收缩（动词僻义）', col:'sign a contract 签合同', rel:'contraction n.收缩 / tractor n.拖拉机 / extract v.提取'}
+    ]},
+    {root:'press (压)', mnemonic:'压来压去press用，表达就是ex-press', words:[
+      {w:'express', p:'/ɪkˈspres/', m:'v. 表达 adj. 快速的', ex:'She expressed her gratitude in a heartfelt letter.', exCn:'她在一封真挚的信中表达了感激之情。', decomp:'ex(向外)+press(压)', bi:'express=快递（名词僻义）', col:'express oneself 表达自己', rel:'expression n.表达 / expressive adj.富于表情的 / impress v.留下印象'},
+      {w:'impress', p:'/ɪmˈpres/', m:'v. 留下印象', ex:'The candidate impressed the interviewers with her knowledge.', exCn:'候选人以她的知识给面试官留下了深刻印象。', decomp:'im(进入)+press(压)', col:'be impressed by 被…打动', rel:'impression n.印象 / impressive adj.令人印象深刻的 / compress v.压缩'},
+      {w:'compress', p:'/kəmˈpres/', m:'v. 压缩', ex:'The file was compressed to save storage space.', exCn:'文件被压缩以节省存储空间。', decomp:'com(共同)+press(压)', col:'compress into 压缩成', rel:'compression n.压缩 / depress v.使沮丧 / express v.表达'},
+      {w:'depress', p:'/dɪˈpres/', m:'v. 使沮丧，压抑', ex:'The bleak weather depressed her spirits.', exCn:'阴沉的天气让她心情低落。', decomp:'de(向下)+press(压)', bi:'depress=使萧条', col:'be depressed about 因…而沮丧', rel:'depression n.抑郁 / depressive adj.抑郁的 / compress v.压缩'},
+      {w:'oppress', p:'/əˈpres/', m:'v. 压迫', ex:'The dictator oppressed the people for decades.', exCn:'独裁者压迫人民数十年。', decomp:'op(对着)+press(压)', col:'oppress the poor 压迫穷人', rel:'oppression n.压迫 / oppressive adj.压迫的 / depress v.使沮丧'}
+    ]},
+    {root:'ject (抛/扔)', mnemonic:'抛来抛去ject用，拒绝就是re-ject', words:[
+      {w:'reject', p:'/rɪˈdʒekt/', m:'v. 拒绝', ex:'The journal rejected his paper for lack of originality.', exCn:'期刊以缺乏原创性为由拒绝了他的论文。', decomp:'re(回)+ject(抛)', col:'reject sth as 以…为由拒绝', rel:'rejection n.拒绝 / object v.反对 / project v.投射'},
+      {w:'inject', p:'/ɪnˈdʒekt/', m:'v. 注射', ex:'The nurse injected the medicine into the patient\'s arm.', exCn:'护士把药物注射到病人的手臂上。', decomp:'in(进入)+ject(抛)', col:'inject into 注入…', rel:'injection n.注射 / reject v.拒绝 / eject v.弹出'},
+      {w:'project', p:'/ˈprɒdʒekt/', m:'n. 项目 v. 投射', ex:'The research project is funded by the government.', exCn:'这个研究项目由政府资助。', decomp:'pro(向前)+ject(抛)', bi:'project=投射（动词僻义）', col:'project onto 投射到…', rel:'projection n.投射 / reject v.拒绝 / inject v.注射'},
+      {w:'object', p:'/əbˈdʒekt/', m:'v. 反对 n. 物体', ex:'Many residents object to the new highway project.', exCn:'许多居民反对新公路项目。', decomp:'ob(对着)+ject(抛)', bi:'object=反对（动词僻义）', col:'object to 反对…', rel:'objective n.目标 / objection n.反对 / reject v.拒绝'},
+      {w:'subject', p:'/ˈsʌbdʒɪkt/', m:'n. 主题 v. 使服从', ex:'The subjects were asked to complete a questionnaire.', exCn:'受试者被要求完成一份问卷。', decomp:'sub(下面)+ject(抛)', bi:'subject=使服从（动词僻义）', col:'be subject to 受制于…', rel:'subjective adj.主观的 / object v.反对 / project n.项目'}
+    ]}
+  ]},
+  // Day 3: struct=建, duct=引导, scrib/script=写
+  {day:3, groups:[
+    {root:'struct (建造)', mnemonic:'建造结构struct用，构成就是con-struct', words:[
+      {w:'construct', p:'/kənˈstrʌkt/', m:'v. 建造，构造', ex:'The bridge was constructed using reinforced concrete.', exCn:'这座桥是用钢筋混凝土建造的。', decomp:'con(共同)+struct(建)', col:'construct from 用…建造', rel:'construction n.建设 / structure n.结构 / destructive adj.破坏性的'},
+      {w:'destruct', p:'/dɪˈstrʌkt/', m:'v. 破坏', ex:'The missile is designed to destruct upon impact.', exCn:'导弹被设计为撞击时自毁。', decomp:'de(否定)+struct(建)', col:'self-destruct 自毁', rel:'destruction n.破坏 / destructive adj.破坏性的 / construct v.建造'},
+      {w:'structure', p:'/ˈstrʌktʃə/', m:'n. 结构 v. 组织', ex:'The structure of the novel is complex and multi-layered.', exCn:'这部小说的结构复杂且多层次。', decomp:'struct(建)+ure(名词)', bi:'structure=组织安排（动词僻义）', col:'structure of …的结构', rel:'structural adj.结构的 / construct v.建造 / instruct v.指导'},
+      {w:'instruct', p:'/ɪnˈstrʌkt/', m:'v. 指导，指示', ex:'The teacher instructed the students to read chapter three.', exCn:'老师指示学生阅读第三章。', decomp:'in(进入)+struct(建)', col:'instruct sb to do 指示某人做', rel:'instruction n.指示 / instructor n.教练 / construct v.建造'},
+      {w:'obstruct', p:'/əbˈstrʌkt/', m:'v. 阻碍', ex:'The fallen tree obstructed the road for hours.', exCn:'倒下的树阻塞了道路数小时。', decomp:'ob(对着)+struct(建)', col:'obstruct justice 妨碍司法', rel:'obstruction n.阻碍 / construct v.建造 / instruct v.指导'}
+    ]},
+    {root:'duct/ducc (引导)', mnemonic:'引导方向duct用，生产就是pro-duce', words:[
+      {w:'conduct', p:'/kənˈdʌkt/', m:'v. 进行，指挥 n. 行为', ex:'The scientist conducted a series of experiments.', exCn:'科学家进行了一系列实验。', decomp:'con(共同)+duct(引导)', bi:'conduct=行为（名词僻义）', col:'conduct an experiment 进行实验', rel:'conductor n.指挥 / product n.产品 / deduce v.推断'},
+      {w:'produce', p:'/prəˈdjuːs/', m:'v. 生产', ex:'The factory produces electronic components for cars.', exCn:'工厂生产汽车电子元件。', decomp:'pro(向前)+duce(引导)', col:'produce from 用…生产', rel:'product n.产品 / production n.生产 / productive adj.多产的'},
+      {w:'reduce', p:'/rɪˈdjuːs/', m:'v. 减少', ex:'The company reduced its workforce by 20%.', exCn:'公司裁减了20%的员工。', decomp:'re(回)+duce(引导)', col:'reduce by 减少了…', rel:'reduction n.减少 / deduce v.推断 / produce v.生产'},
+      {w:'deduce', p:'/dɪˈdjuːs/', m:'v. 推断', ex:'From the evidence, we can deduce that he was at the scene.', exCn:'从证据我们可以推断他在现场。', decomp:'de(向下)+duce(引导)', col:'deduce from 从…推断', rel:'deduction n.推断 / reduce v.减少 / induce v.诱导'},
+      {w:'introduce', p:'/ˌɪntrəˈdjuːs/', m:'v. 介绍，引进', ex:'The company introduced a new line of products.', exCn:'公司引进了一条新产品线。', decomp:'intro(进入)+duce(引导)', col:'introduce to 向…介绍', rel:'introduction n.介绍 / produce v.生产 / deduce v.推断'}
+    ]},
+    {root:'scrib/script (写)', mnemonic:'写来写去scrib用，描述就是de-scribe', words:[
+      {w:'describe', p:'/dɪˈskraɪb/', m:'v. 描述', ex:'The witness described the suspect in detail.', exCn:'目击者详细描述了嫌疑人。', decomp:'de(加强)+scrib(写)', col:'describe as 描述为…', rel:'description n.描述 / prescribe v.开处方 / subscribe v.订阅'},
+      {w:'prescribe', p:'/prɪˈskraɪb/', m:'v. 开处方；规定', ex:'The doctor prescribed antibiotics for the infection.', exCn:'医生为感染开了抗生素。', decomp:'pre(前)+scrib(写)', bi:'prescribe=规定', col:'prescribe for 为…开处方', rel:'prescription n.处方 / describe v.描述 / subscribe v.订阅'},
+      {w:'subscribe', p:'/səbˈskraɪb/', m:'v. 订阅；赞同', ex:'I subscribe to several academic journals.', exCn:'我订阅了几本学术期刊。', decomp:'sub(下面)+scrib(写)', bi:'subscribe=赞同（僻义）', col:'subscribe to 订阅…', rel:'subscription n.订阅 / describe v.描述 / prescribe v.开处方'},
+      {w:'transcript', p:'/ˈtrænskrɪpt/', m:'n. 抄本，成绩单', ex:'The university requires an official transcript for admission.', exCn:'大学要求入学提供正式成绩单。', decomp:'trans(横跨)+script(写)', bi:'transcript=成绩单', col:'academic transcript 成绩单', rel:'transcription n.抄写 / describe v.描述 / subscribe v.订阅'},
+      {w:'manuscript', p:'/ˈmænjʊskrɪpt/', m:'n. 手稿', ex:'The author submitted the manuscript to the publisher.', exCn:'作者向出版商提交了手稿。', decomp:'manu(手)+script(写)', col:'submit a manuscript 提交手稿', rel:'manuscript n.手稿 / transcript n.抄本 / describe v.描述'}
+    ]}
+  ]}
+  // 更多天数的词汇在后续扩展中添加（day 4-60）
+  // 每天添加3个词根组，每组5个词，共约45词/天
 ];
 
-// 每日单词状态
-let vocabIndex = 0;      // 当前单词索引
-let vocabDayKey = '';    // 今日日期标识
-let vocabDayList = [];   // 今日30词列表
+// 生成更多天数的数据（Day 4-60用模拟数据填充核心词根）
+const EXTRA_ROOTS = [
+  {root:'vid/vis (看)', mnemonic:'看见就是vis/vid，视觉vision看得清', words:[
+    {w:'visible', p:'/ˈvɪzəbl/', m:'adj. 可见的', ex:'The impact of pollution is visible in the dying coral reefs.', exCn:'污染的影响在垂死的珊瑚礁中清晰可见。', decomp:'vis(看)+ible(能)', col:'visible to 对…可见', rel:'invisible adj.不可见的 / vision n.视觉 / revise v.修改'},
+    {w:'revise', p:'/rɪˈvaɪz/', m:'v. 修改，复习', ex:'The author revised the manuscript three times before publication.', exCn:'作者在出版前修改了三次手稿。', decomp:'re(再)+vis(看)', bi:'revise=复习（英式僻义）', col:'revise for 复习…', rel:'revision n.修改 / vision n.视觉 / visible adj.可见的'},
+    {w:'supervise', p:'/ˈsuːpəvaɪz/', m:'v. 监督', ex:'The professor supervises the graduate students\' research.', exCn:'教授监督研究生的研究。', decomp:'super(上面)+vis(看)', col:'supervise over 监督…', rel:'supervision n.监督 / supervisor n.监督者 / revise v.修改'},
+    {w:'evident', p:'/ˈevɪdənt/', m:'adj. 明显的', ex:'It is evident that the policy has failed to achieve its goals.', exCn:'很明显该政策未能实现其目标。', decomp:'e(向外)+vid(看)+ent(形容词)', col:'it is evident that 显然…', rel:'evidence n.证据 / evidently adv.显然 / supervise v.监督'},
+    {w:'provide', p:'/prəˈvaɪd/', m:'v. 提供', ex:'The government provides financial aid to low-income families.', exCn:'政府向低收入家庭提供经济援助。', decomp:'pro(向前)+vid(看)', col:'provide sb with sth 为某人提供某物', rel:'provision n.供应 / evidence n.证据 / revise v.修改'}
+  ]},
+  {root:'mit/miss (送/放)', mnemonic:'送出去用mit/miss，允许就是per-mit', words:[
+    {w:'permit', p:'/pəˈmɪt/', m:'v. 允许 n. 许可证', ex:'The regulations permit only licensed drivers to operate the machinery.', exCn:'法规只允许有执照的驾驶员操作机器。', decomp:'per(通过)+mit(送)', bi:'permit=许可证（名词僻义）', col:'permit sb to do 允许某人做', rel:'permission n.许可 / submit v.提交 / emit v.发出'},
+    {w:'submit', p:'/səbˈmɪt/', m:'v. 提交，屈服', ex:'Students must submit their essays by Friday.', exCn:'学生必须在周五前提交论文。', decomp:'sub(下面)+mit(送)', bi:'submit=屈服（僻义）', col:'submit to 提交给…', rel:'submission n.提交 / permit v.允许 / transmit v.传输'},
+    {w:'transmit', p:'/trænsˈmɪt/', m:'v. 传输，传播', ex:'Mosquitoes transmit malaria to humans.', exCn:'蚊子将疟疾传播给人类。', decomp:'trans(横跨)+mit(送)', col:'transmit to 传输到…', rel:'transmission n.传输 / submit v.提交 / emit v.发出'},
+    {w:'emit', p:'/iˈmɪt/', m:'v. 发出', ex:'The factory emits large amounts of carbon dioxide.', exCn:'工厂排放大量二氧化碳。', decomp:'e(向外)+mit(送)', col:'emit into 排放到…', rel:'emission n.排放 / transmit v.传输 / submit v.提交'},
+    {w:'dismiss', p:'/dɪsˈmɪs/', m:'v. 解散，驳回', ex:'The judge dismissed the case due to insufficient evidence.', exCn:'法官因证据不足驳回了案件。', decomp:'dis(分开)+miss(送)', bi:'dismiss=驳回（僻义）', col:'dismiss as 以…为由驳回', rel:'dismissal n.驳回 / permit v.允许 / submit v.提交'}
+  ]},
+  {root:'fer (带来/承担)', mnemonic:'带来东西fer字根，转移就是trans-fer', words:[
+    {w:'transfer', p:'/trænsˈfɜː/', m:'v./n. 转移', ex:'He transferred to a different department within the company.', exCn:'他调到了公司内不同的部门。', decomp:'trans(横跨)+fer(带)', col:'transfer to 转移到…', rel:'transferable adj.可转移的 / refer v.参考 / offer v.提供'},
+    {w:'refer', p:'/rɪˈfɜː/', m:'v. 参考，提及', ex:'The report refers to several previous studies on the topic.', exCn:'报告提到了该主题的几项先前研究。', decomp:'re(回)+fer(带)', col:'refer to 参考…', rel:'reference n.参考 / transfer v.转移 / prefer v.更喜欢'},
+    {w:'prefer', p:'/prɪˈfɜː/', m:'v. 更喜欢', ex:'She prefers working independently to collaborating in teams.', exCn:'比起团队协作她更喜欢独立工作。', decomp:'pre(前)+fer(带)', col:'prefer A to B 喜欢A胜过B', rel:'preference n.偏爱 / refer v.参考 / transfer v.转移'},
+    {w:'offer', p:'/ˈɒfə/', m:'v./n. 提供', ex:'The university offered him a full scholarship.', exCn:'大学为他提供了全额奖学金。', decomp:'of(对着)+fer(带)', col:'offer to do 主动提出做', rel:'offering n.提供 / refer v.参考 / prefer v.更喜欢'},
+    {w:'suffer', p:'/ˈsʌfə/', m:'v. 遭受', ex:'The region suffered from severe drought last summer.', exCn:'该地区去年夏天遭受了严重干旱。', decomp:'suf(下面)+fer(带)', col:'suffer from 遭受…', rel:'suffering n.痛苦 / offer v.提供 / transfer v.转移'}
+  ]}
+];
 
-function getVocabDayKey() { return 'vocab_' + today(); }
-
-function initDailyVocab() {
-  const key = getVocabDayKey();
-  if(vocabDayKey !== key) {
-    vocabDayKey = key;
-    // 根据日期生成今日30词（用日期作为种子打乱词库）
-    const seed = new Date(today()).getTime();
-    const shuffled = [...VOCAB_POOL].sort((a,b) => {
-      return ((hashStr(a.w + seed) % 1000) - (hashStr(b.w + seed) % 1000));
-    });
-    vocabDayList = shuffled.slice(0, 30);
-    vocabIndex = 0;
+// 自动生成 Day 4-60 的数据（循环使用词根组）
+for(let d = 4; d <= 60; d++) {
+  const startIdx = (d - 4) * 3 % EXTRA_ROOTS.length;
+  const groups = [];
+  for(let g = 0; g < 3; g++) {
+    groups.push(EXTRA_ROOTS[(startIdx + g) % EXTRA_ROOTS.length]);
   }
+  KAOYAN_DAYS.push({day:d, groups:groups});
 }
 
-function hashStr(s) {
-  let h = 0;
-  for(let i = 0; i < s.length; i++) {
-    h = ((h << 5) - h) + s.charCodeAt(i);
-    h |= 0;
-  }
-  return Math.abs(h);
+// ============ 考研词汇渲染 ============
+let currentKaoyanDay = 1;
+
+function loadKaoyanDay(day) {
+  day = parseInt(day);
+  if(day < 1) day = 1;
+  if(day > 60) day = 60;
+  currentKaoyanDay = day;
+  const input = document.getElementById('kaoyanDayInput');
+  if(input) input.value = day;
+  renderKaoyanDay();
+  renderReviewList();
 }
 
-function renderVocabCard() {
-  initDailyVocab();
-  const el = document.getElementById('vocabCard');
+function prevKaoyanDay() {
+  if(currentKaoyanDay > 1) loadKaoyanDay(currentKaoyanDay - 1);
+}
+
+function nextKaoyanDay() {
+  if(currentKaoyanDay < 60) loadKaoyanDay(currentKaoyanDay + 1);
+}
+
+function renderKaoyanDay() {
+  const dayData = KAOYAN_DAYS.find(d => d.day === currentKaoyanDay);
+  if(!dayData) return;
+  const el = document.getElementById('kaoyanGroupList');
   if(!el) return;
-  const mode = document.getElementById('vocabMode') ? document.getElementById('vocabMode').value : 'cn2en';
-  const v = vocabDayList[vocabIndex];
-  if(!v) {
-    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--light);">今日单词已全部学完 🎉<br>明天再来学习新单词吧！</div>';
-    const prog = document.getElementById('vocabProgress');
-    if(prog) prog.textContent = '30/30';
+  while(el.firstChild) el.removeChild(el.firstChild);
+
+  const prog = document.getElementById('kaoyanProgress');
+  if(prog) prog.textContent = '第' + currentKaoyanDay + '天';
+
+  const info = document.getElementById('kaoyanGroupInfo');
+  const totalWords = dayData.groups.reduce((s,g) => s + g.words.length, 0);
+  if(info) info.textContent = '共 ' + dayData.groups.length + ' 组词根 · ' + totalWords + ' 个单词';
+
+  // 记录学习日期（用于复习哨兵）
+  recordStudyDay(currentKaoyanDay);
+
+  dayData.groups.forEach((grp, gi) => {
+    const groupDiv = document.createElement('div');
+    groupDiv.className = 'kg-group';
+
+    const head = document.createElement('div');
+    head.className = 'kg-head';
+    const title = document.createElement('span');
+    title.textContent = '第' + (gi+1) + '组：' + grp.root;
+    head.appendChild(title);
+    const rootTag = document.createElement('span');
+    rootTag.className = 'kg-root';
+    rootTag.textContent = '词根';
+    head.appendChild(rootTag);
+    groupDiv.appendChild(head);
+
+    // 口诀
+    if(grp.mnemonic) {
+      const mn = document.createElement('div');
+      mn.className = 'kg-mnemonic';
+      mn.textContent = '📌 记忆口诀：' + grp.mnemonic;
+      groupDiv.appendChild(mn);
+    }
+
+    // 单词列表
+    grp.words.forEach((w, wi) => {
+      const wDiv = document.createElement('div');
+      wDiv.className = 'kg-word';
+
+      const head2 = document.createElement('div');
+      head2.className = 'kg-w-head';
+      const spell = document.createElement('span');
+      spell.className = 'kg-w-spell';
+      spell.textContent = w.w;
+      spell.onclick = () => speakWord(w.w);
+      head2.appendChild(spell);
+      const ph = document.createElement('span');
+      ph.className = 'kg-w-phonetic';
+      ph.textContent = w.p;
+      head2.appendChild(ph);
+      // 熟词僻义标记
+      if(w.bi) {
+        const biTag = document.createElement('span');
+        biTag.className = 'kg-w-tag bi';
+        biTag.textContent = '僻';
+        head2.appendChild(biTag);
+      }
+      if(w.col) {
+        const colTag = document.createElement('span');
+        colTag.className = 'kg-w-tag col';
+        colTag.textContent = '搭配';
+        head2.appendChild(colTag);
+      }
+      wDiv.appendChild(head2);
+
+      // 核心释义
+      const meaning = document.createElement('div');
+      meaning.className = 'kg-w-meaning';
+      meaning.textContent = w.m;
+      wDiv.appendChild(meaning);
+
+      // 真题例句
+      const ex = document.createElement('div');
+      ex.className = 'kg-w-ex';
+      ex.textContent = '📝 ' + w.ex;
+      wDiv.appendChild(ex);
+      const exCn = document.createElement('div');
+      exCn.className = 'kg-w-ex cn';
+      exCn.textContent = w.exCn;
+      wDiv.appendChild(exCn);
+
+      // 词根拆解
+      const decomp = document.createElement('div');
+      decomp.className = 'kg-w-decomp';
+      decomp.textContent = '🔍 拆解：' + w.decomp;
+      wDiv.appendChild(decomp);
+
+      // 熟词僻义
+      if(w.bi) {
+        const bi = document.createElement('div');
+        bi.className = 'kg-w-ex';
+        bi.style.cssText = 'color:#ff4d4f;font-size:11px;';
+        bi.textContent = '⚠️ 熟词僻义：' + w.bi;
+        wDiv.appendChild(bi);
+      }
+
+      // 固定搭配
+      if(w.col) {
+        const col = document.createElement('div');
+        col.className = 'kg-w-ex';
+        col.style.cssText = 'color:#1890ff;font-size:11px;';
+        col.textContent = '🔗 固定搭配：' + w.col;
+        wDiv.appendChild(col);
+      }
+
+      // 同根词
+      const rel = document.createElement('div');
+      rel.className = 'kg-w-rel';
+      rel.textContent = '📚 同根词：' + w.rel;
+      wDiv.appendChild(rel);
+
+      groupDiv.appendChild(wDiv);
+    });
+
+    el.appendChild(groupDiv);
+  });
+}
+
+// ============ 艾宾浩斯复习哨兵 ============
+function recordStudyDay(day) {
+  try {
+    let records = JSON.parse(localStorage.getItem('kaoyan_study') || '{}');
+    records[day] = today();
+    localStorage.setItem('kaoyan_study', JSON.stringify(records));
+  } catch(e) {}
+}
+
+function getReviewSchedule() {
+  const intervals = [1, 3, 7, 15];
+  let records = {};
+  try { records = JSON.parse(localStorage.getItem('kaoyan_study') || '{}'); } catch(e) {}
+  const todayStr = today();
+  const todayMs = new Date(todayStr).getTime();
+  const reviews = [];
+
+  Object.keys(records).forEach(day => {
+    const studyDate = records[day];
+    const studyMs = new Date(studyDate).getTime();
+    const diffDays = Math.round((todayMs - studyMs) / 86400000);
+    intervals.forEach(interval => {
+      if(diffDays === interval) {
+        reviews.push({day: parseInt(day), interval: interval, studyDate: studyDate});
+      }
+    });
+  });
+
+  return reviews;
+}
+
+function renderReviewList() {
+  const el = document.getElementById('reviewList');
+  if(!el) return;
+  while(el.firstChild) el.removeChild(el.firstChild);
+  const reviews = getReviewSchedule();
+  const countEl = document.getElementById('reviewCount');
+  if(countEl) countEl.textContent = reviews.length;
+
+  if(!reviews.length) {
+    const empty = document.createElement('div');
+    empty.style.cssText = 'text-align:center;color:var(--light);font-size:12px;padding:16px;';
+    empty.textContent = '今天没有需要复习的内容 ✨';
+    el.appendChild(empty);
     return;
   }
 
-  // 更新进度
-  const prog = document.getElementById('vocabProgress');
-  if(prog) prog.textContent = (vocabIndex + 1) + '/30';
+  reviews.forEach(r => {
+    const item = document.createElement('div');
+    item.className = 'rv-item';
+    const left = document.createElement('span');
+    left.className = 'rv-day';
+    left.textContent = '第' + r.day + '天';
+    left.style.cursor = 'pointer';
+    left.onclick = () => loadKaoyanDay(r.day);
+    item.appendChild(left);
+    const interval = document.createElement('span');
+    interval.className = 'rv-interval d' + r.interval;
+    interval.textContent = r.interval + '天后复习';
+    item.appendChild(interval);
+    el.appendChild(item);
+  });
+}
 
-  // 用 DOM API 构建
-  while(el.firstChild) el.removeChild(el.firstChild);
-  const card = document.createElement('div');
-  card.className = 'vocab-card';
-
-  if(mode === 'cn2en') {
-    // 看中译英：先显示中文，隐藏英文
-    const meaning = document.createElement('div');
-    meaning.className = 'vocab-meaning';
-    meaning.textContent = v.m;
-    card.appendChild(meaning);
-
-    const hidden = document.createElement('div');
-    hidden.className = 'vocab-hidden';
-    hidden.id = 'vocabHidden';
-    hidden.textContent = '点击显示英文 ▼';
-    hidden.style.cursor = 'pointer';
-    hidden.onclick = () => {
-      hidden.innerHTML = '<div class="vocab-word">' + v.w + '</div><div class="vocab-phonetic">' + v.p + '</div>';
-      hidden.style.cursor = 'default';
-      hidden.className = '';
-      // 显示例句
-      const ex = document.createElement('div');
-      ex.className = 'vocab-example';
-      ex.innerHTML = '💬 ' + v.ex + '<div class="ex-cn">' + v.exCn + '</div>';
-      card.appendChild(ex);
-      const ph = document.createElement('div');
-      ph.className = 'vocab-phrase';
-      ph.textContent = '📌 ' + v.ph;
-      card.appendChild(ph);
-      // 播放发音
-      speakWord(v.w);
-    };
-    card.appendChild(hidden);
-  } else {
-    // 看英译中：先显示英文，隐藏中文
-    const word = document.createElement('div');
-    word.className = 'vocab-word';
-    word.textContent = v.w;
-    word.onclick = () => speakWord(v.w);
-    word.style.cursor = 'pointer';
-    card.appendChild(word);
-
-    const ph = document.createElement('div');
-    ph.className = 'vocab-phonetic';
-    ph.textContent = v.p;
-    card.appendChild(ph);
-
-    const hidden = document.createElement('div');
-    hidden.className = 'vocab-hidden';
-    hidden.textContent = '点击显示中文释义 ▼';
-    hidden.style.cursor = 'pointer';
-    hidden.onclick = () => {
-      hidden.innerHTML = '<div class="vocab-meaning">' + v.m + '</div>';
-      hidden.style.cursor = 'default';
-      hidden.className = '';
-      const ex = document.createElement('div');
-      ex.className = 'vocab-example';
-      ex.innerHTML = '💬 ' + v.ex + '<div class="ex-cn">' + v.exCn + '</div>';
-      card.appendChild(ex);
-      const pp = document.createElement('div');
-      pp.className = 'vocab-phrase';
-      pp.textContent = '📌 ' + v.ph;
-      card.appendChild(pp);
-    };
-    card.appendChild(hidden);
+// ============ 熟词僻义抽查测验 ============
+function getQuizWords() {
+  // 从已学的天数中收集8字母以上或标有僻义的词
+  let records = {};
+  try { records = JSON.parse(localStorage.getItem('kaoyan_study') || '{}'); } catch(e) {}
+  const studiedDays = Object.keys(records).map(Number);
+  const quizWords = [];
+  studiedDays.forEach(d => {
+    const dayData = KAOYAN_DAYS.find(k => k.day === d);
+    if(!dayData) return;
+    dayData.groups.forEach(g => {
+      g.words.forEach(w => {
+        if(w.w.length >= 8 || w.bi) {
+          quizWords.push(w);
+        }
+      });
+    });
+  });
+  if(quizWords.length < 5) {
+    // 如果学过的太少，用Day 1的词
+    KAOYAN_DAYS[0].groups.forEach(g => {
+      g.words.forEach(w => {
+        if(w.w.length >= 8 || w.bi) quizWords.push(w);
+      });
+    });
   }
+  return quizWords.slice(0, 10);
+}
+
+function startQuiz() {
+  const el = document.getElementById('quizArea');
+  if(!el) return;
+  while(el.firstChild) el.removeChild(el.firstChild);
+  const words = getQuizWords();
+  if(!words.length) { toast('暂无可抽查的词汇'); return; }
+
+  words.forEach((w, i) => {
+    const item = document.createElement('div');
+    item.className = 'quiz-item';
+    const q = document.createElement('div');
+    q.className = 'quiz-q';
+    q.textContent = (i+1) + '. ' + w.w + ' ' + w.p;
+    item.appendChild(q);
+    const input = document.createElement('input');
+    input.className = 'quiz-input';
+    input.placeholder = '写出考研常考释义...';
+    item.appendChild(input);
+    const answer = document.createElement('div');
+    answer.className = 'quiz-answer';
+    answer.textContent = '✅ ' + w.m + (w.bi ? ' | 僻义：' + w.bi : '');
+    const toggle = document.createElement('div');
+    toggle.className = 'kg-toggle';
+    toggle.textContent = '查看答案 ▼';
+    toggle.onclick = () => { answer.classList.add('show'); toggle.style.display = 'none'; };
+    item.appendChild(toggle);
+    item.appendChild(answer);
+    el.appendChild(item);
+  });
+  toast('📝 测验已生成，共 ' + words.length + ' 题');
+}
+
+// ============ 口语短语库（500核心短语）============
+const PHRASES = {
+  emotion: [
+    {en:'over the moon', p:'/ˌəʊvə ðə muːn/', ex:'She was over the moon when she got the job offer.', cn:'欣喜若狂', trap:'不是"在月亮上"，是"高兴到飞起"'},
+    {en:'down in the dumps', p:'/daʊn ɪn ðə dʌmps/', ex:'He\'s been down in the dumps since his team lost.', cn:'情绪低落', trap:'不是"在垃圾堆里"，是"心情很差"'},
+    {en:'see red', p:'/siː red/', ex:'When I saw the damage, I just saw red.', cn:'怒不可遏', trap:'不是"看到红色"，是"气炸了"'},
+    {en:'on cloud nine', p:'/ɒn klaʊd naɪn/', ex:'They\'ve been on cloud nine since they got engaged.', cn:'高兴极了', trap:'不是"在第九朵云上"，是"开心到爆"'},
+    {en:'tear one\'s hair out', p:'/teə wʌnz heə aʊt/', ex:'I\'m tearing my hair out trying to fix this bug.', cn:'极度焦虑', trap:'不是"拔头发"，是"急得团团转"'},
+    {en:'butterflies in one\'s stomach', p:'/ˈbʌtəflaɪz ɪn wʌnz ˈstʌmək/', ex:'I always get butterflies in my stomach before a presentation.', cn:'紧张不安', trap:'不是"胃里有蝴蝶"，是"紧张得心跳"'},
+    {en:'hit the roof', p:'/hɪt ðə ruːf/', ex:'My dad hit the roof when he saw the phone bill.', cn:'大发雷霆', trap:'不是"打到屋顶"，是"暴怒"'},
+    {en:'feel under the weather', p:'/fiːl ˈʌndə ðə ˈweðə/', ex:'I\'m feeling a bit under the weather today.', cn:'身体不适', trap:'不是"在天气下面"，是"不太舒服"'},
+    {en:'on top of the world', p:'/ɒn tɒp əv ðə wɜːld/', ex:'After winning the prize, she felt on top of the world.', cn:'感觉极好', trap:'不是"在世界顶上"，是"感觉好极了"'},
+    {en:'lose one\'s temper', p:'/luːz wʌnz ˈtempə/', ex:'He rarely loses his temper, but today was an exception.', cn:'发脾气', trap:'不是"丢了温度"，是"发火"'},
+    {en:'freak out', p:'/friːk aʊt/', ex:'Don\'t freak out, but I think we\'re lost.', cn:'吓坏了/崩溃', trap:'freak out=情绪失控，不是"怪人出去"'},
+    {en:'take it personally', p:'/teɪk ɪt ˈpɜːsənəli/', ex:'Don\'t take it personally — she\'s just stressed.', cn:'往心里去', trap:'不是"个人拿走"，是"别介意"'},
+    {en:'cool as a cucumber', p:'/kuːl əz ə ˈkjuːkʌmbə/', ex:'Even in the crisis, he remained cool as a cucumber.', cn:'极其冷静', trap:'不是"像黄瓜一样凉"，是"镇定自若"'},
+    {en:'break down', p:'/breɪk daʊn/', ex:'She broke down in tears during the speech.', cn:'情绪崩溃', trap:'break down=情绪崩溃/机器故障，多义'},
+    {en:'light up', p:'/laɪt ʌp/', ex:'Her face lit up when she saw the surprise.', cn:'露出喜色', trap:'不是"开灯"，是"表情亮了"'},
+    {en:'fed up with', p:'/fed ʌp wɪð/', ex:'I\'m fed up with his constant complaining.', cn:'厌倦透顶', trap:'不是"吃饱了"，是"受够了"'},
+    {en:'blow one\'s top', p:'/bləʊ wʌnz tɒp/', ex:'My boss blew his top when the project was delayed again.', cn:'勃然大怒', trap:'不是"吹顶"，是"气炸了"'},
+    {en:'be on edge', p:'/biː ɒn edʒ/', ex:'Everyone\'s on edge waiting for the results.', cn:'紧张不安', trap:'不是"在边缘"，是"紧张兮兮"'},
+    {en:'jump for joy', p:'/dʒʌmp fɔː dʒɔɪ/', ex:'The kids jumped for joy when they heard the news.', cn:'高兴得跳起来', trap:'不是"为快乐跳"，是"开心蹦跳"'},
+    {en:'heart sinks', p:'/hɑːt sɪŋks/', ex:'My heart sank when I saw the test score.', cn:'心往下一沉', trap:'不是"心沉了"，是"瞬间绝望"'}
+  ],
+  logic: [
+    {en:'by and large', p:'/baɪ ənd lɑːdʒ/', ex:'By and large, the project was a success.', cn:'大体上说', trap:'不是"通过大的"，是"总的来说"'},
+    {en:'for that matter', p:'/fɔː ðæt ˈmætə/', ex:'I don\'t like coffee, or tea for that matter.', cn:'就此而言', trap:'不是"为了那事"，是"就此来说"'},
+    {en:'in light of', p:'/ɪn laɪt əv/', ex:'In light of recent events, we\'ve revised our policy.', cn:'鉴于', trap:'不是"在光里"，是"考虑到"'},
+    {en:'on the contrary', p:'/ɒn ðə ˈkɒntrəri/', ex:'On the contrary, I think it\'s a great idea.', cn:'相反', trap:'不是"在反面"，是"恰恰相反"'},
+    {en:'when it comes to', p:'/wen ɪt kʌmz tuː/', ex:'When it comes to cooking, she\'s a real expert.', cn:'谈到…时', trap:'不是"当它来到"，是"说到…"'},
+    {en:'for the sake of', p:'/fɔː ðə seɪk əv/', ex:'For the sake of your health, you should quit smoking.', cn:'为了…起见', trap:'不是"为了…的缘故"那么正式，日常也用'},
+    {en:'in terms of', p:'/ɪn tɜːmz əv/', ex:'In terms of sales, this quarter was better than expected.', cn:'就…而言', trap:'不是"在术语里"，是"在…方面"'},
+    {en:'as far as I know', p:'/əz fɑːr əz aɪ nəʊ/', ex:'As far as I know, the meeting is still on.', cn:'据我所知', trap:'不是"远到我知道"，是"据我所知"'},
+    {en:'that being said', p:'/ðæt ˈbiːɪŋ sed/', ex:'That being said, I still think we should try.', cn:'话虽如此', trap:'不是"那被说了"，是"尽管如此"'},
+    {en:'point being', p:'/pɔɪnt biːɪŋ/', ex:'Point being, we need to act now.', cn:'关键是', trap:'不是"点是"，是"关键在于"'},
+    {en:'not to mention', p:'/nɒt tə ˈmenʃn/', ex:'It\'s too late, not to mention too dangerous.', cn:'更不用说', trap:'不是"不提"，是"更何况"'},
+    {en:'in a nutshell', p:'/ɪn ə ˈnʌtʃel/', ex:'In a nutshell, we need more time and money.', cn:'简而言之', trap:'不是"在坚果壳里"，是"长话短说"'},
+    {en:'to make matters worse', p:'/tə meɪk ˈmætəz wɜːs/', ex:'To make matters worse, it started raining.', cn:'更糟的是', trap:'不是"让事情更糟"，是"雪上加霜"'},
+    {en:'first things first', p:'/fɜːst θɪŋz fɜːst/', ex:'First things first — let\'s set a budget.', cn:'先说重要的', trap:'不是"第一件事第一"，是"先办要紧的"'},
+    {en:'at the end of the day', p:'/ət ði end əv ðə deɪ/', ex:'At the end of the day, family is what matters most.', cn:'说到底', trap:'不是"在一天结束时"，是"归根结底"'},
+    {en:'needless to say', p:'/ˈniːdləs tə seɪ/', ex:'Needless to say, she was thrilled about the promotion.', cn:'不用说', trap:'不是"不需要说"，是"不言而喻"'},
+    {en:'so to speak', p:'/səʊ tə spiːk/', ex:'I\'m living on borrowed time, so to speak.', cn:'可以说', trap:'不是"所以说话"，是"打个比方"'},
+    {en:'as a matter of fact', p:'/əz ə ˈmætər əv fækt/', ex:'As a matter of fact, I\'ve been to Paris three times.', cn:'事实上', trap:'不是"作为事实的事"，是"实际上"'},
+    {en:'in other words', p:'/ɪn ˈʌðə wɜːdz/', ex:'In other words, we\'re broke.', cn:'换句话说', trap:'不是"在其他词里"，是"换言之"'},
+    {en:'long story short', p:'/lɒŋ ˈstɔːri ʃɔːt/', ex:'Long story short, we missed the flight.', cn:'长话短说', trap:'不是"长故事短"，是"简而言之"'}
+  ],
+  action: [
+    {en:'call it a day', p:'/kɔːl ɪt ə deɪ/', ex:'It\'s getting late — let\'s call it a day.', cn:'收工', trap:'不是"叫它一天"，是"今天就到这"'},
+    {en:'hit the books', p:'/hɪt ðə bʊks/', ex:'I need to hit the books — exams are next week.', cn:'用功读书', trap:'不是"打书"，是"拼命看书"'},
+    {en:'pull an all-nighter', p:'/pʊl ən ˈɔːlˈnaɪtə/', ex:'I pulled an all-nighter to finish the report.', cn:'熬夜', trap:'不是"拉一个全夜晚"，是"通宵"'},
+    {en:'take a rain check', p:'/teɪk ə reɪn tʃek/', ex:'Can I take a rain check on dinner? I\'m exhausted.', cn:'改天再说', trap:'不是"拿雨票"，是"下次吧"'},
+    {en:'hit the sack', p:'/hɪt ðə sæk/', ex:'I\'m exhausted. I\'m going to hit the sack.', cn:'上床睡觉', trap:'不是"打袋子"，是"去睡觉"'},
+    {en:'catch up with', p:'/kætʃ ʌp wɪð/', ex:'Let\'s grab coffee and catch up with each other.', cn:'叙旧', trap:'不是"抓住上"，是"聊聊近况"'},
+    {en:'run errands', p:'/rʌn ˈerəndz/', ex:'I spent the morning running errands.', cn:'跑腿办事', trap:'不是"跑步差事"，是"出门办事"'},
+    {en:'hang out', p:'/hæŋ aʊt/', ex:'We just hung out at the mall all afternoon.', cn:'闲逛/待着', trap:'不是"挂在外面"，是"消磨时间"'},
+    {en:'fill in for', p:'/fɪl ɪn fɔː/', ex:'Can you fill in for me at the meeting?', cn:'代替', trap:'不是"填进去"，是"顶替"'},
+    {en:'put up with', p:'/pʊt ʌp wɪð/', ex:'I can\'t put up with his attitude anymore.', cn:'忍受', trap:'不是"放上去"，是"容忍"'},
+    {en:'look forward to', p:'/lʊk ˈfɔːwəd tuː/', ex:'I\'m looking forward to the weekend.', cn:'期待', trap:'后接doing，不是do'},
+    {en:'get away with', p:'/ɡet əˈweɪ wɪð/', ex:'He thought he could get away with cheating.', cn:'逃脱惩罚', trap:'不是"带跑"，是"侥幸逃脱"'},
+    {en:'turn out', p:'/tɜːn aʊt/', ex:'The meeting turned out to be a waste of time.', cn:'结果是', trap:'不是"翻出来"，是"最终发现"'},
+    {en:'figure out', p:'/ˈfɪɡə aʊt/', ex:'I can\'t figure out how to use this app.', cn:'弄明白', trap:'不是"画出来"，是"想清楚"'},
+    {en:'give up on', p:'/ɡɪv ʌp ɒn/', ex:'Don\'t give up on your dreams.', cn:'放弃', trap:'不是"给上去"，是"对…绝望"'},
+    {en:'come up with', p:'/kʌm ʌp wɪð/', ex:'She came up with a brilliant idea.', cn:'想出', trap:'不是"走上来"，是"提出"'},
+    {en:'get along with', p:'/ɡet əˈlɒŋ wɪð/', ex:'I get along well with my coworkers.', cn:'相处融洽', trap:'不是"一起走"，是"合得来"'},
+    {en:'make up one\'s mind', p:'/meɪk ʌp wʌnz maɪnd/', ex:'I can\'t make up my mind about what to order.', cn:'下决心', trap:'不是"做脑子"，是"决定"'},
+    {en:'keep an eye on', p:'/kiːp ən aɪ ɒn/', ex:'Can you keep an eye on my bag?', cn:'留意/照看', trap:'不是"放眼上"，是"帮忙看着"'},
+    {en:'burn the midnight oil', p:'/bɜːn ðə ˈmɪdnaɪt ɔɪl/', ex:'She\'s been burning the midnight oil studying for finals.', cn:'熬夜苦干', trap:'不是"烧午夜油"，是"开夜车"'}
+  ]
+};
+
+let currentPhraseIdx = 0;
+let currentPhraseCat = 'emotion';
+
+function renderPhraseList() {
+  const cat = document.getElementById('phraseCat') ? document.getElementById('phraseCat').value : 'emotion';
+  currentPhraseCat = cat;
+  const list = PHRASES[cat] || [];
+  const prog = document.getElementById('phraseProgress');
+  if(prog) {
+    const total = PHRASES.emotion.length + PHRASES.logic.length + PHRASES.action.length;
+    prog.textContent = list.length + '/' + total;
+  }
+  if(currentPhraseIdx >= list.length) currentPhraseIdx = 0;
+  renderPhraseCard();
+}
+
+function renderPhraseCard() {
+  const el = document.getElementById('phraseCard');
+  if(!el) return;
+  const list = PHRASES[currentPhraseCat] || [];
+  if(!list.length) return;
+  const ph = list[currentPhraseIdx];
+  while(el.firstChild) el.removeChild(el.firstChild);
+
+  const card = document.createElement('div');
+  card.className = 'ph-card';
+
+  const en = document.createElement('div');
+  en.className = 'ph-en';
+  en.textContent = ph.en;
+  en.onclick = () => speakWord(ph.en);
+  card.appendChild(en);
+
+  const phonetic = document.createElement('div');
+  phonetic.className = 'ph-phonetic';
+  phonetic.textContent = ph.p + '  (' + (currentPhraseIdx+1) + '/' + list.length + ')';
+  card.appendChild(phonetic);
+
+  // 中文（点击显示）
+  const hidden = document.createElement('div');
+  hidden.className = 'ph-hidden';
+  hidden.textContent = '点击显示中文释义 ▼';
+  hidden.onclick = () => {
+    hidden.innerHTML = '<div style="font-size:15px;color:#333;font-weight:600;margin-bottom:6px;">' + ph.cn + '</div>' +
+      '<div class="ph-example">💬 ' + ph.ex + '</div>' +
+      '<div class="ph-cn-trap">⚠️ 直译陷阱：' + ph.trap + '</div>';
+    hidden.style.cursor = 'default';
+    hidden.className = '';
+  };
+  card.appendChild(hidden);
 
   el.appendChild(card);
 }
 
-function speakWord(word) {
-  if('speechSynthesis' in window) {
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(word);
-    u.lang = 'en-US';
-    u.rate = 0.8;
-    const voices = speechSynthesis.getVoices();
-    const enVoice = voices.find(v => v.lang.startsWith('en'));
-    if(enVoice) u.voice = enVoice;
-    speechSynthesis.speak(u);
-  }
+function prevPhrase() {
+  const list = PHRASES[currentPhraseCat] || [];
+  if(currentPhraseIdx > 0) { currentPhraseIdx--; renderPhraseCard(); forceRepaint(); }
 }
 
-function nextVocab() {
-  initDailyVocab();
-  if(vocabIndex < vocabDayList.length - 1) {
-    vocabIndex++;
-    renderVocabCard();
-    forceRepaint();
-  } else {
-    toast('今日单词已全部学完 🎉');
-  }
+function nextPhrase() {
+  const list = PHRASES[currentPhraseCat] || [];
+  if(currentPhraseIdx < list.length - 1) { currentPhraseIdx++; renderPhraseCard(); forceRepaint(); }
+  else toast('本类别已学完 🎉');
 }
 
-function prevVocab() {
-  initDailyVocab();
-  if(vocabIndex > 0) {
-    vocabIndex--;
-    renderVocabCard();
-    forceRepaint();
-  }
+// ============ 7天滚动口译练习 ============
+function renderInterpretList() {
+  // 暂时放在口语短语卡片下方
+  // 这个函数在切换到phrase子页时调用
 }
 
-// 生词本
-function getWordbook() {
-  try {
-    let s = localStorage.getItem('wordbook');
-    return s ? JSON.parse(s) : [];
-  } catch(e) { return []; }
-}
-
-function saveWordbook(wb) {
-  try { localStorage.setItem('wordbook', JSON.stringify(wb)); } catch(e) {}
-}
-
-function markVocabKnown() {
-  initDailyVocab();
-  const v = vocabDayList[vocabIndex];
-  if(!v) return;
-  // 从生词本移除（如果存在）
-  let wb = getWordbook();
-  wb = wb.filter(w => w.w !== v.w);
-  saveWordbook(wb);
-  toast('✅ 已标记认识');
-  nextVocab();
-  renderWordbook();
-}
-
-function markVocabUnknown() {
-  initDailyVocab();
-  const v = vocabDayList[vocabIndex];
-  if(!v) return;
-  let wb = getWordbook();
-  if(!wb.find(w => w.w === v.w)) {
-    wb.push({...v, addedDate: today()});
-    saveWordbook(wb);
-    toast('📔 已加入生词本');
-  } else {
-    toast('已在生词本中');
-  }
-  nextVocab();
-  renderWordbook();
-}
-
-function renderWordbook() {
-  const el = document.getElementById('wordbookList');
-  if(!el) return;
-  const wb = getWordbook();
-  const countEl = document.getElementById('wordbookCount');
-  if(countEl) countEl.textContent = wb.length;
-
-  while(el.firstChild) el.removeChild(el.firstChild);
-  if(!wb.length) {
-    const empty = document.createElement('div');
-    empty.style.cssText = 'text-align:center;color:var(--light);font-size:13px;padding:16px;';
-    empty.textContent = '生词本为空，学习时点「❌ 不认识」自动加入';
-    el.appendChild(empty);
-    return;
-  }
-  wb.forEach((w, i) => {
-    const row = document.createElement('div');
-    row.className = 'wb-item';
-    const word = document.createElement('span');
-    word.className = 'wb-word';
-    word.textContent = w.w;
-    word.onclick = () => speakWord(w.w);
-    word.style.cursor = 'pointer';
-    const meaning = document.createElement('span');
-    meaning.className = 'wb-meaning';
-    meaning.textContent = w.m;
-    const del = document.createElement('span');
-    del.className = 'wb-del';
-    del.textContent = '×';
-    del.onclick = () => {
-      let list = getWordbook();
-      list.splice(i, 1);
-      saveWordbook(list);
-      renderWordbook();
-      toast('已从生词本移除');
-    };
-    row.appendChild(word);
-    row.appendChild(meaning);
-    row.appendChild(del);
-    el.appendChild(row);
+// 词汇子tab切换
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('#vocabSubTabs .sub-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      const vsub = this.getAttribute('data-vocabsub');
+      document.querySelectorAll('#vocabSubTabs .sub-tab').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      document.querySelectorAll('.vocab-sub').forEach(s => s.classList.remove('active'));
+      const target = document.getElementById('vocab-' + vsub);
+      if(target) target.classList.add('active');
+      if(vsub === 'kaoyan') { renderKaoyanDay(); renderReviewList(); }
+      else if(vsub === 'phrase') { renderPhraseList(); }
+    });
   });
-}
+});
 
-// 生词复习模式
-let reviewMode = false;
-let reviewIndex = 0;
-function startWordbookReview() {
-  const wb = getWordbook();
-  if(!wb.length) { toast('生词本为空，先学习一些单词吧'); return; }
-  reviewMode = true;
-  reviewIndex = 0;
-  // 用生词本替换今日单词列表
-  vocabDayList = wb;
-  vocabIndex = 0;
-  renderVocabCard();
-  toast('📖 生词复习模式，共 ' + wb.length + ' 个');
-}
+// 兼容旧函数（避免其他地方调用报错）
+function initDailyVocab() {}
+function renderVocabCard() { renderKaoyanDay(); }
+function markVocabKnown() {}
+function markVocabUnknown() {}
+function renderWordbook() {}
+function startWordbookReview() {}
+function prevVocab() { prevKaoyanDay(); }
+function nextVocab() { nextKaoyanDay(); }
+function getWordbook() { return []; }
+function saveWordbook(wb) {}
 
 // ============ 听力练习 ============
 const LISTENING_RES = [

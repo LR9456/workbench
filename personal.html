@@ -1215,7 +1215,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Mi
 <script>
 // ============ 数据层 ============
 const STORE_KEY = 'daily_workbench_data';
-const APP_VERSION = 'v7.0 · 出国交流+跟读增强';
+const APP_VERSION = 'v7.1 · TED整篇跟读';
 let state = {
   records: [],      // {id,type,amount,category,note,date}
   tasks: {},        // {date: {english:bool, fitness:bool, manage:bool, knowledge:bool}}
@@ -3330,133 +3330,133 @@ function renderSpeakingFromScene(scene) {
 }
 
 function renderSpeakingArticle(contentEl, article) {
-  // 文章标题和信息
   const header = document.createElement('div');
   header.style.cssText = 'margin-bottom:12px;';
   const titleEl = document.createElement('div');
   titleEl.style.cssText = 'font-size:15px;font-weight:700;color:var(--primary);margin-bottom:4px;';
   titleEl.textContent = article.icon + ' ' + article.title;
   header.appendChild(titleEl);
-
   if(article.speaker) {
     const speakerEl = document.createElement('div');
     speakerEl.style.cssText = 'font-size:12px;color:var(--gray);margin-bottom:4px;';
-    speakerEl.textContent = '演讲者：' + article.speaker;
+    speakerEl.textContent = '\u6f14\u8bb2\u8005\uff1a' + article.speaker;
     header.appendChild(speakerEl);
   }
-
   const descEl = document.createElement('div');
   descEl.style.cssText = 'font-size:12px;color:#888;';
   descEl.textContent = article.desc;
   header.appendChild(descEl);
 
-  // 整篇播放按钮
-  const btnRow = document.createElement('div');
-  btnRow.style.cssText = 'display:flex;gap:6px;margin-top:10px;';
-  const playAllBtn = document.createElement('button');
-  playAllBtn.className = 'btn btn-green';
-  playAllBtn.style.cssText = 'flex:1;font-size:13px;';
-  playAllBtn.textContent = '▶ 播放全文（影子跟读）';
-  playAllBtn.onclick = () => playFullArticle(article);
-  btnRow.appendChild(playAllBtn);
-  const toggleCnBtn = document.createElement('button');
-  toggleCnBtn.className = 'btn btn-sm btn-outline';
-  toggleCnBtn.textContent = '🙈 隐藏中文';
-  toggleCnBtn.onclick = () => {
-    const segs = contentEl.querySelectorAll('.seg-cn');
-    const hidden = segs[0] && segs[0].style.display === 'none';
-    segs.forEach(s => s.style.display = hidden ? '' : 'none');
-    toggleCnBtn.textContent = hidden ? '🙈 隐藏中文' : '👁️ ���示中文';
-  };
-  btnRow.appendChild(toggleCnBtn);
-  header.appendChild(btnRow);
+  const ctrlRow = document.createElement('div');
+  ctrlRow.style.cssText = 'display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;';
+  const playBtn = document.createElement('button');
+  playBtn.className = 'btn btn-green';
+  playBtn.style.cssText = 'flex:1;font-size:13px;min-width:120px;';
+  playBtn.textContent = '\u25b6 \u6574\u7bc7\u64ad\u653e\u8ddf\u8bfb';
+  playBtn.onclick = () => playFullArticle(article, playBtn);
+  ctrlRow.appendChild(playBtn);
 
+  let cnVisible = true;
+  const cnBtn = document.createElement('button');
+  cnBtn.className = 'btn btn-sm btn-outline';
+  cnBtn.textContent = '\ud83d\ude48 \u9690\u85cf\u4e2d\u6587\u5b57\u5e55';
+  cnBtn.onclick = () => {
+    cnVisible = !cnVisible;
+    contentEl.querySelectorAll('.article-cn').forEach(s => s.style.display = cnVisible ? '' : 'none');
+    cnBtn.textContent = cnVisible ? '\ud83d\ude48 \u9690\u85cf\u4e2d\u6587\u5b57\u5e55' : '\ud83d\udc41\ufe0f \u663e\u793a\u4e2d\u6587\u5b57\u5e55';
+  };
+  ctrlRow.appendChild(cnBtn);
+
+  let enVisible = true;
+  const enBtn = document.createElement('button');
+  enBtn.className = 'btn btn-sm btn-outline';
+  enBtn.textContent = '\ud83d\ude48 \u9690\u85cf\u82f1\u6587\u5b57\u5e55';
+  enBtn.onclick = () => {
+    enVisible = !enVisible;
+    contentEl.querySelectorAll('.article-en').forEach(s => s.style.display = enVisible ? '' : 'none');
+    enBtn.textContent = enVisible ? '\ud83d\ude48 \u9690\u85cf\u82f1\u6587\u5b57\u5e55' : '\ud83d\udc41\ufe0f \u663e\u793a\u82f1\u6587\u5b57\u5e55';
+  };
+  ctrlRow.appendChild(enBtn);
+  header.appendChild(ctrlRow);
+
+  const speedRow = document.createElement('div');
+  speedRow.style.cssText = 'display:flex;gap:6px;margin-top:6px;align-items:center;';
+  const speedLabel = document.createElement('span');
+  speedLabel.style.cssText = 'font-size:11px;color:var(--gray);';
+  speedLabel.textContent = '\u8bed\u901f\uff1a';
+  speedRow.appendChild(speedLabel);
+  const speedSelect = document.createElement('select');
+  speedSelect.id = 'articleSpeed';
+  speedSelect.style.cssText = 'font-size:12px;padding:3px 6px;border:1px solid var(--border);border-radius:6px;';
+  speedSelect.innerHTML = '<option value="0.6">0.6x \u6162\u901f</option><option value="0.8">0.8x \u7a0d\u6162</option><option value="0.9" selected>0.9x \u6b63\u5e38</option><option value="1.0">1.0x \u539f\u901f</option>';
+  speedRow.appendChild(speedSelect);
+  header.appendChild(speedRow);
   contentEl.appendChild(header);
 
-  // 每个段落
+  const articleBox = document.createElement('div');
+  articleBox.style.cssText = 'background:#f5f7fa;border-radius:10px;padding:14px;line-height:2.0;font-size:14px;';
   article.segs.forEach((seg, i) => {
-    const div = document.createElement('div');
-    div.className = 'shadow-seg';
-
-    const en = document.createElement('div');
-    en.className = 'seg-en';
-    en.textContent = (i + 1) + '. ' + seg.en;
-    div.appendChild(en);
-
-    const cn = document.createElement('div');
-    cn.className = 'seg-cn';
-    cn.textContent = seg.cn;
-    div.appendChild(cn);
-
-    const actions = document.createElement('div');
-    actions.className = 'seg-actions';
-
-    const btnNormal = document.createElement('button');
-    btnNormal.className = 'seg-btn';
-    btnNormal.textContent = '🔊 正常';
-    btnNormal.onclick = () => speakShadow(seg.en, 1);
-    actions.appendChild(btnNormal);
-
-    const btnSlow = document.createElement('button');
-    btnSlow.className = 'seg-btn';
-    btnSlow.textContent = '🐢 慢速';
-    btnSlow.onclick = () => speakShadow(seg.en, 0.6);
-    actions.appendChild(btnSlow);
-
-    const btnRepeat = document.createElement('button');
-    btnRepeat.className = 'seg-btn';
-    btnRepeat.textContent = '🔁 跟读×3';
-    btnRepeat.onclick = () => speakShadowRepeat(seg.en, 3);
-    actions.appendChild(btnRepeat);
-
-    div.appendChild(actions);
-    contentEl.appendChild(div);
+    const enSpan = document.createElement('span');
+    enSpan.className = 'article-en';
+    enSpan.dataset.idx = i;
+    enSpan.style.cssText = 'color:#333;transition:all 0.3s;';
+    enSpan.textContent = seg.en + ' ';
+    articleBox.appendChild(enSpan);
+    const cnSpan = document.createElement('span');
+    cnSpan.className = 'article-cn';
+    cnSpan.style.cssText = 'color:var(--gray);font-size:12px;';
+    cnSpan.textContent = '(' + seg.cn + ') ';
+    articleBox.appendChild(cnSpan);
   });
+  contentEl.appendChild(articleBox);
+
+  const tip = document.createElement('div');
+  tip.style.cssText = 'font-size:11px;color:var(--gray);margin-top:8px;line-height:1.5;';
+  tip.textContent = '\u70b9\u51fb\u300c\u6574\u7bc7\u64ad\u653e\u8ddf\u8bfb\u300d\u540e\uff0c\u97f3\u9891\u9010\u53e5\u64ad\u653e\uff0c\u5f53\u524d\u53e5\u81ea\u52a8\u9ad8\u4eae+\u6eda\u52a8\u3002\u6bcf\u53e5\u64ad\u5b8c\u505c\u987f1.5\u79d2\u7ed9\u4f60\u8ddf\u8bfb\u3002\u53ef\u9690\u85cf\u4e2d\u6587/\u82f1\u6587\u5b57\u5e55\u81ea\u6d4b\u3002';
+  contentEl.appendChild(tip);
 }
 
-// 播放整篇文章（影子跟读模式：逐句播放，每句间隔给跟读时间）
 let _fullArticlePlaying = false;
-function playFullArticle(article) {
+function playFullArticle(article, playBtn) {
   if(_fullArticlePlaying) {
     speechSynthesis.cancel();
     _fullArticlePlaying = false;
-    toast('⏹ 已停止播放');
+    if(playBtn) { playBtn.textContent = '\u25b6 \u6574\u7bc7\u64ad\u653e\u8ddf\u8bfb'; playBtn.classList.add('btn-green'); playBtn.classList.remove('btn-red'); }
+    document.querySelectorAll('.article-en').forEach(s => { s.style.background=''; s.style.color='#333'; s.style.padding=''; s.style.borderRadius=''; });
+    toast('\u23f9 \u5df2\u505c\u6b62');
     return;
   }
-  if(!('speechSynthesis' in window)) { toast('不支持语音播放'); return; }
-
+  if(!('speechSynthesis' in window)) { toast('\u4e0d\u652f\u6301\u8bed\u97f3\u64ad\u653e'); return; }
   _fullArticlePlaying = true;
-  toast('▶ 影子跟读模式开始：先听原句，然后跟读');
-
+  if(playBtn) { playBtn.textContent = '\u23f9 \u505c\u6b62\u64ad\u653e'; playBtn.classList.remove('btn-green'); playBtn.classList.add('btn-red'); }
+  const speedSelect = document.getElementById('articleSpeed');
+  const rate = speedSelect ? parseFloat(speedSelect.value) : 0.9;
+  toast('\u25b6 \u6574\u7bc7\u8ddf\u8bfb\u5f00\u59cb\uff0c\u8ddf\u7740\u97f3\u9891\u5927\u58f0\u8bfb\uff01');
   let idx = 0;
   const playNext = () => {
     if(!_fullArticlePlaying || idx >= article.segs.length) {
       _fullArticlePlaying = false;
-      toast('✅ 全文跟读完成！');
+      if(playBtn) { playBtn.textContent = '\u25b6 \u6574\u7bc7\u64ad\u653e\u8ddf\u8bfb'; playBtn.classList.add('btn-green'); playBtn.classList.remove('btn-red'); }
+      document.querySelectorAll('.article-en').forEach(s => { s.style.background=''; s.style.color='#333'; s.style.padding=''; s.style.borderRadius=''; });
+      toast('\u2705 \u6574\u7bc7\u8ddf\u8bfb\u5b8c\u6210\uff01');
       return;
     }
     const seg = article.segs[idx];
     const u = new SpeechSynthesisUtterance(seg.en);
     u.lang = 'en-US';
-    u.rate = 0.9;
+    u.rate = rate;
     const voices = speechSynthesis.getVoices();
     const enVoice = voices.find(v => v.lang.startsWith('en'));
     if(enVoice) u.voice = enVoice;
-
-    // 高亮当前段落
-    const segs = document.querySelectorAll('#speakingContent .shadow-seg');
-    segs.forEach(s => s.style.background = '');
-    if(segs[idx]) {
-      segs[idx].style.background = '#e8f4ff';
-      segs[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.querySelectorAll('.article-en').forEach(s => { s.style.background=''; s.style.color='#333'; s.style.padding=''; s.style.borderRadius=''; });
+    const cur = document.querySelector('.article-en[data-idx="' + idx + '"]');
+    if(cur) {
+      cur.style.background = '#fff3cd';
+      cur.style.padding = '2px 4px';
+      cur.style.borderRadius = '4px';
+      cur.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
-
-    u.onend = () => {
-      if(!_fullArticlePlaying) return;
-      idx++;
-      // 间隔1.5秒给跟读时间
-      setTimeout(playNext, 1500);
-    };
+    u.onend = () => { if(!_fullArticlePlaying) return; idx++; setTimeout(playNext, 1500); };
     speechSynthesis.speak(u);
   };
   playNext();

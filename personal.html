@@ -626,6 +626,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Mi
               <option value="action">🏃 日常动作</option>
               <option value="airport">✈️ 机场情景</option>
               <option value="daily">🏠 日常口语</option>
+              <option value="travel">🌐 出国交流</option>
               <option value="review">📖 待复习</option>
             </select>
             <button class="btn btn-sm btn-outline" onclick="prevPhrase()">◀</button>
@@ -1214,7 +1215,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Mi
 <script>
 // ============ 数据层 ============
 const STORE_KEY = 'daily_workbench_data';
-const APP_VERSION = 'v6.9 · 情景口语+待复习';
+const APP_VERSION = 'v7.0 · 出国交流+跟读增强';
 let state = {
   records: [],      // {id,type,amount,category,note,date}
   tasks: {},        // {date: {english:bool, fitness:bool, manage:bool, knowledge:bool}}
@@ -2188,6 +2189,28 @@ const PHRASES = {
     {en:'keep in touch', p:'/kiːp ɪn tʌtʃ/', ex:'Let\'s keep in touch after graduation.', cn:'保持联系', trap:'不是"保持触碰"，是"常联系"'},
     {en:'take care', p:'/teɪk keə/', ex:'Take care! See you next week.', cn:'保重', trap:'不是"拿走照顾"，是"保重"'},
     {en:'out of the blue', p:'/aʊt əv ðə bluː/', ex:'He called me out of the blue after years of silence.', cn:'突然/毫无预兆', trap:'不是"从蓝色出来"，是"突然发生"'}
+  ],
+  travel: [
+    {en:'Could you say that again?', p:'/kʊd juː seɪ ðæt əˈɡen/', ex:'Sorry, could you say that again? I didn\'t catch it.', cn:'能再说一遍吗？', trap:'catch=听清，不是"抓住"'},
+    {en:'I don\'t quite follow you', p:'/aɪ dəʊnt kwaɪt ˈfɒləʊ juː/', ex:'I don\'t quite follow you. Could you explain?', cn:'我没太听懂', trap:'follow=理解，不是"跟随"'},
+    {en:'How do I get to...?', p:'/haʊ duː aɪ ɡet tuː/', ex:'Excuse me, how do I get to the train station?', cn:'怎么去…？', trap:'get to=到达，最常用问路句'},
+    {en:'What does this mean?', p:'/wɒt dʌz ðɪs miːn/', ex:'What does this sign mean? I can\'t read it.', cn:'这是什么意思？', trap:'mean=意思，不是"吝啬"'},
+    {en:'Can I have the bill, please?', p:'/kæn aɪ həv ðə bɪl pliːz/', ex:'Can I have the bill, please? We\'re done eating.', cn:'请结账', trap:'bill=账单，不是"钞票"'},
+    {en:'I\'d like to book a room', p:'/aɪd laɪk tuː bʊk ə ruːm/', ex:'I\'d like to book a room for two nights.', cn:'我想订房间', trap:'book=预订，不是"书"'},
+    {en:'Is breakfast included?', p:'/ɪz ˈbrekfəst ɪnˈkluːdɪd/', ex:'Is breakfast included in the room rate?', cn:'包含早餐吗？', trap:'included=包含的，不是"关闭"'},
+    {en:'Where is the nearest...?', p:'/weər ɪz ðə ˈnɪərɪst/', ex:'Where is the nearest pharmacy? I need medicine.', cn:'最近的…在哪？', trap:'nearest=最近的，问路必备'},
+    {en:'How much is this?', p:'/haʊ mʌtʃ ɪz ðɪs/', ex:'How much is this? Can I pay by card?', cn:'这个多少钱？', trap:'by card=刷卡，不是"卡片"'},
+    {en:'Can I pay by card?', p:'/kæn aɪ peɪ baɪ kɑːd/', ex:'Can I pay by card? I don\'t have cash.', cn:'能刷卡吗？', trap:'by card=信用卡支付'},
+    {en:'I\'m allergic to...', p:'/aɪm əˈlɜːdʒɪk tuː/', ex:'I\'m allergic to peanuts. Does this contain any?', cn:'我对…过敏', trap:'allergic=过敏的，点餐/看病必备'},
+    {en:'Could you take a photo for me?', p:'/kʊd juː teɪk ə ˈfəʊtəʊ fɔː miː/', ex:'Excuse me, could you take a photo for me?', cn:'能帮我拍照吗？', trap:'take a photo=拍照，不是"拿照片"'},
+    {en:'What time does it open/close?', p:'/wɒt taɪm dʌz ɪt ˈəʊpən/', ex:'What time does the museum open on Sundays?', cn:'几点开门/关门？', trap:'open=营业，不是"打开"'},
+    {en:'I lost my passport', p:'/aɪ lɒst maɪ ˈpɑːspɔːt/', ex:'I lost my passport. Where\'s the embassy?', cn:'我丢了护照', trap:'lost=丢失，过去式'},
+    {en:'Can I get a receipt?', p:'/kæn aɪ ɡet ə rɪˈsiːt/', ex:'Can I get a receipt, please? I need it for reimbursement.', cn:'能开收据吗？', trap:'receipt的p不发音'},
+    {en:'Is there a discount?', p:'/ɪz ðeər ə ˈdɪskaʊnt/', ex:'Is there a discount for students?', cn:'有折扣吗？', trap:'discount=折扣，不是"不数"'},
+    {en:'I\'d like to return this', p:'/aɪd laɪk tuː rɪˈtɜːn ðɪs/', ex:'I\'d like to return this. It doesn\'t fit.', cn:'我想退货', trap:'return=退还，不是"回来"'},
+    {en:'Does this taste spicy?', p:'/dʌz ðɪs teɪst ˈspaɪsi/', ex:'Does this taste spicy? I can\'t handle hot food.', cn:'这个辣吗？', trap:'spicy=辣的，不是"香料"'},
+    {en:'Can you call a taxi for me?', p:'/kæn juː kɔːl ə ˈtæksi fɔː miː/', ex:'Can you call a taxi for me? I don\'t know the number.', cn:'能帮我叫出租车吗？', trap:'call=打电话叫，不是"喊"'},
+    {en:'I need to see a doctor', p:'/aɪ niːd tuː siː ə ˈdɒktə/', ex:'I need to see a doctor. I feel very sick.', cn:'我需要看医生', trap:'see a doctor=看医生，不是"看见医生"'}
   ]
 };
 
@@ -3328,12 +3351,25 @@ function renderSpeakingArticle(contentEl, article) {
   header.appendChild(descEl);
 
   // 整篇播放按钮
+  const btnRow = document.createElement('div');
+  btnRow.style.cssText = 'display:flex;gap:6px;margin-top:10px;';
   const playAllBtn = document.createElement('button');
-  playAllBtn.className = 'btn btn-green btn-block';
-  playAllBtn.style.cssText = 'margin-top:10px;font-size:13px;';
-  playAllBtn.textContent = '▶ 播放全文（影子跟读模式）';
+  playAllBtn.className = 'btn btn-green';
+  playAllBtn.style.cssText = 'flex:1;font-size:13px;';
+  playAllBtn.textContent = '▶ 播放全文（影子跟读）';
   playAllBtn.onclick = () => playFullArticle(article);
-  header.appendChild(playAllBtn);
+  btnRow.appendChild(playAllBtn);
+  const toggleCnBtn = document.createElement('button');
+  toggleCnBtn.className = 'btn btn-sm btn-outline';
+  toggleCnBtn.textContent = '🙈 隐藏中文';
+  toggleCnBtn.onclick = () => {
+    const segs = contentEl.querySelectorAll('.seg-cn');
+    const hidden = segs[0] && segs[0].style.display === 'none';
+    segs.forEach(s => s.style.display = hidden ? '' : 'none');
+    toggleCnBtn.textContent = hidden ? '🙈 隐藏中文' : '👁️ ���示中文';
+  };
+  btnRow.appendChild(toggleCnBtn);
+  header.appendChild(btnRow);
 
   contentEl.appendChild(header);
 

@@ -1211,7 +1211,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Mi
 <script>
 // ============ 数据层 ============
 const STORE_KEY = 'daily_workbench_data';
-const APP_VERSION = 'v6.7 · 心灵树洞';
+const APP_VERSION = 'v6.8 · 单词发音';
 let state = {
   records: [],      // {id,type,amount,category,note,date}
   tasks: {},        // {date: {english:bool, fitness:bool, manage:bool, knowledge:bool}}
@@ -1860,10 +1860,18 @@ function renderKaoyanDay() {
       spell.textContent = w.w;
       spell.onclick = () => speakWord(w.w);
       head2.appendChild(spell);
+      // 音标
       const ph = document.createElement('span');
       ph.className = 'kg-w-phonetic';
       ph.textContent = w.p;
       head2.appendChild(ph);
+      // 发音按钮
+      const speakBtn = document.createElement('span');
+      speakBtn.className = 'kg-w-speak';
+      speakBtn.textContent = '🔊';
+      speakBtn.style.cssText = 'font-size:16px;cursor:pointer;padding:2px 4px;border-radius:6px;background:#e6f7ff;';
+      speakBtn.onclick = () => speakWord(w.w);
+      head2.appendChild(speakBtn);
       // 熟词僻义标记
       if(w.bi) {
         const biTag = document.createElement('span');
@@ -1886,10 +1894,19 @@ function renderKaoyanDay() {
       wDiv.appendChild(meaning);
 
       // 真题例句
+      const exRow = document.createElement('div');
+      exRow.style.cssText = 'display:flex;align-items:flex-start;gap:4px;';
       const ex = document.createElement('div');
       ex.className = 'kg-w-ex';
       ex.textContent = '📝 ' + w.ex;
-      wDiv.appendChild(ex);
+      ex.style.flex = '1';
+      exRow.appendChild(ex);
+      const exSpeak = document.createElement('span');
+      exSpeak.textContent = '🔊';
+      exSpeak.style.cssText = 'font-size:14px;cursor:pointer;flex-shrink:0;padding-top:2px;';
+      exSpeak.onclick = () => speakWord(w.ex);
+      exRow.appendChild(exSpeak);
+      wDiv.appendChild(exRow);
       const exCn = document.createElement('div');
       exCn.className = 'kg-w-ex cn';
       exCn.textContent = w.exCn;
@@ -2156,14 +2173,30 @@ function renderPhraseCard() {
 
   const en = document.createElement('div');
   en.className = 'ph-en';
-  en.textContent = ph.en;
+  en.textContent = '🔊 ' + ph.en;
   en.onclick = () => speakWord(ph.en);
   card.appendChild(en);
 
   const phonetic = document.createElement('div');
   phonetic.className = 'ph-phonetic';
   phonetic.textContent = ph.p + '  (' + (currentPhraseIdx+1) + '/' + list.length + ')';
+  phonetic.style.cssText += 'margin-bottom:8px;';
   card.appendChild(phonetic);
+
+  // 专门的播放按钮
+  const playRow = document.createElement('div');
+  playRow.style.cssText = 'display:flex;gap:6px;justify-content:center;margin-bottom:6px;';
+  const playBtn = document.createElement('button');
+  playBtn.className = 'btn btn-sm btn-green';
+  playBtn.textContent = '🔊 播放发音';
+  playBtn.onclick = () => speakWord(ph.en);
+  playRow.appendChild(playBtn);
+  const slowBtn = document.createElement('button');
+  slowBtn.className = 'btn btn-sm btn-outline';
+  slowBtn.textContent = '🐢 慢速';
+  slowBtn.onclick = () => speakWordSlow(ph.en);
+  playRow.appendChild(slowBtn);
+  card.appendChild(playRow);
 
   // 中文（点击显示）
   const hidden = document.createElement('div');
@@ -2225,6 +2258,35 @@ function prevVocab() { prevKaoyanDay(); }
 function nextVocab() { nextKaoyanDay(); }
 function getWordbook() { return []; }
 function saveWordbook(wb) {}
+
+// 单词发音
+function speakWord(word) {
+  if('speechSynthesis' in window) {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(word);
+    u.lang = 'en-US';
+    u.rate = 0.85;
+    const voices = speechSynthesis.getVoices();
+    const enVoice = voices.find(v => v.lang.startsWith('en'));
+    if(enVoice) u.voice = enVoice;
+    speechSynthesis.speak(u);
+  }
+}
+
+// 慢速发音
+function speakWordSlow(word) {
+  if('speechSynthesis' in window) {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(word);
+    u.lang = 'en-US';
+    u.rate = 0.5;
+    const voices = speechSynthesis.getVoices();
+    const enVoice = voices.find(v => v.lang.startsWith('en'));
+    if(enVoice) u.voice = enVoice;
+    speechSynthesis.speak(u);
+    toast('🐢 慢速播放中');
+  }
+}
 
 // ============ 听力练习 ============
 const LISTENING_RES = [

@@ -624,6 +624,9 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Mi
               <option value="emotion">😊 情绪态度</option>
               <option value="logic">🔗 逻辑衔接</option>
               <option value="action">🏃 日常动作</option>
+              <option value="airport">✈️ 机场情景</option>
+              <option value="daily">🏠 日常口语</option>
+              <option value="review">📖 待复习</option>
             </select>
             <button class="btn btn-sm btn-outline" onclick="prevPhrase()">◀</button>
             <button class="btn btn-sm btn-outline" onclick="nextPhrase()">▶</button>
@@ -1211,7 +1214,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Mi
 <script>
 // ============ 数据层 ============
 const STORE_KEY = 'daily_workbench_data';
-const APP_VERSION = 'v6.8 · 单词发音';
+const APP_VERSION = 'v6.9 · 情景口语+待复习';
 let state = {
   records: [],      // {id,type,amount,category,note,date}
   tasks: {},        // {date: {english:bool, fitness:bool, manage:bool, knowledge:bool}}
@@ -2141,6 +2144,50 @@ const PHRASES = {
     {en:'make up one\'s mind', p:'/meɪk ʌp wʌnz maɪnd/', ex:'I can\'t make up my mind about what to order.', cn:'下决心', trap:'不是"做脑子"，是"决定"'},
     {en:'keep an eye on', p:'/kiːp ən aɪ ɒn/', ex:'Can you keep an eye on my bag?', cn:'留意/照看', trap:'不是"放眼上"，是"帮忙看着"'},
     {en:'burn the midnight oil', p:'/bɜːn ðə ˈmɪdnaɪt ɔɪl/', ex:'She\'s been burning the midnight oil studying for finals.', cn:'熬夜苦干', trap:'不是"烧午夜油"，是"开夜车"'}
+  ],
+  airport: [
+    {en:'check in', p:'/tʃek ɪn/', ex:'I need to check in two hours before the flight.', cn:'办理值机', trap:'check in=值机/登记入住，多义'},
+    {en:'boarding pass', p:'/ˈbɔːdɪŋ pɑːs/', ex:'Please have your boarding pass and ID ready.', cn:'登机牌', trap:'不是"登船通行证"，就是"登机牌"'},
+    {en:'carry-on luggage', p:'/ˈkæri ɒn ˈlʌɡɪdʒ/', ex:'You can only bring one piece of carry-on luggage.', cn:'随身行李', trap:'carry-on=随身携带的，不是"继续"'},
+    {en:'go through security', p:'/ɡəʊ θruː sɪˈkjʊərəti/', ex:'We need to go through security before boarding.', cn:'过安检', trap:'不是"穿过安全"，是"通过安检"'},
+    {en:'gate', p:'/ɡeɪt/', ex:'Our flight is boarding at gate 12.', cn:'登机口', trap:'gate=登机口/大门，看语境'},
+    {en:'delayed', p:'/dɪˈleɪd/', ex:'The flight is delayed by two hours due to weather.', cn:'延误', trap:'不是"放松"，是"延迟/延误"'},
+    {en:'fasten your seatbelt', p:'/ˈfɑːsn jɔː ˈsiːtbelt/', ex:'Please fasten your seatbelt for takeoff.', cn:'系好安全带', trap:'fasten=系紧，不是"快速"'},
+    {en:'customs declaration', p:'/ˈkʌstəmz ˌdekləˈreɪʃn/', ex:'Do you have anything to declare on your customs declaration?', cn:'海关申报', trap:'declare=申报，不是"宣布"'},
+    {en:'duty-free', p:'/ˈdjuːti friː/', ex:'I bought some perfume at the duty-free shop.', cn:'免税的', trap:'不是"责任免费"，是"免税"'},
+    {en:'layover', p:'/ˈleɪəʊvə/', ex:'We have a three-hour layover in Dubai.', cn:'中转停留', trap:'不是"覆盖"，是"中转等待"'},
+    {en:'window seat', p:'/ˈwɪndəʊ siːt/', ex:'I prefer a window seat so I can look out.', cn:'靠窗座位', trap:'直译但常用，记住搭配'},
+    {en:'baggage claim', p:'/ˈbæɡɪdʒ kleɪm/', ex:'Meet me at baggage claim after we land.', cn:'行李提取处', trap:'claim=领取，不是"声称"'},
+    {en:'final call', p:'/ˈfaɪnl kɔːl/', ex:'This is the final call for flight CA456 to Shanghai.', cn:'最后一次登机广播', trap:'不是"最后的电话"，是"最后登机通知"'},
+    {en:'passport control', p:'/ˈpɑːspɔːt kənˈtrəʊl/', ex:'Please proceed to passport control with your documents.', cn:'护照检查/边检', trap:'control=检查，不是"控制"'},
+    {en:'excess baggage', p:'/ɪkˈses ˈbæɡɪdʒ/', ex:'You\'ll need to pay for excess baggage.', cn:'超重行李', trap:'excess=超出的，不是"额外免费"'},
+    {en:'connecting flight', p:'/kəˈnektɪŋ flaɪt/', ex:'I missed my connecting flight to Tokyo.', cn:'转机航班', trap:'connecting=衔接的，不是"连接中"'},
+    {en:'aisle seat', p:'/aɪl siːt/', ex:'I always book an aisle seat for more legroom.', cn:'靠过道座位', trap:'aisle=过道，发音像"艾尔"'},
+    {en:'departures', p:'/dɪˈpɑːtʃəz/', ex:'Check the departures board for your gate number.', cn:'出发大厅/出发', trap:'不是"离开者"，是"出发区域"'},
+    {en:'arrivals', p:'/əˈraɪvəlz/', ex:'Wait for me at arrivals, gate 3.', cn:'到达大厅', trap:'不是"到达者"复数，是"到达区"'},
+    {en:'immigration', p:'/ˌɪmɪˈɡreɪʃn/', ex:'The immigration officer stamped my passport.', cn:'入境检查', trap:'不是"移民"，是"边检入境"'}
+  ],
+  daily: [
+    {en:'no worries', p:'/nəʊ ˈwʌriz/', ex:'— Sorry I\'m late! — No worries, we just started.', cn:'没关系/别担心', trap:'不是"没有担忧"，是"没事"'},
+    {en:'fair enough', p:'/feər ɪˈnʌf/', ex:'— I can\'t come tonight, too much work. — Fair enough.', cn:'有道理/也行', trap:'不是"足够公平"，是"说得对"'},
+    {en:'make sense', p:'/meɪk sens/', ex:'That makes sense — I understand now.', cn:'有道理/说得通', trap:'不是"制造感觉"，是"合乎情理"'},
+    {en:'cheers', p:'/tʃɪəz/', ex:'Cheers! See you tomorrow.', cn:'谢谢/再见/干杯', trap:'cheers=多义，看语境'},
+    {en:'mate', p:'/meɪt/', ex:'Hey mate, how\'s it going?', cn:'伙计/朋友', trap:'不是"配偶"，英式口语叫"朋友"'},
+    {en:'brilliant', p:'/ˈbrɪliənt/', ex:'— I got us tickets! — Brilliant!', cn:'太棒了', trap:'不是"聪明"，英式口语="好极了"'},
+    {en:'knock it off', p:'/nɒk ɪt ɒf/', ex:'Knock it off, you two! Stop arguing.', cn:'别闹了/住手', trap:'不是"敲掉"，是"停下来"'},
+    {en:'give me a hand', p:'/ɡɪv miː ə hænd/', ex:'Can you give me a hand with these boxes?', cn:'帮个忙', trap:'不是"给我一只手"，是"帮我"'},
+    {en:'hold on', p:'/həʊld ɒn/', ex:'Hold on, let me check my calendar.', cn:'等一下', trap:'不是"抓住"，是"稍等"'},
+    {en:'go ahead', p:'/ɡəʊ əˈhed/', ex:'— Can I sit here? — Go ahead.', cn:'请便/去吧', trap:'不是"往前走"，是"你请便"'},
+    {en:'never mind', p:'/ˈnevə maɪnd/', ex:'Never mind, I figured it out myself.', cn:'算了/别管了', trap:'不是"从不介意"，是"算了"'},
+    {en:'sounds good', p:'/saʊndz ɡʊd/', ex:'— Let\'s meet at 6? — Sounds good!', cn:'听起来不错/行', trap:'不是"听起来好听"，是"可以"'},
+    {en:'it depends', p:'/ɪt dɪˈpendz/', ex:'— Are you free this weekend? — It depends.', cn:'看情况', trap:'不是"它依赖"，是"不一定"'},
+    {en:'my bad', p:'/maɪ bæd/', ex:'— You forgot to send the email. — Oh, my bad!', cn:'我的错', trap:'不是"我的坏"，是"怪我"'},
+    {en:'hang on a sec', p:'/hæŋ ɒn ə sek/', ex:'Hang on a sec, I\'ll be right there.', cn:'等一下', trap:'不是"挂着一秒"，是"等一等"'},
+    {en:'no big deal', p:'/nəʊ bɪɡ diːl/', ex:'It\'s no big deal, really. Don\'t worry about it.', cn:'没什么大不了', trap:'不是"没有大交易"，是"小事"'},
+    {en:'what\'s up', p:'/wɒts ʌp/', ex:'Hey, what\'s up? Long time no see.', cn:'怎么了/最近怎样', trap:'不是"什么在上面"，是"怎么了"'},
+    {en:'keep in touch', p:'/kiːp ɪn tʌtʃ/', ex:'Let\'s keep in touch after graduation.', cn:'保持联系', trap:'不是"保持触碰"，是"常联系"'},
+    {en:'take care', p:'/teɪk keə/', ex:'Take care! See you next week.', cn:'保重', trap:'不是"拿走照顾"，是"保重"'},
+    {en:'out of the blue', p:'/aʊt əv ðə bluː/', ex:'He called me out of the blue after years of silence.', cn:'突然/毫无预兆', trap:'不是"从蓝色出来"，是"突然发生"'}
   ]
 };
 
@@ -2150,20 +2197,44 @@ let currentPhraseCat = 'emotion';
 function renderPhraseList() {
   const cat = document.getElementById('phraseCat') ? document.getElementById('phraseCat').value : 'emotion';
   currentPhraseCat = cat;
-  const list = PHRASES[cat] || [];
+  // review类别从localStorage动态读取
+  let list;
+  if(cat === 'review') {
+    list = getReviewPhrases();
+    PHRASES.review = list;
+  } else {
+    list = PHRASES[cat] || [];
+  }
   const prog = document.getElementById('phraseProgress');
   if(prog) {
-    const total = PHRASES.emotion.length + PHRASES.logic.length + PHRASES.action.length;
+    const total = (PHRASES.emotion.length||0) + (PHRASES.logic.length||0) + (PHRASES.action.length||0) + (PHRASES.airport.length||0) + (PHRASES.daily.length||0);
     prog.textContent = list.length + '/' + total;
   }
   if(currentPhraseIdx >= list.length) currentPhraseIdx = 0;
+  if(list.length === 0) {
+    const el = document.getElementById('phraseCard');
+    if(el) {
+      while(el.firstChild) el.removeChild(el.firstChild);
+      const empty = document.createElement('div');
+      empty.style.cssText = 'text-align:center;color:var(--light);font-size:13px;padding:20px;';
+      empty.textContent = '📝 待复习列表为空\n学习时点「❌ 不熟悉」的短语会出现在这里';
+      el.appendChild(empty);
+    }
+    return;
+  }
   renderPhraseCard();
 }
 
 function renderPhraseCard() {
   const el = document.getElementById('phraseCard');
   if(!el) return;
-  const list = PHRASES[currentPhraseCat] || [];
+  let list;
+  if(currentPhraseCat === 'review') {
+    list = getReviewPhrases();
+    PHRASES.review = list;
+  } else {
+    list = PHRASES[currentPhraseCat] || [];
+  }
   if(!list.length) return;
   const ph = list[currentPhraseIdx];
   while(el.firstChild) el.removeChild(el.firstChild);
@@ -2211,7 +2282,74 @@ function renderPhraseCard() {
   };
   card.appendChild(hidden);
 
+  // 不熟悉/已掌握按钮
+  const actionRow = document.createElement('div');
+  actionRow.style.cssText = 'display:flex;gap:8px;margin-top:10px;';
+  const knownBtn = document.createElement('button');
+  knownBtn.className = 'btn btn-sm btn-green';
+  knownBtn.style.flex = '1';
+  knownBtn.textContent = '✅ 已掌握';
+  knownBtn.onclick = () => markPhraseKnown(ph);
+  actionRow.appendChild(knownBtn);
+  const unknownBtn = document.createElement('button');
+  unknownBtn.className = 'btn btn-sm btn-red';
+  unknownBtn.style.flex = '1';
+  unknownBtn.textContent = '❌ 不熟悉';
+  unknownBtn.onclick = () => markPhraseUnknown(ph);
+  actionRow.appendChild(unknownBtn);
+  card.appendChild(actionRow);
+
   el.appendChild(card);
+}
+
+// 短语学习状态管理
+function getPhraseStats() {
+  try { return JSON.parse(localStorage.getItem('phrase_stats') || '{}'); } catch(e) { return {}; }
+}
+
+function savePhraseStats(stats) {
+  try { localStorage.setItem('phrase_stats', JSON.stringify(stats)); } catch(e) {}
+}
+
+function markPhraseKnown(ph) {
+  const stats = getPhraseStats();
+  const key = ph.en;
+  if(!stats[key]) stats[key] = {};
+  stats[key].status = 'known';
+  stats[key].lastReview = today();
+  savePhraseStats(stats);
+  // 如果在待复习列表中，移除它
+  if(currentPhraseCat === 'review') {
+    let reviewList = getReviewPhrases();
+    reviewList = reviewList.filter(p => p.en !== ph.en);
+    localStorage.setItem('phrase_review', JSON.stringify(reviewList));
+  }
+  toast('✅ 已标记掌握');
+  nextPhrase();
+  if(currentPhraseCat === 'review') renderPhraseList();
+}
+
+function markPhraseUnknown(ph) {
+  const stats = getPhraseStats();
+  const key = ph.en;
+  if(!stats[key]) stats[key] = {};
+  stats[key].status = 'unknown';
+  stats[key].lastReview = today();
+  savePhraseStats(stats);
+  // 同时加入待复习列表
+  let reviewList = [];
+  try { reviewList = JSON.parse(localStorage.getItem('phrase_review') || '[]'); } catch(e) {}
+  if(!reviewList.find(p => p.en === ph.en)) {
+    reviewList.push({...ph, addedDate: today()});
+    localStorage.setItem('phrase_review', JSON.stringify(reviewList));
+  }
+  toast('📖 已移入待复习列表');
+  nextPhrase();
+}
+
+// 获取待复习短语（动态构建 PHRASES.review）
+function getReviewPhrases() {
+  try { return JSON.parse(localStorage.getItem('phrase_review') || '[]'); } catch(e) { return []; }
 }
 
 function prevPhrase() {
